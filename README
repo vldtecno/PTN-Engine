@@ -1,0 +1,10 @@
+The PTN Engine is a C++ library that implements (a subset of) Petri nets and embedds its logic in the integrating program.
+
+CMake v3.8 or greater is required to build the PTN Engine.
+
+For more information read the documentation in the Doc folder.
+
+PTN Engine is distributed under the Apache License, Version 2.0:
+http://www.apache.org/licenses/LICENSE-2.0 
+
+There is a copy of this license in the LICENSE file.

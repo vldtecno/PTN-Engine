@@ -1,0 +1,142 @@
+/*
+ * This file is part of PTN Engine
+ *
+ * Copyright (c) 2017 Eduardo Valgôde
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
+#include "PTN_Engine/Place.h"
+#include "PTN_Engine/PTN_Engine/Transition.h"
+#include "PTN_Engine/PTN_Exception.h"
+
+namespace ptne
+{
+	using namespace std;
+
+	PTN_EngineImp::PTN_EngineImp():
+		m_stop{false}
+	{}
+
+	PTN_EngineImp::~PTN_EngineImp()
+	{}
+
+	void PTN_EngineImp::createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<ConditionFunctorPtr>& additionalConditions)
+	{
+		std::vector<WeakPtrPlace> activationPlacesVector;
+		for(const auto& activationPlace : activationPlaces)
+		{
+			if(m_places.find(activationPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + activationPlace);
+			}
+			activationPlacesVector.push_back(m_places.at(activationPlace));
+		}
+
+		std::vector<WeakPtrPlace> destinationPlacesVector;
+		for(const auto& destinationPlace : destinationPlaces)
+		{
+			if(m_places.find(destinationPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + destinationPlace);
+			}
+			destinationPlacesVector.push_back(m_places.at(destinationPlace));
+		}
+
+		m_transitions.push_back(
+				Transition(activationPlacesVector, destinationPlacesVector, additionalConditions));
+	}
+
+	void PTN_EngineImp::execute()
+	{
+		m_stop = false;
+		bool transitionFired;
+
+		do
+		{
+			transitionFired = false;
+			for(Transition& transition : m_transitions)
+			{
+				transitionFired |= transition.execute();
+			}
+		} while(transitionFired && !m_stop);
+		clearInputPlaces();
+		m_stop = false;
+	}
+
+	void PTN_EngineImp::addPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			ActionFunctorPtr onEnterAction,
+			ActionFunctorPtr onExitAction,
+			const bool input)
+	{
+		if(m_places.find(name)!= m_places.end())
+		{
+			throw PTN_Exception("Trying to add an already existing place");
+		}
+
+		SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens,
+				onEnterAction,
+				onExitAction,
+				input);
+
+		m_places[name] = place;
+		if(place->isInputPlace())
+		{
+			m_inputPlaces.push_back(place);
+		}
+	}
+
+	void PTN_EngineImp::clearInputPlaces()
+	{
+		for( WeakPtrPlace& place : m_inputPlaces)
+		{
+			if(SharedPtrPlace spPlace = place.lock())
+			{
+				spPlace->setNumberOfTokens(0);
+			}
+			else
+			{
+				throw PTN_Exception("Could not access place.");
+			}
+		}
+	}
+
+	size_t PTN_EngineImp::getNumberOfTokens(const std::string& place) const
+	{
+		if(m_places.find(place) == m_places.end())
+		{
+			throw PTN_Exception("Invalid place " + place);
+		}
+		return m_places.at(place)->getNumberOfTokens();
+	}
+
+	void PTN_EngineImp::incrementInputPlace(const std::string& place)
+	{
+		if(m_places.find(place) == m_places.end())
+		{
+			throw PTN_Exception("Invalid place " + place);
+		}
+		if(!m_places.at(place)->isInputPlace())
+		{
+			throw PTN_Exception(place + " is not an input place");
+		}
+		m_places.at(place)->increaseNumberOfTokens(1);
+	}
+
+}
