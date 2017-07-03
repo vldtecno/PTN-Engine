@@ -43,7 +43,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/PTN_Engine/include)
 
-option(BUILD_UTEST "Builds the unit tests" OFF)
+option(BUILD_TESTS "Builds the unit tests" OFF)
 option(BUILD_SAMPLES "Builds the samples" OFF)
 
 #Projects
