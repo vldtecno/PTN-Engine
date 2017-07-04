@@ -18,15 +18,15 @@
 
 #pragma once
 
+#include "../../../Examples/PhoneMenu/Model/Call.h"
+#include "../../../Examples/PhoneMenu/Model/List.h"
+#include "../../../Examples/PhoneMenu/Model/Message.h"
+#include "../../../Examples/PhoneMenu/View/CallLogView.h"
+#include "../../../Examples/PhoneMenu/View/MainMenuView.h"
+#include "../../../Examples/PhoneMenu/View/MessagesMenuView.h"
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
-#include "Model/List.h"
-#include "Model/Call.h"
-#include "Model/Message.h"
-
 #include "View/MainMenuView.h"
-#include "View/MessagesMenuView.h"
-#include "View/CallLogView.h"
 
 
 //! Example of a controller class
@@ -159,4 +159,4 @@ template class ptne::ActivationCondition<Controller>;
 //!
 using ControllerFireCondition = ptne::ActivationCondition<Controller>;
 
-#include "Controller/MenuStateMachine.h"
+#include "../../../Examples/PhoneMenu/Controller/MenuStateMachine.h"

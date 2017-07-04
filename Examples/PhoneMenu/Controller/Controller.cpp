@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
+#include "../../../Examples/PhoneMenu/Controller/Controller.h"
+
 #include <iostream>
-#include "Controller/Controller.h"
 
 using namespace std;
 

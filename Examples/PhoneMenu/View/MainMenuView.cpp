@@ -16,33 +16,53 @@
  * limitations under the License.
  */
 
-#include "View/MessagesMenuView.h"
+#include "../../../Examples/PhoneMenu/View/MainMenuView.h"
+
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
-void MessagesMenuView::showMessagesList(const MessageList& messageList, const int selectedMessage)
+MainMenuView::MainMenuView():
+	m_selection(0)
 {
-	for(size_t i = 0 ; i < messageList.size(); ++i)
+
+}
+
+MainMenuView::~MainMenuView()
+{
+
+}
+
+void MainMenuView::showMenu() const
+{
+	cout << "OPTIONS:" << endl;
+	cout << "\tCall Log" << endl;
+	cout << "\tMessages" << endl << endl;
+	cout << "SELECTED: ";
+	switch(m_selection)
 	{
-		if(i == selectedMessage)
-		{
-			cout << "=>";
-		}
-		else
-		{
-			cout << "  ";
-		}
-		cout << i << " - " << messageList.getItem(i).m_title << endl;
+	default:
+		throw runtime_error("Undefined");
+	case 0:
+		cout << "Call Log" << endl;
+		break;
+	case 1:
+		cout << "Messages" << endl;
+		break;
 	}
 }
 
-void MessagesMenuView::displayMessage(const Message& message)
+void MainMenuView::select(const int option)
 {
-	cout << "TITLE:" << endl;
-	cout << message.m_title << endl<<endl;
+	switch(option)
+	{
+	default:
+		throw runtime_error("Invalid option");
+	case 0:
+		m_selection = 0; break;
+	case 1:
+		m_selection = 1; break;
+	}
 
-	cout << "MESSAGE:" << endl;
-	cout << message.m_body << endl<<endl;
 }
-

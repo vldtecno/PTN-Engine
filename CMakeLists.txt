@@ -44,7 +44,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/PTN_Engine/include)
 
 option(BUILD_TESTS "Builds the unit tests" OFF)
-option(BUILD_SAMPLES "Builds the samples" OFF)
+option(BUILD_EXAMPLES "Builds the examples" OFF)
 
 #Projects
 add_subdirectory(PTN_Engine)
@@ -54,7 +54,7 @@ add_subdirectory(Tests/WhiteBoxTests)
 add_subdirectory(Tests/BlackBoxTests)
 endif(BUILD_TESTS)
 
-if(BUILD_SAMPLES)
-add_subdirectory(Samples)
-endif(BUILD_SAMPLES)
+if(BUILD_EXAMPLES)
+add_subdirectory(Examples)
+endif(BUILD_EXAMPLES)
 

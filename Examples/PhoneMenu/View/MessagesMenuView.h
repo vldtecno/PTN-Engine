@@ -18,20 +18,31 @@
 
 #pragma once
 
-#include "Model/Call.h"
-#include "Model/List.h"
+#include <string>
 
-//! View the call logs
-class CallLogView
+#include "../../../Examples/PhoneMenu/Model/List.h"
+#include "../../../Examples/PhoneMenu/Model/Message.h"
+
+//! View of the messages menu.
+class MessagesMenuView
 {
 public:
 
-	CallLogView() = default;
+	using MessageList = List<Message>;
+
+	MessagesMenuView() = default;
 
 	/*!
-	 * Print the call logs on screen.
-	 * \param callLog List of calls.
+	 * Show the message list on screen.
+	 * \param messageList List of messages.
+	 * \param selectedMessage Selected message from the list.
 	 */
-	void viewCallLog(const List<Call>& callLog);
+	void showMessagesList(const MessageList& messageList, const int selectedMessage);
+
+	/*!
+	 * Print the selected message on screen.
+	 * \param message Message to be displayed.
+	 */
+	void displayMessage(const Message& message);
 
 };

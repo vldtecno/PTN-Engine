@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "Controller/Controller.h"
-#include "Controller/IControllerPetriNet.h"
+#include "../../../Examples/PhoneMenu/Controller/Controller.h"
+#include "../../../Examples/PhoneMenu/Controller/IControllerPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 
 //! Implements PTN Engine net defining the phone menu behaviour.
