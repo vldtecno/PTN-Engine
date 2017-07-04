@@ -1,11 +1,13 @@
 # PTN Engine Release Notes
 
+## version 1.1.0 - yyyy-mm-dd
 
-## version 1.0.1 - 2107-07-03
+ - New feature 1... 
+
+### v1.0.0 bug fixes
+
+- Corrected failing test. An exception must be thrown if there is an attempt
+ to exit a place with not enough tokens to do it.
 
 - Corrected bug in CMake script that prevented the tests makefiles from being
 generated.
-
-## version 1.0.0 - 2017-07-03
-
-It begins!
