@@ -16,24 +16,17 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "../../../Examples/PhoneMenu/View/CallLogView.h"
 
-#include "Controller/MenuStateMachine.h"
+#include <iostream>
 
-//!Base class for a PTN Engine net that controls the Controller.
-class Controller::IControllerPetriNet
+using namespace std;
+
+void CallLogView::viewCallLog(const List<Call>& callLog)
 {
-public:
-
-	virtual ~IControllerPetriNet(){}
-
-	//! Press A key event.
-	virtual void pressA() = 0;
-
-	//! Press B key event.
-	virtual void pressB() = 0;
-
-	//! Press C key event.
-	virtual void pressC() = 0;
-
-};
+	for(size_t i = 0 ; i < callLog.size(); ++i)
+	{
+		const Call& call = callLog.getItem(i);
+		cout << call.m_date << " - " << call.m_number << endl;
+	}
+}

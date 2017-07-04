@@ -102,7 +102,7 @@ should be created as shared pointers and passed to the engine (addPlace).
 Transitions should be created also in the constructor of the class inheriting
 from PTN_Engine.
 
-For more information on how to do this please read the code of the samples.
+For more information on how to do this please read the code of the examples.
 
 ##### Place
 This class defines a place in a Petri net. Additionally function pointers can be
@@ -133,8 +133,8 @@ Collection of tests that access the internals of the *PTN Engine*.
 Collection of tests that can only access the public interface of the
 *PTN Engine*.
 
-#### Samples
-Collection of samples using the *PTN Engine*.
+#### Examples
+Collection of examples using the *PTN Engine*.
 
 ## Performance
 In this version performance was not yet evaluated. This point should be
@@ -201,7 +201,7 @@ of:
  * Test Reports - TODO
  * Benchmarks - TODO
 
-Additionally the samples also provide valuable insight in how to use the *PTN
+Additionally the examples also provide valuable insight in how to use the *PTN
 Engine*.
 
 ### Specification
@@ -211,7 +211,7 @@ The current document is the *PTN Engine* specification. It describes what the
 ### Code Documentation
 The code is commented according to the Doxygen format and doxyfiles are also
 provided at Doc/Doxygen/. There are two configurations for the documentation
-generation. One including everything (*PTN Engine*, tests and samples) and
+generation. One including everything (*PTN Engine*, tests and examples) and
 another only for the *PTN Engine* itself.
 
 Doxygen can be used to generate this part of the documentation.

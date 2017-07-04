@@ -16,16 +16,22 @@
  * limitations under the License.
  */
 
-#include "View/CallLogView.h"
-#include <iostream>
+#pragma once
 
-using namespace std;
+#include "../../../Examples/PhoneMenu/Model/Call.h"
+#include "../../../Examples/PhoneMenu/Model/List.h"
 
-void CallLogView::viewCallLog(const List<Call>& callLog)
+//! View the call logs
+class CallLogView
 {
-	for(size_t i = 0 ; i < callLog.size(); ++i)
-	{
-		const Call& call = callLog.getItem(i);
-		cout << call.m_date << " - " << call.m_number << endl;
-	}
-}
+public:
+
+	CallLogView() = default;
+
+	/*!
+	 * Print the call logs on screen.
+	 * \param callLog List of calls.
+	 */
+	void viewCallLog(const List<Call>& callLog);
+
+};

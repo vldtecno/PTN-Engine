@@ -20,7 +20,7 @@ set(PROJECT_TEST_NAME PhoneMenu)
 
 include_directories(
 	   ${INCLUDE_DIR}
-	   ${PROJECT_SOURCE_DIR}/Samples/PhoneMenu 
+	   ${PROJECT_SOURCE_DIR}/Examples/PhoneMenu 
 	)	
 
 file( GLOB_RECURSE PhoneMenu_SRC

@@ -4,7 +4,7 @@
 
 This is a step by step guide of how to integrate the *PTN Engine* in your program.
 
-For further details you can read the code of the sample's included in this
+For further details you can read the code of the examples included in this
 distribution.
 
 ### 1. Build the *PTN Engine*

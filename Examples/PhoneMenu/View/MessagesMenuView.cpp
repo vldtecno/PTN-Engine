@@ -16,32 +16,34 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "../../../Examples/PhoneMenu/View/MessagesMenuView.h"
 
-#include <string>
-#include "Model/List.h"
-#include "Model/Message.h"
+#include <iostream>
 
-//! View of the messages menu.
-class MessagesMenuView
+using namespace std;
+
+void MessagesMenuView::showMessagesList(const MessageList& messageList, const int selectedMessage)
 {
-public:
+	for(size_t i = 0 ; i < messageList.size(); ++i)
+	{
+		if(i == selectedMessage)
+		{
+			cout << "=>";
+		}
+		else
+		{
+			cout << "  ";
+		}
+		cout << i << " - " << messageList.getItem(i).m_title << endl;
+	}
+}
 
-	using MessageList = List<Message>;
+void MessagesMenuView::displayMessage(const Message& message)
+{
+	cout << "TITLE:" << endl;
+	cout << message.m_title << endl<<endl;
 
-	MessagesMenuView() = default;
+	cout << "MESSAGE:" << endl;
+	cout << message.m_body << endl<<endl;
+}
 
-	/*!
-	 * Show the message list on screen.
-	 * \param messageList List of messages.
-	 * \param selectedMessage Selected message from the list.
-	 */
-	void showMessagesList(const MessageList& messageList, const int selectedMessage);
-
-	/*!
-	 * Print the selected message on screen.
-	 * \param message Message to be displayed.
-	 */
-	void displayMessage(const Message& message);
-
-};
