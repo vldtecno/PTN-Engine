@@ -50,8 +50,8 @@ option(BUILD_SAMPLES "Builds the samples" OFF)
 add_subdirectory(PTN_Engine)
 
 if(BUILD_TESTS)
-add_subdirectory(WhiteBoxTests)
-add_subdirectory(BlackBoxTests)
+add_subdirectory(Tests/WhiteBoxTests)
+add_subdirectory(Tests/BlackBoxTests)
 endif(BUILD_TESTS)
 
 if(BUILD_SAMPLES)

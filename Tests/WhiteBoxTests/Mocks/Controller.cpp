@@ -16,42 +16,43 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
+#include "Mocks/Controller.h"
 
-#include "WhiteBoxTests/Fixtures/FixtureTestPlace.h"
-
-
-TEST_F(FixtureTestPlace, InputPlace)
+Controller::Controller():
+	m_enterCounter{0},
+	m_exitCounter{0},
+	m_canFire{true}
 {
-	inputPlace();
+
 }
 
-TEST_F(FixtureTestPlace, EnterPlaceDefault)
+void Controller::onEnter()
 {
-	enterPlace();
+	++m_enterCounter;
 }
 
-TEST_F(FixtureTestPlace, ExitPlaceDefault)
+void Controller::onExit()
 {
-	enterPlace();
-	exitPlace();
-	exitPlace();
+	++m_exitCounter;
 }
 
-TEST_F(FixtureTestPlace, EnterPlace)
+size_t Controller::getEnterCounter() const
 {
-	//TODO testar max int
-	enterPlace(1);
-	enterPlace(2);
-	enterPlace(3);
+	return m_enterCounter;
 }
 
-TEST_F(FixtureTestPlace, ExitPlace)
+size_t Controller::getExitCounter() const
 {
-	//TODO testar max int
-	enterPlace(4);
-	exitPlace(1);
-	exitPlace(2);
-	exitPlace(3);
+	return m_exitCounter;
+}
+
+bool Controller::activationCondition() const
+{
+	return m_canFire;
+}
+
+void Controller::setFireCondition(const bool canFire)
+{
+	m_canFire = canFire;
 }
 

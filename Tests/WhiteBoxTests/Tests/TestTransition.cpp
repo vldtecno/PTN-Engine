@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "WhiteBoxTests/Fixtures/FixtureTestTransition.h"
+#include "Fixtures/FixtureTestTransition.h"
 
 TEST_F(FixtureTestTransition, T1)
 {
