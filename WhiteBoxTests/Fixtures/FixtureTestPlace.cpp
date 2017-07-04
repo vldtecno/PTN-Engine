@@ -52,13 +52,18 @@ void FixtureTestPlace::exitPlace()
 	{
 		expectedNumberOfTokens = expectedNumberOfTokens-1;
 		expectedExitCounter = exitCounter+1;
+
+		m_place.exitPlace();
 	}
-
-	m_place.exitPlace();
-
+	else
+	{
+		ASSERT_THROW(m_place.exitPlace(), PTN_Exception);
+	}
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
 	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
+
+
 }
 
 void FixtureTestPlace::enterPlace(const size_t tokens)
@@ -84,9 +89,13 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 	{
 		expectedNumberOfTokens = expectedNumberOfTokens-tokens;
 		expectedExitCounter = exitCounter+1;
-	}
 
-	m_place.exitPlace(tokens);
+		m_place.exitPlace(tokens);
+	}
+	else
+	{
+		ASSERT_THROW(m_place.exitPlace(tokens), PTN_Exception);
+	}
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
 	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
