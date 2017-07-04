@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "WhiteBoxTests/Fixtures/FixtureTestTransition.h"
+#include "Fixtures/FixtureTestTransition.h"
 
 using namespace ptne;
 

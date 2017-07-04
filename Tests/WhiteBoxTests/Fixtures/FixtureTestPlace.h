@@ -20,8 +20,8 @@
 
 #include "gtest/gtest.h"
 
-#include "WhiteBoxTests/Mocks/Controller.h"
-#include "PTN_Engine/PTN_Engine/Place.h"
+#include "Mocks/Controller.h"
+#include "PTN_Engine/Place.h"
 
 
 //! Fixture to test places.

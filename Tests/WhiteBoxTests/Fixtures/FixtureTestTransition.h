@@ -20,9 +20,9 @@
 
 #include "gtest/gtest.h"
 #include "PTN_Engine/Place.h"
-#include "PTN_Engine/PTN_Engine/Transition.h"
+#include "PTN_Engine/Transition.h"
 #include <memory>
-#include "WhiteBoxTests/Mocks/Controller.h"
+#include "Mocks/Controller.h"
 
 //! Fixture to test transitions.
 class FixtureTestTransition: public ::testing::Test

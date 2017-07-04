@@ -26,7 +26,8 @@ set(PROJECT_TEST_NAME &{PROJECT_NAME_STR}_test)
 
 include_directories(
 		${INCLUDE_DIR}
-		${PROJECT_SOURCE_DIR} 
+		${PROJECT_SOURCE_DIR}/Tests/WhiteBoxTests 
+		${PROJECT_SOURCE_DIR}/PTN_Engine
 		${GOOGLE_TEST_INCLUDE_DIR}
 	)
 

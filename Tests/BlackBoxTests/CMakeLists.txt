@@ -24,7 +24,7 @@ set(PROJECT_TEST_NAME &{PROJECT_NAME_STR}_test)
 
 include_directories(
 	   ${INCLUDE_DIR}
-	   ${PROJECT_SOURCE_DIR}/BlackBoxTests 
+	   ${PROJECT_SOURCE_DIR}/Tests/BlackBoxTests 
 	   ${GOOGLE_TEST_INCLUDE_DIR}
 	)	
 
