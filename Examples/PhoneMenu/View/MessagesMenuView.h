@@ -20,8 +20,8 @@
 
 #include <string>
 
-#include "../../../Examples/PhoneMenu/Model/List.h"
-#include "../../../Examples/PhoneMenu/Model/Message.h"
+#include "Model/List.h"
+#include "Model/Message.h"
 
 //! View of the messages menu.
 class MessagesMenuView
