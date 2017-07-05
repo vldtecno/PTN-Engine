@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../../../Examples/PhoneMenu/Controller/Controller.h"
+#include "Controller/Controller.h"
 
 #include <iostream>
 
@@ -63,7 +63,6 @@ void Controller::initialize()
 		return;
 	}
 
-	using namespace std;
 	m_pPetriNet = move(
 		PtrPetriNet(new MenuStateMachine(shared_from_this()))
 		);
@@ -71,7 +70,7 @@ void Controller::initialize()
 
 void Controller::showMainMenu()
 {
-	if(std::shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
+	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
 	{
 		mainMenu->showMenu();
 	}
@@ -79,7 +78,7 @@ void Controller::showMainMenu()
 
 void Controller::selectCallsOption()
 {
-	if(std::shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
+	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
 	{
 		mainMenu->select(0);
 	}
@@ -87,7 +86,7 @@ void Controller::selectCallsOption()
 
 void Controller::selectMessagesOption()
 {
-	if(std::shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
+	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
 	{
 		mainMenu->select(1);
 	}
@@ -95,9 +94,9 @@ void Controller::selectMessagesOption()
 
 void Controller::showCallsMenu()
 {
-	if(std::shared_ptr<CallList> callLog = m_callLog.lock())
+	if(shared_ptr<CallList> callLog = m_callLog.lock())
 	{
-		if(std::shared_ptr<CallLogView> callLogView = m_callLogView.lock())
+		if(shared_ptr<CallLogView> callLogView = m_callLogView.lock())
 		{
 			callLogView->viewCallLog(*callLog);
 		}
@@ -106,9 +105,9 @@ void Controller::showCallsMenu()
 
 void Controller::showMessageMenu()
 {
-	if(std::shared_ptr<MessageList> messageList = m_messageList.lock())
+	if(shared_ptr<MessageList> messageList = m_messageList.lock())
 	{
-		if(std::shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
+		if(shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
 		{
 			messagesMenu->showMessagesList(*messageList, m_messageSelected);
 		}
@@ -117,7 +116,7 @@ void Controller::showMessageMenu()
 
 void Controller::selectNextMessage()
 {
-	if(std::shared_ptr<MessageList> messageList = m_messageList.lock())
+	if(shared_ptr<MessageList> messageList = m_messageList.lock())
 	{
 		++m_messageSelected;
 		if(m_messageSelected == messageList->size())
@@ -129,36 +128,36 @@ void Controller::selectNextMessage()
 
 void Controller::showMessage()
 {
-	if(std::shared_ptr<MessageList> messageList = m_messageList.lock())
+	if(shared_ptr<MessageList> messageList = m_messageList.lock())
 	{
-		if(std::shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
+		if(shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
 		{
 			messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
 		}
 	}
 }
 
-void Controller::setMessageList(std::shared_ptr<MessageList> messageList)
+void Controller::setMessageList(shared_ptr<MessageList> messageList)
 {
 	m_messageList = messageList;
 }
 
-void Controller::setCallLogView(std::shared_ptr<CallLogView> callLogView)
+void Controller::setCallLogView(shared_ptr<CallLogView> callLogView)
 {
 	m_callLogView = callLogView;
 }
 
-void Controller::setMainMenuView(std::shared_ptr<MainMenuView> mainMenu)
+void Controller::setMainMenuView(shared_ptr<MainMenuView> mainMenu)
 {
 	m_mainMenu = mainMenu;
 }
 
-void Controller::setMessagesMenuView(std::shared_ptr<MessagesMenuView> messagesMenu)
+void Controller::setMessagesMenuView(shared_ptr<MessagesMenuView> messagesMenu)
 {
 	m_messagesMenu = messagesMenu;
 }
 
-void Controller::setCallLog(std::shared_ptr<CallList> callLog)
+void Controller::setCallLog(shared_ptr<CallList> callLog)
 {
 	m_callLog = callLog;
 }

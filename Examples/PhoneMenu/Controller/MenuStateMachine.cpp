@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../../../Examples/PhoneMenu/Controller/MenuStateMachine.h"
+#include "Controller/MenuStateMachine.h"
 
 #include "PTN_Engine/Place.h"
 
