@@ -1,0 +1,27 @@
+# Build matrix / environment variable are explained on:
+# http://about.travis-ci.org/docs/user/build-configuration/
+# This file can be validated on:
+# http://lint.travis-ci.org/
+
+addons:
+  apt:
+    # List of whitelisted in travis packages for ubuntu-precise can be found here:
+    #   https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
+    # List of whitelisted in travis apt-sources:
+    #   https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.9
+    - g++-4.9
+    #- valgrind
+	- cmake
+os:
+  - linux
+language: cpp
+compiler:
+  - gcc
+script: ./travis.sh
+notifications:
+  email: false
+sudo: false
