@@ -38,6 +38,8 @@ install:
   
 compiler:
   - gcc
+
+sudo: required
 script:
   # Link gcc-4.9 and g++-4.9 to their standard commands
   - ln -s /usr/bin/gcc-4.9 /usr/local/bin/gcc
@@ -55,4 +57,3 @@ script:
   - make
 notifications:
   email: false
-sudo: false
