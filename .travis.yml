@@ -15,7 +15,7 @@ addons:
     - gcc-4.9
     - g++-4.9
     #- valgrind
-    - cmake
+    - cmake-3.8
 os:
   - linux
 language: cpp
