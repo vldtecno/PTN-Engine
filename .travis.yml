@@ -9,9 +9,9 @@ addons:
     #   https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
     # List of whitelisted in travis apt-sources:
     #   https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
-    sources:
+  sources:
     - ubuntu-toolchain-r-test
-    packages:
+  packages:
     - gcc-4.9
     - g++-4.9
     #- valgrind
@@ -21,7 +21,12 @@ os:
 language: cpp
 compiler:
   - gcc
-script: ./travis.sh
+script:
+  - mkdir build || true
+  - cd build/
+  - cd build/
+  - cmake -Dbuild_examples=ON -Dbuild_tests=OFF -Dgoogle_test_build_dir="" -Dgoogle_test_include_dir="" 
+  - make
 notifications:
   email: false
 sudo: false
