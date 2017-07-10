@@ -42,7 +42,7 @@ script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build || true
   - cd build/
-  - cmake -Dbuild_examples=ON -Dbuild_tests=OFF -Dgoogle_test_build_dir="" -Dgoogle_test_include_dir="" ..  
+  - cmake -DBUILD_EXAMPLES=ON -DBUILD_TESTS=OFF -DGOOGLE_TEST_BUILD_DIR="" -DGOOGLE_TEST_INCLUDE_DIR="" ..  
   - make
 notifications:
   email: false
