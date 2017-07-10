@@ -9,12 +9,12 @@ addons:
     #   https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
     # List of whitelisted in travis apt-sources:
     #   https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
-  sources:
-    - ubuntu-toolchain-r-test
-  packages:
-    - gcc-4.9
-    - g++-4.9
-    #- valgrind
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.9
+      - g++-4.9
+      #- valgrind
 os:
   - linux
 language: cpp
@@ -39,6 +39,15 @@ install:
 compiler:
   - gcc
 script:
+  # Link gcc-4.9 and g++-4.9 to their standard commands
+  - ln -s /usr/bin/gcc-4.9 /usr/local/bin/gcc
+  - ln -s /usr/bin/g++-4.9 /usr/local/bin/g++
+  # Export CC and CXX to tell cmake which compiler to use
+  - export CC=/usr/bin/gcc-4.9
+  - export CXX=/usr/bin/g++-4.9
+  # Check versions of gcc, g++ and cmake
+  - gcc -v && g++ -v && cmake --version
+  # Go to the travis build dir
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir build || true
   - cd build/
