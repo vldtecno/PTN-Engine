@@ -55,7 +55,7 @@ namespace ptne
 
 	void Place::increaseNumberOfTokens(const size_t tokens)
 	{
-		if(tokens <= 0)
+		if(tokens == 0)
 		{
 			throw PTN_Exception("Number of tokens must greater than 0");
 		}
@@ -64,7 +64,7 @@ namespace ptne
 
 	void Place::decreaseNumberOfTokens(const size_t tokens)
 	{
-		if(tokens <= 0)
+		if(tokens == 0)
 		{
 			throw PTN_Exception("Number of tokens must greater than 0");
 		}
