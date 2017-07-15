@@ -1,3 +1,9 @@
 # CodeDocs.xyz Configuration File
 
-DOXYFILE = Doc/Doxygen/PTN_Engine.doxy
+# Include the Doxygen configuration from another file.
+# The file must be a relative path with respect to the root of the repository.
+# If any of the options in this doxyfile include a path (ie, INPUT), these
+# paths will be considered relative to the root of the repository, not the
+# location of the DOXYFILE.
+
+DOXYFILE = Doc/Doxygen/Codedocs.doxy
