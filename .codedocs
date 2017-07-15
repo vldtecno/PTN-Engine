@@ -1,0 +1,10 @@
+# CodeDocs.xyz Configuration File
+
+DOXYFILE = Doc/Doxygen/FullDocumentation.doxy
+
+PROJECT_NUMBER         =
+PROJECT_LOGO           = 
+INPUT                  = 
+STRIP_FROM_PATH        = 
+HTML_FOOTER            =
+SEARCHENGINE = YES
