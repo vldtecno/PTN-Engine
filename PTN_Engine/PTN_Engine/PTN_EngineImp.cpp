@@ -20,6 +20,7 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include <algorithm>
 
 namespace ptne
 {
@@ -68,15 +69,34 @@ namespace ptne
 
 		do
 		{
+			vector<unique_ptr<Transition>> activeTransitions(move(
+					collectActiveTransitionsRandomly()));
+
 			transitionFired = false;
-			for(Transition& transition : m_transitions)
+			for(unique_ptr<Transition>& transition : activeTransitions)
 			{
-				transitionFired |= transition.execute();
+				transitionFired |= transition->execute();
 			}
 		} while(transitionFired && !m_stop);
+
 		clearInputPlaces();
 		m_stop = false;
 	}
+
+	vector<unique_ptr<Transition>> PTN_EngineImp::collectActiveTransitionsRandomly()
+	{
+		vector<unique_ptr<Transition>> activeTransitions;
+		for(Transition& transition : m_transitions)
+		{
+			if(transition.isActive())
+			{
+				activeTransitions.push_back(unique_ptr<Transition>(&transition));
+			}
+		}
+		random_shuffle(activeTransitions.begin(), activeTransitions.end());
+		return activeTransitions;
+	}
+
 
 	void PTN_EngineImp::addPlace(
 			const std::string& name,
