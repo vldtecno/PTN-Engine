@@ -102,7 +102,7 @@ namespace ptne
 		 * Collects and randomizes the order of all active transitions.
 		 * \return Vector of unique pointers to active transitions.
 		 */
-		std::vector<std::unique_ptr<Transition>> collectActiveTransitionsRandomly();
+		std::vector<Transition*> collectActiveTransitionsRandomly();
 
 		//! Vector with the transitions.
 		/*!
