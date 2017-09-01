@@ -60,13 +60,13 @@ namespace ptne
 		 */
 		bool execute();
 
-	private:
-
 		/*!
 		 * Evaluates if the transition can be fired.
 		 * \return True if can be fired, false if it cannot.
 		 */
 		bool isActive() const;
+
+	private:
 
 		/*!
 		 * Checks if all activation places have enough tokens.

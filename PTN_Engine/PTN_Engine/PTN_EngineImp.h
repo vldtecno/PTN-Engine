@@ -98,6 +98,12 @@ namespace ptne
 		 */
 		void clearInputPlaces();
 
+		/*!
+		 * Collects and randomizes the order of all active transitions.
+		 * \return Vector of unique pointers to active transitions.
+		 */
+		std::vector<std::unique_ptr<Transition>> collectActiveTransitionsRandomly();
+
 		//! Vector with the transitions.
 		/*!
 		 * Insertions on construction. Otherwise (should remain) unchanged.
