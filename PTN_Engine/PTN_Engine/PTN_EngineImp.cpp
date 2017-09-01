@@ -69,11 +69,11 @@ namespace ptne
 
 		do
 		{
-			vector<unique_ptr<Transition>> activeTransitions(move(
+			vector<Transition*> activeTransitions(move(
 					collectActiveTransitionsRandomly()));
 
 			transitionFired = false;
-			for(unique_ptr<Transition>& transition : activeTransitions)
+			for(Transition* transition : activeTransitions)
 			{
 				transitionFired |= transition->execute();
 			}
@@ -83,14 +83,14 @@ namespace ptne
 		m_stop = false;
 	}
 
-	vector<unique_ptr<Transition>> PTN_EngineImp::collectActiveTransitionsRandomly()
+	vector<Transition*> PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
-		vector<unique_ptr<Transition>> activeTransitions;
+		vector<Transition*> activeTransitions;
 		for(Transition& transition : m_transitions)
 		{
 			if(transition.isActive())
 			{
-				activeTransitions.push_back(unique_ptr<Transition>(&transition));
+				activeTransitions.push_back(&transition);
 			}
 		}
 		random_shuffle(activeTransitions.begin(), activeTransitions.end());
