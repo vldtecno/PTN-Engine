@@ -20,6 +20,7 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include <algorithm>
 
 namespace ptne
 {
@@ -33,11 +34,11 @@ namespace ptne
 	{}
 
 	void PTN_EngineImp::createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions)
+			const vector<string>& activationPlaces,
+			const vector<string>& destinationPlaces,
+			const vector<ConditionFunctorPtr>& additionalConditions)
 	{
-		std::vector<WeakPtrPlace> activationPlacesVector;
+		vector<WeakPtrPlace> activationPlacesVector;
 		for(const auto& activationPlace : activationPlaces)
 		{
 			if(m_places.find(activationPlace) == m_places.end())
@@ -47,7 +48,7 @@ namespace ptne
 			activationPlacesVector.push_back(m_places.at(activationPlace));
 		}
 
-		std::vector<WeakPtrPlace> destinationPlacesVector;
+		vector<WeakPtrPlace> destinationPlacesVector;
 		for(const auto& destinationPlace : destinationPlaces)
 		{
 			if(m_places.find(destinationPlace) == m_places.end())
@@ -68,18 +69,41 @@ namespace ptne
 
 		do
 		{
+			//Safe to use raw pointers here. Nothing justifies deleting a
+			// transition from m_transitions, so there should never be an
+			// invalid pointer. At this moment this is single threaded, so
+			// synchronization problems are not an issue.
+			vector<Transition*> activeTransitions(move(
+					collectActiveTransitionsRandomly()));
+
 			transitionFired = false;
-			for(Transition& transition : m_transitions)
+			for(Transition* transition : activeTransitions)
 			{
-				transitionFired |= transition.execute();
+				transitionFired |= transition->execute();
 			}
 		} while(transitionFired && !m_stop);
+
 		clearInputPlaces();
 		m_stop = false;
 	}
 
+	vector<Transition*> PTN_EngineImp::collectActiveTransitionsRandomly()
+	{
+		vector<Transition*> activeTransitions;
+		for(Transition& transition : m_transitions)
+		{
+			if(transition.isActive())
+			{
+				activeTransitions.push_back(&transition);
+			}
+		}
+		random_shuffle(activeTransitions.begin(), activeTransitions.end());
+		return activeTransitions;
+	}
+
+
 	void PTN_EngineImp::addPlace(
-			const std::string& name,
+			const string& name,
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
 			ActionFunctorPtr onExitAction,
@@ -117,7 +141,7 @@ namespace ptne
 		}
 	}
 
-	size_t PTN_EngineImp::getNumberOfTokens(const std::string& place) const
+	size_t PTN_EngineImp::getNumberOfTokens(const string& place) const
 	{
 		if(m_places.find(place) == m_places.end())
 		{
@@ -126,7 +150,7 @@ namespace ptne
 		return m_places.at(place)->getNumberOfTokens();
 	}
 
-	void PTN_EngineImp::incrementInputPlace(const std::string& place)
+	void PTN_EngineImp::incrementInputPlace(const string& place)
 	{
 		if(m_places.find(place) == m_places.end())
 		{

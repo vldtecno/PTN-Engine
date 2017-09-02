@@ -42,10 +42,7 @@ void Dispatcher::initialize()
 		return;
 	}
 
-	using namespace std;
-	m_pPetriNet = move(
-		PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this()))
-		);
+	setRoundRobinMode();
 }
 
 Dispatcher::~Dispatcher()
@@ -117,4 +114,18 @@ void Dispatcher::dispatch()
 	{
 		m_pPetriNet->dispatch();
 	}
+}
+
+void Dispatcher::setRoundRobinMode()
+{
+	m_pPetriNet = move(
+		PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this()))
+		);
+}
+
+void Dispatcher::setFreeChoiceMode()
+{
+	m_pPetriNet = move(
+			PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this()))
+		);
 }
