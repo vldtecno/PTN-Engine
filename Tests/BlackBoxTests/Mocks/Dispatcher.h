@@ -38,8 +38,11 @@ private:
 	//! Interface for Petri nets controlling the logic of this dispatcher
 	class IDispatcherPetriNet;
 
-	//! Concrete Petri net controlling this dispatcher
+	//! Alternately uses channel a and b to dispatch packages.
 	class RoundRobinPetriNet;
+
+	//! Randomly choses a channel to dispatch a package.
+	class FreeChoicePetriNet;
 
 	//! For testing purposes only
 	friend class FixturePetriNet;
@@ -50,7 +53,7 @@ private:
 	//! Action to be performed when using channel A.
 	void actionChannelA();
 
-	//! Action to ber performed when using channel B.
+	//! Action to be performed when using channel B.
 	void actionChannelB();
 
 	//! Action to be performed when channel A is selected.
@@ -81,6 +84,7 @@ private:
 	bool resetCounter() const;
 
 	using PtrRoundRobinPetriNet = std::unique_ptr<RoundRobinPetriNet>;
+	using PtrFreeChoicePetriNet = std::unique_ptr<FreeChoicePetriNet>;
 
 	//! Petri net that defines and controls the dispatcher business logic.
 	std::unique_ptr<IDispatcherPetriNet> m_pPetriNet;
@@ -125,6 +129,10 @@ public:
 	//! Flag that indicates channel B is selected.
 	bool m_isChannelBSelected;
 
+	void setRoundRobinMode();
+
+	void setFreeChoiceMode();
+
 };
 
 template class ptne::Action<Dispatcher>;
@@ -133,4 +141,5 @@ using DispatcherAction = ptne::Action<Dispatcher>;
 template class ptne::ActivationCondition<Dispatcher>;
 using DispatcherFireCondition = ptne::ActivationCondition<Dispatcher>;
 
-#include "../../BlackBoxTests/Mocks/RoundRobinPetriNet.h"
+#include "Mocks/RoundRobinPetriNet.h"
+#include "Mocks/FreeChoicePetriNet.h"

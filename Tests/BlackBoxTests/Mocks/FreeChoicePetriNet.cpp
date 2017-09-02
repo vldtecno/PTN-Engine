@@ -16,17 +16,16 @@
  * limitations under the License.
  */
 
-#include "Mocks/RoundRobinPetriNet.h"
+#include "Mocks/FreeChoicePetriNet.h"
 #include "PTN_Engine/Place.h"
 
 
 using namespace ptne;
 using namespace std;
 
-Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDispatcher):
+Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDispatcher):
 	PTN_Engine{}
 {
-
 
 	//Places
 	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
@@ -39,17 +38,13 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
+	addPlace("CounterA", 0,	nullptr, nullptr);
+
 	addPlace("ChannelB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
 
-	addPlace("SelectA", 1,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectA),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelA));
-
-	addPlace("SelectB", 0,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectB),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelB));
+	addPlace("CounterB", 0,	nullptr, nullptr);
 
 	addPlace("PackageCounter", 0, nullptr, nullptr);
 
@@ -58,32 +53,33 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 
 	//Use A
 	createTransition(
-			{"InputWaitPackage", "WaitPackage", "SelectA"}, //activation
+			{"InputWaitPackage", "WaitPackage"}, //activation
 			{ "ChannelA", "PackageCounter"}, //destination
 			{} //additional conditions
 			);
 
 	//Use B
 	createTransition(
-			{"InputWaitPackage", "WaitPackage", "SelectB"}, //activation
+			{"InputWaitPackage", "WaitPackage"}, //activation
 			{"ChannelB", "PackageCounter"}, //destination
 			{} //additional conditions
 			);
 
-	//Switch to A
-	createTransition({"ChannelA"}, //activation
-			{"SelectB", "WaitPackage"}, //destination
+	//From A back to waiting a package
+	createTransition(
+			{"ChannelA"}, //activation
+			{"WaitPackage", "CounterA"}, //destination
 			{} //additional conditions
 			);
 
-	//Switch to B
+	//From B back to waiting a package
 	createTransition(
 			{"ChannelB"}, //activation
-			{"SelectA", "WaitPackage"}, //destination
+			{"WaitPackage", "CounterB"}, //destination
 			{} //additional conditions
 			);
 
-	//Reset Counter
+	//Reset Counters
 	createTransition(
 			{"PackageCounter"}, //activation
 			{}, //destination
@@ -91,9 +87,23 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
 			);
 
+	createTransition(
+			{"CounterA"}, //activation
+			{}, //destination
+			//additional conditions
+			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
+			);
+
+	createTransition(
+			{"CounterB"}, //activation
+			{}, //destination
+			//additional conditions
+			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
+			);
+
 }
 
-void Dispatcher::RoundRobinPetriNet::dispatch()
+void Dispatcher::FreeChoicePetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
 	execute();
