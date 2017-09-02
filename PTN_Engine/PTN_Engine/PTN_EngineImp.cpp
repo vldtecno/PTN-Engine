@@ -34,11 +34,11 @@ namespace ptne
 	{}
 
 	void PTN_EngineImp::createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions)
+			const vector<string>& activationPlaces,
+			const vector<string>& destinationPlaces,
+			const vector<ConditionFunctorPtr>& additionalConditions)
 	{
-		std::vector<WeakPtrPlace> activationPlacesVector;
+		vector<WeakPtrPlace> activationPlacesVector;
 		for(const auto& activationPlace : activationPlaces)
 		{
 			if(m_places.find(activationPlace) == m_places.end())
@@ -48,7 +48,7 @@ namespace ptne
 			activationPlacesVector.push_back(m_places.at(activationPlace));
 		}
 
-		std::vector<WeakPtrPlace> destinationPlacesVector;
+		vector<WeakPtrPlace> destinationPlacesVector;
 		for(const auto& destinationPlace : destinationPlaces)
 		{
 			if(m_places.find(destinationPlace) == m_places.end())
@@ -99,7 +99,7 @@ namespace ptne
 
 
 	void PTN_EngineImp::addPlace(
-			const std::string& name,
+			const string& name,
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
 			ActionFunctorPtr onExitAction,
@@ -137,7 +137,7 @@ namespace ptne
 		}
 	}
 
-	size_t PTN_EngineImp::getNumberOfTokens(const std::string& place) const
+	size_t PTN_EngineImp::getNumberOfTokens(const string& place) const
 	{
 		if(m_places.find(place) == m_places.end())
 		{
@@ -146,7 +146,7 @@ namespace ptne
 		return m_places.at(place)->getNumberOfTokens();
 	}
 
-	void PTN_EngineImp::incrementInputPlace(const std::string& place)
+	void PTN_EngineImp::incrementInputPlace(const string& place)
 	{
 		if(m_places.find(place) == m_places.end())
 		{
