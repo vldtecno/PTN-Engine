@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../../../Examples/PhoneMenu/View/MessagesMenuView.h"
+#include "View/MessagesMenuView.h"
 
 #include <iostream>
 

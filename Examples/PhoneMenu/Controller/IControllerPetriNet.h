@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../../../Examples/PhoneMenu/Controller/MenuStateMachine.h"
+#include "Controller/MenuStateMachine.h"
 
 //!Base class for a PTN Engine net that controls the Controller.
 class Controller::IControllerPetriNet

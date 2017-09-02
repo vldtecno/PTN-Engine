@@ -18,12 +18,12 @@
 
 #include <iostream>
 
-#include "../../Examples/PhoneMenu/Controller/Controller.h"
-#include "../../Examples/PhoneMenu/Model/List.h"
+#include "Controller/Controller.h"
+#include "Model/List.h"
 
 using namespace std;
 
-void initializeMessageList(std::shared_ptr<Controller::MessageList> messageList)
+void initializeMessageList(shared_ptr<Controller::MessageList> messageList)
 {
 	messageList->addItem(Message("Hi...","Hi John, don't forget to water the plants."));
 	messageList->addItem(Message("Is...","Is this thing working?"));
@@ -31,7 +31,7 @@ void initializeMessageList(std::shared_ptr<Controller::MessageList> messageList)
 }
 
 
-void initializeCallList(std::shared_ptr<Controller::CallList> callLog)
+void initializeCallList(shared_ptr<Controller::CallList> callLog)
 {
 	callLog->addItem(Call("10:05:03 29-JUN-2018", "John Doe"));
 	callLog->addItem(Call("09:35:50 29-JUN-2018", "Sally Smith"));
@@ -78,15 +78,15 @@ void programLoop(shared_ptr<Controller> controller)
 int main(int argc, char** argv)
 {
 	//Set up data
-	std::shared_ptr<Controller::MessageList> messageList = std::make_shared<Controller::MessageList>();
+	shared_ptr<Controller::MessageList> messageList = make_shared<Controller::MessageList>();
 	initializeMessageList(messageList);
-	std::shared_ptr<Controller::CallList> callLog = std::make_shared<Controller::CallList>();
+	shared_ptr<Controller::CallList> callLog = make_shared<Controller::CallList>();
 	initializeCallList(callLog);
 
 	//Set up views
-	std::shared_ptr<MainMenuView> mainMenu = std::make_shared<MainMenuView>();
-	std::shared_ptr<MessagesMenuView> messagesMenu = std::make_shared<MessagesMenuView>();
-	std::shared_ptr<CallLogView> callLogView = std::make_shared<CallLogView>();
+	shared_ptr<MainMenuView> mainMenu = make_shared<MainMenuView>();
+	shared_ptr<MessagesMenuView> messagesMenu = make_shared<MessagesMenuView>();
+	shared_ptr<CallLogView> callLogView = make_shared<CallLogView>();
 
 	//Set up controller
 	shared_ptr<Controller> controller = make_shared<Controller>();

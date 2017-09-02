@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../../../Examples/PhoneMenu/View/CallLogView.h"
+#include "View/CallLogView.h"
 
 #include <iostream>
 

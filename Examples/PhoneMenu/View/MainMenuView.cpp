@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../../../Examples/PhoneMenu/View/MainMenuView.h"
+#include "View/MainMenuView.h"
 
 #include <iostream>
 #include <stdexcept>

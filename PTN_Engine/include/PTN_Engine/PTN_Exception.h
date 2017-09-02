@@ -26,7 +26,7 @@ namespace ptne
 	{
 	public:
 
-		PTN_Exception(const std::string& msg):
+		explicit PTN_Exception(const std::string& msg):
 			std::runtime_error(msg)
 		{}
 

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../../../Examples/PhoneMenu/Model/Call.h"
-#include "../../../Examples/PhoneMenu/Model/List.h"
+#include "Model/Call.h"
+#include "Model/List.h"
 
 //! View the call logs
 class CallLogView

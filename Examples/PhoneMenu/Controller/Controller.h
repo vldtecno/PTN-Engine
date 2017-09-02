@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "../../../Examples/PhoneMenu/Model/Call.h"
-#include "../../../Examples/PhoneMenu/Model/List.h"
-#include "../../../Examples/PhoneMenu/Model/Message.h"
-#include "../../../Examples/PhoneMenu/View/CallLogView.h"
-#include "../../../Examples/PhoneMenu/View/MainMenuView.h"
-#include "../../../Examples/PhoneMenu/View/MessagesMenuView.h"
+#include "Model/Call.h"
+#include "Model/List.h"
+#include "Model/Message.h"
+#include "View/CallLogView.h"
+#include "View/MainMenuView.h"
+#include "View/MessagesMenuView.h"
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
 #include "View/MainMenuView.h"
