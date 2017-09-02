@@ -69,6 +69,10 @@ namespace ptne
 
 		do
 		{
+			//Safe to use raw pointers here. Nothing justifies deleting a
+			// transition from m_transitions, so there should never be an
+			// invalid pointer. At this moment this is single threaded, so
+			// synchronization problems are not an issue.
 			vector<Transition*> activeTransitions(move(
 					collectActiveTransitionsRandomly()));
 
