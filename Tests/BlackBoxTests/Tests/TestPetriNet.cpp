@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 #include "Fixtures/FixturePetriNet.h"
 
-TEST_F(FixturePetriNet, T1)
+TEST_F(FixturePetriNet, RoundRobin_1)
 {
 	if(!m_dispatcher)
 	{
@@ -37,7 +37,7 @@ TEST_F(FixturePetriNet, T1)
 	//	m_plPackageCounter;
 	size_t expectedState[7] = {0,1,0,0,1,0,0};
 
-	testState(expectedState);
+	testRoundRobinState(expectedState);
 
 	m_dispatcher->dispatch();
 	EXPECT_EQ(true, m_dispatcher->m_isWaitingPackage && m_dispatcher->m_isChannelBSelected && (!m_dispatcher->m_isChannelASelected));
@@ -45,7 +45,7 @@ TEST_F(FixturePetriNet, T1)
 	expectedState[4] = 0; 	//	m_plSelectA;
 	expectedState[5] = 1; 	//	m_plSelectB;
 	expectedState[6] = 1; 	//	m_plPackageCounter;
-	testState(expectedState);
+	testRoundRobinState(expectedState);
 
 	m_dispatcher->dispatch();
 	EXPECT_EQ(true, m_dispatcher->m_isWaitingPackage && m_dispatcher->m_isChannelASelected && (!m_dispatcher->m_isChannelBSelected));
@@ -53,14 +53,32 @@ TEST_F(FixturePetriNet, T1)
 	expectedState[4] = 1;  	//	m_plSelectA;
 	expectedState[5] = 0;  	//	m_plSelectB;
 	expectedState[6] = 2;  	//	m_plPackageCounter;
-	testState(expectedState);
+	testRoundRobinState(expectedState);
 
 	m_dispatcher->setResetCounter(true);
 	m_dispatcher->dispatch();
 	expectedState[4] = 0;  	//	m_plSelectA;
 	expectedState[5] = 1;  	//	m_plSelectB;
 	expectedState[6] = 0;  	//	m_plPackageCounter;
-	testState(expectedState);
+	testRoundRobinState(expectedState);
+}
+
+TEST_F(FixturePetriNet, FreeChoice_1)
+{
+	if(!m_dispatcher)
+	{
+		throw std::runtime_error("No dispatcher available");
+	}
+
+	size_t numberOfIterations = 100;
+	size_t expectedState[7] = {0,1,0,0,0,0,numberOfIterations};
+	m_dispatcher->setResetCounter(false);
+	m_dispatcher->setFreeChoiceMode();
+	for(size_t i = 0; i < numberOfIterations; ++i)
+	{
+		m_dispatcher->dispatch();
+	}
+	testFreeChoiceState(expectedState);
 
 }
 

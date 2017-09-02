@@ -31,7 +31,10 @@ class FixturePetriNet: public ::testing::Test
 public:
 
 	//! Total number of places in the net.
-	const static size_t s_numberOfPlaces = 7;
+	const static size_t s_numberOfRoundRobinPlaces = 7;
+
+	//! Total number of places in the net.
+	const static size_t s_numberOfFreeChoicePlaces = 7;
 
 	//! Constructor.
 	FixturePetriNet();
@@ -40,7 +43,13 @@ public:
 	 * Tests the number of tokens in all places of the net.
 	 * \param expectedTokens Expected number of tokens in each place.
 	 */
-	void testState(const size_t expectedTokens[s_numberOfPlaces]);
+	void testRoundRobinState(const size_t expectedTokens[s_numberOfRoundRobinPlaces]);
+
+	/*!
+	 * Tests the number of tokens in all places of the net.
+	 * \param expectedTokens Expected number of tokens in each place.
+	 */
+	void testFreeChoiceState(const size_t expectedTokens[s_numberOfFreeChoicePlaces]);
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;
