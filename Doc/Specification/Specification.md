@@ -42,10 +42,9 @@ Build instructions are scripted to be used with CMake.
 
 TODO
 
-## Remarks about *Version 1.0.0*
+## Remarks about *Version 1.1.0*
 
-This version supports only small subset of Petri nets. Hence free
-choice, weights and priority are not (yet) supported.
+This version supports only a subset of Petri nets.
 
 It can nonetheless be used to implement finite-state machines and marked graphs.
 
