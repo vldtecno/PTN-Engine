@@ -51,13 +51,32 @@ namespace ptne
 		/*!
 		 * Create a new transition
 		 * \param activationPlaces A vector with the names of the activation places.
+		 * \param activationWeights A vector with the weights of each activation place.
+		 * \param destinationPlaces A vector with the names of the destination places.
+		 * \param destinationWeights A vector with the weights of each destination place.
+		 * \param additionalConditions A vector with functors that return bool.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+		 */
+		void createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<size_t>& activationWeights,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<size_t>& destinationWeights,
+			const std::vector<ConditionFunctorPtr>& additionalConditions,
+			const std::vector<std::string>& inhibitorPlaces = {});
+
+		/*!
+		 * Create a new transition
+		 * \param activationPlaces A vector with the names of the activation places.
 		 * \param destinationPlaces A vector with the names of the destination places.
 		 * \param additionalConditions A vector with functors that return bool.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
 		 */
 		void createTransition(
 			const std::vector<std::string>& activationPlaces,
 			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions);
+			const std::vector<ConditionFunctorPtr>& additionalConditions,
+			const std::vector<std::string>& inhibitorPlaces = {});
 
 		//! Run until it no more transitions can be fired or stop is flagged.
 		void execute();

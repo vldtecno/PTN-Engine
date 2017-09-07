@@ -35,8 +35,11 @@ namespace ptne
 
 	void PTN_EngineImp::createTransition(
 			const vector<string>& activationPlaces,
+			const vector<size_t>& activationWeights,
 			const vector<string>& destinationPlaces,
-			const vector<ConditionFunctorPtr>& additionalConditions)
+			const vector<size_t>& destinationWeights,
+			const vector<ConditionFunctorPtr>& additionalConditions,
+			const vector<string>& inhibitorPlaces)
 	{
 		vector<WeakPtrPlace> activationPlacesVector;
 		for(const auto& activationPlace : activationPlaces)
@@ -58,8 +61,66 @@ namespace ptne
 			destinationPlacesVector.push_back(m_places.at(destinationPlace));
 		}
 
+		vector<WeakPtrPlace> inhibitorPlacesVector;
+		for(const auto& inhibitorPlace : inhibitorPlaces)
+		{
+			if(m_places.find(inhibitorPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + inhibitorPlace);
+			}
+			inhibitorPlacesVector.push_back(m_places.at(inhibitorPlace));
+		}
+
 		m_transitions.push_back(
-				Transition(activationPlacesVector, destinationPlacesVector, additionalConditions));
+				Transition(activationPlacesVector,
+						activationWeights,
+						destinationPlacesVector,
+						destinationWeights,
+						additionalConditions,
+						inhibitorPlacesVector));
+	}
+
+	void PTN_EngineImp::createTransition(
+			const vector<string>& activationPlaces,
+			const vector<string>& destinationPlaces,
+			const vector<ConditionFunctorPtr>& additionalConditions,
+			const vector<std::string>& inhibitorPlaces)
+	{
+		vector<WeakPtrPlace> activationPlacesVector;
+		for(const auto& activationPlace : activationPlaces)
+		{
+			if(m_places.find(activationPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + activationPlace);
+			}
+			activationPlacesVector.push_back(m_places.at(activationPlace));
+		}
+
+		vector<WeakPtrPlace> destinationPlacesVector;
+		for(const auto& destinationPlace : destinationPlaces)
+		{
+			if(m_places.find(destinationPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + destinationPlace);
+			}
+			destinationPlacesVector.push_back(m_places.at(destinationPlace));
+		}
+
+		vector<WeakPtrPlace> inhibitorPlacesVector;
+		for(const auto& inhibitorPlace : inhibitorPlaces)
+		{
+			if(m_places.find(inhibitorPlace) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + inhibitorPlace);
+			}
+			inhibitorPlacesVector.push_back(m_places.at(inhibitorPlace));
+		}
+
+		m_transitions.push_back(
+				Transition(activationPlacesVector,
+						destinationPlacesVector,
+						additionalConditions,
+						inhibitorPlacesVector));
 	}
 
 	void PTN_EngineImp::execute()
