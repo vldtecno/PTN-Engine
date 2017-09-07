@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <vector>
+#include <tuple>
 
 namespace ptne
 {
@@ -50,8 +51,25 @@ namespace ptne
 		 * \param destinationPlaces Collection of outgoing places.
 		 * \param additionalActivationConditions Boolean function from the controller that can block firing.
 		 */
-		Transition(const std::vector<WeakPtrPlace>& activationPlaces,
+		Transition(
+			const std::vector<WeakPtrPlace>& activationPlaces,
 			const std::vector<WeakPtrPlace>& destinationPlaces,
+			const std::vector<ConditionFunctorPtr>& additionalActivationConditions);
+
+		//! Constructor.
+		/*!
+		 * Constructor.
+		 * \param activationPlaces Collection of incoming places.
+		 * \param activationWeights Weights of each activation place.
+		 * \param destinationPlaces Collection of outgoing places.
+		 * \param destinationWeights Weights of each destination place.
+		 * \param additionalActivationConditions Boolean function from the controller that can block firing.
+		 */
+		Transition(
+			const std::vector<WeakPtrPlace>& activationPlaces,
+			const std::vector<size_t>& activationWeights,
+			const std::vector<WeakPtrPlace>& destinationPlaces,
+			const std::vector<size_t>& destinationWeights,
 			const std::vector<ConditionFunctorPtr>& additionalActivationConditions);
 
 		/*!
@@ -89,11 +107,12 @@ namespace ptne
 		//! Inserts tokens in the destination places.
 		void enterDestinationPlaces();
 
+
 		//! Pointers to the activations places from the net.
-		std::vector<WeakPtrPlace> m_activationPlaces;
+		std::vector<std::tuple<WeakPtrPlace,size_t>> m_activationPlaces;
 
 		//! Pointers to the destination places from the net.
-		std::vector<WeakPtrPlace> m_destinationPlaces;
+		std::vector<std::tuple<WeakPtrPlace,size_t>> m_destinationPlaces;
 
 		//! Pointers to the controller's functions that evaluate if the transition can be fired.
 		std::vector<ConditionFunctorPtr> m_additionalActivationConditions;
