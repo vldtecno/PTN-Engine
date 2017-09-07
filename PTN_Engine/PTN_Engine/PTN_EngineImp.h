@@ -143,6 +143,12 @@ namespace ptne
 		 */
 		std::map<std::string, SharedPtrPlace> m_places;
 
+		//! Translates a vector of names of places to a vector of weak pointers to those places.
+		/*!
+		 *
+		 */
+		std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string>&) const;
+
 		//! Flag to stop the execution of the net.
 		/*!
 		 * For future use in multi-threaded operation.
