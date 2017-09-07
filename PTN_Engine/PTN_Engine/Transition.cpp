@@ -26,8 +26,10 @@ namespace ptne
 
 	Transition::Transition(const vector<WeakPtrPlace>& activationPlaces,
 		const vector<WeakPtrPlace>& destinationPlaces,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions):
-			m_additionalActivationConditions{additionalActivationConditions}
+		const vector<ConditionFunctorPtr>& additionalActivationConditions,
+		const vector<WeakPtrPlace>& inhibitorPlaces):
+			m_additionalActivationConditions{additionalActivationConditions},
+			m_inhibitorPlaces(inhibitorPlaces)
 	{
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
@@ -45,8 +47,10 @@ namespace ptne
 		const vector<size_t>& activationWeights,
 		const vector<WeakPtrPlace>& destinationPlaces,
 		const vector<size_t>& destinationWeights,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions):
-			m_additionalActivationConditions{additionalActivationConditions}
+		const vector<ConditionFunctorPtr>& additionalActivationConditions,
+		const vector<WeakPtrPlace>& inhibitorPlaces):
+			m_additionalActivationConditions{additionalActivationConditions},
+			m_inhibitorPlaces(inhibitorPlaces)
 	{
 		if(activationPlaces.size() != activationWeights.size())
 		{
@@ -91,6 +95,11 @@ namespace ptne
 
 	bool Transition::isActive() const
 	{
+		if(!checkInhibitorPlaces())
+		{
+			return false;
+		}
+
 		if(!checkActivationPlaces())
 		{
 			return false;
@@ -101,6 +110,25 @@ namespace ptne
 			return false;
 		}
 
+		return true;
+	}
+
+	bool Transition::checkInhibitorPlaces() const
+	{
+		for(const WeakPtrPlace& inhibitorPlace: m_inhibitorPlaces)
+		{
+			if(SharedPtrPlace spInhibitorPlace = inhibitorPlace.lock())
+			{
+				if(spInhibitorPlace->getNumberOfTokens() > 0)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				throw runtime_error("Could not obtain pointer to place.");
+			}
+		}
 		return true;
 	}
 
@@ -117,6 +145,10 @@ namespace ptne
 				{
 					return false;
 				}
+			}
+			else
+			{
+				throw runtime_error("Could not obtain pointer to place.");
 			}
 		}
 		return true;

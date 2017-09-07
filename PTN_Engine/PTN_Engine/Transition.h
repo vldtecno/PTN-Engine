@@ -50,11 +50,13 @@ namespace ptne
 		 * \param activationPlaces Collection of incoming places.
 		 * \param destinationPlaces Collection of outgoing places.
 		 * \param additionalActivationConditions Boolean function from the controller that can block firing.
+		 * \param inhibitorPlaces Places that must be empty for the transition to fire.
 		 */
 		Transition(
 			const std::vector<WeakPtrPlace>& activationPlaces,
 			const std::vector<WeakPtrPlace>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalActivationConditions);
+			const std::vector<ConditionFunctorPtr>& additionalActivationConditions,
+			const std::vector<WeakPtrPlace>& inhibitorPlaces = {});
 
 		//! Constructor.
 		/*!
@@ -64,13 +66,15 @@ namespace ptne
 		 * \param destinationPlaces Collection of outgoing places.
 		 * \param destinationWeights Weights of each destination place.
 		 * \param additionalActivationConditions Boolean function from the controller that can block firing.
+		 * \param inhibitorPlaces Places that must be empty for the transition to fire.
 		 */
 		Transition(
 			const std::vector<WeakPtrPlace>& activationPlaces,
 			const std::vector<size_t>& activationWeights,
 			const std::vector<WeakPtrPlace>& destinationPlaces,
 			const std::vector<size_t>& destinationWeights,
-			const std::vector<ConditionFunctorPtr>& additionalActivationConditions);
+			const std::vector<ConditionFunctorPtr>& additionalActivationConditions,
+			const std::vector<WeakPtrPlace>& inhibitorPlaces = {});
 
 		/*!
 		 * Evaluate the activation places and transit the tokens if possible.
@@ -85,6 +89,12 @@ namespace ptne
 		bool isActive() const;
 
 	private:
+
+		/*!
+		 * Checks if all inhibitor places are empty.
+		 * \return True if yes, false if not.
+		 */
+		bool checkInhibitorPlaces() const;
 
 		/*!
 		 * Checks if all activation places have enough tokens.
@@ -107,7 +117,6 @@ namespace ptne
 		//! Inserts tokens in the destination places.
 		void enterDestinationPlaces();
 
-
 		//! Pointers to the activations places from the net.
 		std::vector<std::tuple<WeakPtrPlace,size_t>> m_activationPlaces;
 
@@ -116,6 +125,9 @@ namespace ptne
 
 		//! Pointers to the controller's functions that evaluate if the transition can be fired.
 		std::vector<ConditionFunctorPtr> m_additionalActivationConditions;
+
+		//! Inhibitor arcs
+		std::vector<WeakPtrPlace> m_inhibitorPlaces;
 
 	};
 }
