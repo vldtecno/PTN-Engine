@@ -20,43 +20,64 @@
 
 #include "Fixtures/FixtureTestTransition.h"
 
+using namespace std;
+
 TEST_F(FixtureTestTransition, T1)
 {
 	using namespace ptne;
 
-	std::vector<size_t> inputTokens {1,1,1};
-	std::vector<size_t> outputTokens {0,0,0};
-	std::vector<size_t> expectedOutputTokens {1,1,1};
-	VectorOfConditions conditions {std::make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
+	vector<size_t> inputTokens {1,1,1};
+	vector<size_t> expectedInputTokens {0,0,0};
+	vector<size_t> outputTokens {0,0,0};
+	vector<size_t> expectedOutputTokens {1,1,1};
+	VectorOfConditions conditions {make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
 	bool expectedFireResult = true;
 
-	createTransition(inputTokens, outputTokens, expectedOutputTokens, conditions, expectedFireResult);
+	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
 }
 
 TEST_F(FixtureTestTransition, T2)
 {
 	using namespace ptne;
 
-	std::vector<size_t> inputTokens {1,0,1};
-	std::vector<size_t> outputTokens {0,0,0};
-	std::vector<size_t> expectedOutputTokens {0,0,0};
-	VectorOfConditions conditions {std::make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
+	vector<size_t> inputTokens {1,0,1};
+	vector<size_t> expectedInputTokens {1,0,1};
+	vector<size_t> outputTokens {0,0,0};
+	vector<size_t> expectedOutputTokens {0,0,0};
+	VectorOfConditions conditions {make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
 	bool expectedFireResult = false;
 
-	createTransition(inputTokens, outputTokens, expectedOutputTokens, conditions, expectedFireResult);
+	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
 }
 
 TEST_F(FixtureTestTransition, T3)
 {
 	using namespace ptne;
 
-	std::vector<size_t> inputTokens {1,1,1};
-	std::vector<size_t> outputTokens {0,0,0};
-	std::vector<size_t> expectedOutputTokens {0,0,0};
-	VectorOfConditions conditions {std::make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
+	vector<size_t> inputTokens {1,1,1};
+	vector<size_t> expectedInputTokens {1,1,1};
+	vector<size_t> outputTokens {0,0,0};
+	vector<size_t> expectedOutputTokens {0,0,0};
+	VectorOfConditions conditions {make_shared<ControllerFireCondition>(ControllerFireCondition(m_controller, &Controller::activationCondition))};
 	bool expectedFireResult = false;
 	m_controller->setFireCondition(false);
 
-	createTransition(inputTokens, outputTokens, expectedOutputTokens, conditions, expectedFireResult);
+	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
+}
+
+TEST_F(FixtureTestTransition, T4_Weights)
+{
+	using namespace ptne;
+
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2,1};
+	vector<size_t> outputTokens {0};
+	vector<size_t> outputWeighs {2};
+	vector<size_t> expectedInputTokens{0,1};
+	vector<size_t> expectedOutputTokens {2};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	createTransitionWithWeights(inputTokens, inputWeights, outputTokens, outputWeighs, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
 }
 

@@ -60,11 +60,19 @@ namespace ptne
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
+			if(activationWeights[i] == 0)
+			{
+				throw runtime_error("Weights cannot be 0.");
+			}
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
 		}
 
 		for(size_t i = 0; i < destinationPlaces.size(); ++i)
 		{
+			if(destinationWeights[i] == 0)
+			{
+				throw runtime_error("Weights cannot be 0.");
+			}
 			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
 		}
 	}
