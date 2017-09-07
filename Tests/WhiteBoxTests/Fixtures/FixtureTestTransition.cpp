@@ -19,24 +19,26 @@
 #include "Fixtures/FixtureTestTransition.h"
 
 using namespace ptne;
+using namespace std;
 
 FixtureTestTransition::FixtureTestTransition():
-	m_controller{std::make_shared<Controller>(Controller{})}
+	m_controller{make_shared<Controller>(Controller{})}
 {
 
 }
 
-void FixtureTestTransition::createTransition(const std::vector<size_t> inputTokens,
-		const std::vector<size_t> outputTokens,
-		const std::vector<size_t> expectedOutputTokens,
+void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
+		const vector<size_t> outputTokens,
+		const vector<size_t> expectedInputTokens,
+		const vector<size_t> expectedOutputTokens,
 		VectorOfConditions conditions,
 		const bool expectedFireResult)
 {
-	std::vector<std::shared_ptr<Place>> inputPlaces;
-	std::vector<std::weak_ptr<Place>> wInputPlaces;
+	vector<shared_ptr<Place>> inputPlaces;
+	vector<weak_ptr<Place>> wInputPlaces;
 	for(size_t i : inputTokens)
 	{
-		std::shared_ptr<Place> newPlace (
+		shared_ptr<Place> newPlace (
 				new Place(i, nullptr, nullptr));
 		inputPlaces.push_back(newPlace);
 		wInputPlaces.push_back(newPlace);
@@ -44,11 +46,11 @@ void FixtureTestTransition::createTransition(const std::vector<size_t> inputToke
 
 
 
-	std::vector<std::shared_ptr<Place>> outputPlaces;
-	std::vector<std::weak_ptr<Place>> wOutputPlaces;
+	vector<shared_ptr<Place>> outputPlaces;
+	vector<weak_ptr<Place>> wOutputPlaces;
 	for(size_t i : outputTokens)
 	{
-		std::shared_ptr<Place> newPlace (
+		shared_ptr<Place> newPlace (
 				new Place(i, nullptr, nullptr));
 		outputPlaces.push_back(newPlace);
 		wOutputPlaces.push_back(newPlace);
@@ -59,16 +61,77 @@ void FixtureTestTransition::createTransition(const std::vector<size_t> inputToke
 	EXPECT_EQ(expectedFireResult, transition.execute());
 
 	size_t i = 0;
+	for(size_t expected : expectedInputTokens)
+	{
+		EXPECT_EQ(expected, inputPlaces[i]->getNumberOfTokens());
+		++i;
+	}
+
+	i = 0;
 	for(size_t expected : expectedOutputTokens)
 	{
-		std::shared_ptr<Place> newPlace(
-				new Place(i, nullptr, nullptr));
-		outputPlaces.push_back(newPlace);
-		wOutputPlaces.push_back(newPlace);
 		EXPECT_EQ(expected, outputPlaces[i]->getNumberOfTokens());
 		++i;
 	}
 }
 
+
+void FixtureTestTransition::createTransitionWithWeights(
+		const vector<size_t> inputTokens,
+		const vector<size_t> inputWeights,
+		const vector<size_t> outputTokens,
+		const vector<size_t> ouptutWeights,
+		const vector<size_t> expectedInputTokens,
+		const vector<size_t> expectedOutputTokens,
+		VectorOfConditions conditions,
+		const bool expectedFireResult)
+{
+	EXPECT_EQ(inputTokens.size(), inputWeights.size());
+	EXPECT_EQ(outputTokens.size(), ouptutWeights.size());
+	EXPECT_EQ(outputTokens.size(), expectedOutputTokens.size());
+
+
+	//Create input places
+	vector<shared_ptr<Place>> inputPlaces;
+	vector<weak_ptr<Place>> wInputPlaces;
+	for(size_t i : inputTokens)
+	{
+		shared_ptr<Place> newPlace (
+				new Place(i, nullptr, nullptr));
+		inputPlaces.push_back(newPlace);
+		wInputPlaces.push_back(newPlace);
+	}
+
+	//Create output places
+	vector<shared_ptr<Place>> outputPlaces;
+	vector<weak_ptr<Place>> wOutputPlaces;
+	for(size_t i : outputTokens)
+	{
+		shared_ptr<Place> newPlace (
+				new Place(i, nullptr, nullptr));
+		outputPlaces.push_back(newPlace);
+		wOutputPlaces.push_back(newPlace);
+	}
+
+	//Create transition
+	Transition transition(wInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, conditions);
+
+	//Test transition
+	EXPECT_EQ(expectedFireResult, transition.execute());
+
+	size_t i = 0;
+	for(size_t expected : expectedInputTokens)
+	{
+		EXPECT_EQ(expected, inputPlaces[i]->getNumberOfTokens());
+		++i;
+	}
+
+	i = 0;
+	for(size_t expected : expectedOutputTokens)
+	{
+		EXPECT_EQ(expected, outputPlaces[i]->getNumberOfTokens());
+		++i;
+	}
+}
 
 

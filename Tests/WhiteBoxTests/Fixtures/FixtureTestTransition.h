@@ -40,12 +40,36 @@ public:
 	 * Test creating a transition and makes it available for further testing.
 	 * \param inputTokens Tokens to put in each activation place.
 	 * \param outputTokens Tokens to put in the destination places before firing.
+	 * \param expectedInputTokens Expected number of tokens on the inputs after executing the transition.
 	 * \param expectedOutputTokens Expected tokens after trying to fire the transition.
 	 * \param conditions Additional conditions from the controller.
 	 * \param expectedFireResult If it is expected that the condition fires.
 	 */
 	void createTransition(const std::vector<size_t> inputTokens,
 			const std::vector<size_t> outputTokens,
+			const std::vector<size_t> expectedInputTokens,
+			const std::vector<size_t> expectedOutputTokens,
+			VectorOfConditions conditions,
+			const bool expectedFireResult);
+
+
+	/*!
+	 *
+	 * \param inputTokens Tokens to put in each activation place.
+	 * \param inputWeights Input weights.
+	 * \param outputTokens Tokens to put in the destination places before firing.
+	 * \param outputWeights Output weights.
+	 * \param expectedInputTokens Expected number of tokens on the inputs after executing the transition.
+	 * \param expectedOutputTokens Expected tokens after trying to fire the transition.
+	 * \param conditions Additional conditions from the controller.
+	 * \param expectedFireResult If it is expected that the condition fires.
+	 */
+	void createTransitionWithWeights(
+			const std::vector<size_t> inputTokens,
+			const std::vector<size_t> inputWeights,
+			const std::vector<size_t> outputTokens,
+			const std::vector<size_t> outputWeights,
+			const std::vector<size_t> expectedInputTokens,
 			const std::vector<size_t> expectedOutputTokens,
 			VectorOfConditions conditions,
 			const bool expectedFireResult);
