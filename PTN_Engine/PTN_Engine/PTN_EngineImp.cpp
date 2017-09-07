@@ -41,35 +41,14 @@ namespace ptne
 			const vector<ConditionFunctorPtr>& additionalConditions,
 			const vector<string>& inhibitorPlaces)
 	{
-		vector<WeakPtrPlace> activationPlacesVector;
-		for(const auto& activationPlace : activationPlaces)
-		{
-			if(m_places.find(activationPlace) == m_places.end())
-			{
-				throw PTN_Exception("Invalid name: " + activationPlace);
-			}
-			activationPlacesVector.push_back(m_places.at(activationPlace));
-		}
+		vector<WeakPtrPlace> activationPlacesVector =
+				getPlacesFromNames(activationPlaces);
 
-		vector<WeakPtrPlace> destinationPlacesVector;
-		for(const auto& destinationPlace : destinationPlaces)
-		{
-			if(m_places.find(destinationPlace) == m_places.end())
-			{
-				throw PTN_Exception("Invalid name: " + destinationPlace);
-			}
-			destinationPlacesVector.push_back(m_places.at(destinationPlace));
-		}
+		vector<WeakPtrPlace> destinationPlacesVector =
+				getPlacesFromNames(destinationPlaces);
 
-		vector<WeakPtrPlace> inhibitorPlacesVector;
-		for(const auto& inhibitorPlace : inhibitorPlaces)
-		{
-			if(m_places.find(inhibitorPlace) == m_places.end())
-			{
-				throw PTN_Exception("Invalid name: " + inhibitorPlace);
-			}
-			inhibitorPlacesVector.push_back(m_places.at(inhibitorPlace));
-		}
+		vector<WeakPtrPlace> inhibitorPlacesVector =
+				getPlacesFromNames(inhibitorPlaces);
 
 		m_transitions.push_back(
 				Transition(activationPlacesVector,
@@ -189,7 +168,7 @@ namespace ptne
 
 	void PTN_EngineImp::clearInputPlaces()
 	{
-		for( WeakPtrPlace& place : m_inputPlaces)
+		for( const WeakPtrPlace& place : m_inputPlaces)
 		{
 			if(SharedPtrPlace spPlace = place.lock())
 			{
@@ -222,6 +201,20 @@ namespace ptne
 			throw PTN_Exception(place + " is not an input place");
 		}
 		m_places.at(place)->increaseNumberOfTokens(1);
+	}
+
+	vector<WeakPtrPlace> PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
+	{
+		vector<WeakPtrPlace> placesVector;
+		for(const auto& placeName : placesNames)
+		{
+			if(m_places.find(placeName) == m_places.end())
+			{
+				throw PTN_Exception("Invalid name: " + placeName);
+			}
+			placesVector.push_back(m_places.at(placeName));
+		}
+		return placesVector;
 	}
 
 }

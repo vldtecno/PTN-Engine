@@ -19,6 +19,7 @@
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IConditionFunctor.h"
+#include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
@@ -54,19 +55,19 @@ namespace ptne
 	{
 		if(activationPlaces.size() != activationWeights.size())
 		{
-			throw runtime_error("The number of activation weights must be the same as the number of activation places.");
+			throw PTN_Exception("The number of activation weights must be the same as the number of activation places.");
 		}
 
 		if(destinationPlaces.size() != destinationWeights.size())
 		{
-			throw runtime_error("The number of destination weights must be the same as the number of destination places.");
+			throw PTN_Exception("The number of destination weights must be the same as the number of destination places.");
 		}
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
 			if(activationWeights[i] == 0)
 			{
-				throw runtime_error("Weights cannot be 0.");
+				throw PTN_Exception("Weights cannot be 0.");
 			}
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
 		}
@@ -75,7 +76,7 @@ namespace ptne
 		{
 			if(destinationWeights[i] == 0)
 			{
-				throw runtime_error("Weights cannot be 0.");
+				throw PTN_Exception("Weights cannot be 0.");
 			}
 			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
 		}
@@ -126,7 +127,7 @@ namespace ptne
 			}
 			else
 			{
-				throw runtime_error("Could not obtain pointer to place.");
+				throw PTN_Exception("Could not obtain pointer to place.");
 			}
 		}
 		return true;
@@ -148,7 +149,7 @@ namespace ptne
 			}
 			else
 			{
-				throw runtime_error("Could not obtain pointer to place.");
+				throw PTN_Exception("Could not obtain pointer to place.");
 			}
 		}
 		return true;
