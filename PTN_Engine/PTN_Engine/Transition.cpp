@@ -27,10 +27,47 @@ namespace ptne
 	Transition::Transition(const vector<WeakPtrPlace>& activationPlaces,
 		const vector<WeakPtrPlace>& destinationPlaces,
 		const vector<ConditionFunctorPtr>& additionalActivationConditions):
-			m_activationPlaces{activationPlaces},
-			m_destinationPlaces{destinationPlaces},
 			m_additionalActivationConditions{additionalActivationConditions}
-	{}
+	{
+		for(size_t i = 0; i < activationPlaces.size(); ++i)
+		{
+			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i],1));
+		}
+
+		for(size_t i = 0; i < destinationPlaces.size(); ++i)
+		{
+			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i],1));
+		}
+	}
+
+	Transition::Transition(
+		const vector<WeakPtrPlace>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<WeakPtrPlace>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<ConditionFunctorPtr>& additionalActivationConditions):
+			m_additionalActivationConditions{additionalActivationConditions}
+	{
+		if(activationPlaces.size() != activationWeights.size())
+		{
+			throw runtime_error("The number of activation weights must be the same as the number of activation places.");
+		}
+
+		if(destinationPlaces.size() != destinationWeights.size())
+		{
+			throw runtime_error("The number of destination weights must be the same as the number of destination places.");
+		}
+
+		for(size_t i = 0; i < activationPlaces.size(); ++i)
+		{
+			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
+		}
+
+		for(size_t i = 0; i < destinationPlaces.size(); ++i)
+		{
+			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
+		}
+	}
 
 	bool Transition::execute()
 	{
@@ -61,11 +98,14 @@ namespace ptne
 
 	bool Transition::checkActivationPlaces() const
 	{
-		for( const WeakPtrPlace activationPlace : m_activationPlaces)
+		for( const tuple<WeakPtrPlace, size_t>& tupleActivationPlace : m_activationPlaces)
 		{
+			const WeakPtrPlace& activationPlace = get<0>(tupleActivationPlace);
+			const size_t activationWeight = get<1>(tupleActivationPlace);
+
 			if(SharedPtrPlace spPlace = activationPlace.lock())
 			{
-				if(spPlace->getNumberOfTokens() < 1) //only arcs with weight 1 supported in this implementation
+				if(spPlace->getNumberOfTokens() < activationWeight)
 				{
 					return false;
 				}
@@ -101,22 +141,28 @@ namespace ptne
 
 	void Transition::exitActivationPlaces()
 	{
-		for( WeakPtrPlace activationPlace : m_activationPlaces)
+		for( tuple<WeakPtrPlace, size_t>& tupleActivationPlace : m_activationPlaces)
 		{
+			WeakPtrPlace& activationPlace = get<0>(tupleActivationPlace);
+			const size_t activationWeight = get<1>(tupleActivationPlace);
+
 			if(SharedPtrPlace spPlace = activationPlace.lock())
 			{
-				spPlace->exitPlace();
+				spPlace->exitPlace(activationWeight);
 			}
 		}
 	}
 
 	void Transition::enterDestinationPlaces()
 	{
-		for(WeakPtrPlace destinationPlace : m_destinationPlaces)
+		for( tuple<WeakPtrPlace, size_t>& tupleDestinationPlace : m_destinationPlaces)
 		{
+			WeakPtrPlace& destinationPlace = get<0>(tupleDestinationPlace);
+			const size_t destinationWeight = get<1>(tupleDestinationPlace);
+
 			if(SharedPtrPlace spPlace = destinationPlace.lock())
 			{
-				spPlace->enterPlace();
+				spPlace->enterPlace(destinationWeight);
 			}
 		}
 	}
