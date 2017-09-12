@@ -19,6 +19,7 @@
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IConditionFunctor.h"
+#include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
@@ -26,8 +27,10 @@ namespace ptne
 
 	Transition::Transition(const vector<WeakPtrPlace>& activationPlaces,
 		const vector<WeakPtrPlace>& destinationPlaces,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions):
-			m_additionalActivationConditions{additionalActivationConditions}
+		const vector<ConditionFunctorPtr>& additionalActivationConditions,
+		const vector<WeakPtrPlace>& inhibitorPlaces):
+			m_additionalActivationConditions{additionalActivationConditions},
+			m_inhibitorPlaces(inhibitorPlaces)
 	{
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
@@ -45,24 +48,26 @@ namespace ptne
 		const vector<size_t>& activationWeights,
 		const vector<WeakPtrPlace>& destinationPlaces,
 		const vector<size_t>& destinationWeights,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions):
-			m_additionalActivationConditions{additionalActivationConditions}
+		const vector<ConditionFunctorPtr>& additionalActivationConditions,
+		const vector<WeakPtrPlace>& inhibitorPlaces):
+			m_additionalActivationConditions{additionalActivationConditions},
+			m_inhibitorPlaces(inhibitorPlaces)
 	{
 		if(activationPlaces.size() != activationWeights.size())
 		{
-			throw runtime_error("The number of activation weights must be the same as the number of activation places.");
+			throw PTN_Exception("The number of activation weights must be the same as the number of activation places.");
 		}
 
 		if(destinationPlaces.size() != destinationWeights.size())
 		{
-			throw runtime_error("The number of destination weights must be the same as the number of destination places.");
+			throw PTN_Exception("The number of destination weights must be the same as the number of destination places.");
 		}
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
 			if(activationWeights[i] == 0)
 			{
-				throw runtime_error("Weights cannot be 0.");
+				throw PTN_Exception("Weights cannot be 0.");
 			}
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
 		}
@@ -71,7 +76,7 @@ namespace ptne
 		{
 			if(destinationWeights[i] == 0)
 			{
-				throw runtime_error("Weights cannot be 0.");
+				throw PTN_Exception("Weights cannot be 0.");
 			}
 			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
 		}
@@ -91,6 +96,11 @@ namespace ptne
 
 	bool Transition::isActive() const
 	{
+		if(!checkInhibitorPlaces())
+		{
+			return false;
+		}
+
 		if(!checkActivationPlaces())
 		{
 			return false;
@@ -101,6 +111,25 @@ namespace ptne
 			return false;
 		}
 
+		return true;
+	}
+
+	bool Transition::checkInhibitorPlaces() const
+	{
+		for(const WeakPtrPlace& inhibitorPlace: m_inhibitorPlaces)
+		{
+			if(SharedPtrPlace spInhibitorPlace = inhibitorPlace.lock())
+			{
+				if(spInhibitorPlace->getNumberOfTokens() > 0)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				throw PTN_Exception("Could not obtain pointer to place.");
+			}
+		}
 		return true;
 	}
 
@@ -117,6 +146,10 @@ namespace ptne
 				{
 					return false;
 				}
+			}
+			else
+			{
+				throw PTN_Exception("Could not obtain pointer to place.");
 			}
 		}
 		return true;

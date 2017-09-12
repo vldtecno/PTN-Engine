@@ -22,6 +22,8 @@
 
 namespace ptne
 {
+	using namespace std;
+
 	PTN_Engine::~PTN_Engine()
 	{}
 
@@ -31,11 +33,33 @@ namespace ptne
 	}
 
 	void PTN_Engine::createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions)
+			const vector<string>& activationPlaces,
+			const vector<size_t>& activationWeights,
+			const vector<string>& destinationPlaces,
+			const vector<size_t>& destinationWeights,
+			const vector<ConditionFunctorPtr>& additionalConditions,
+			const vector<string>& inhibitorPlaces)
 	{
-		m_implementation->createTransition(activationPlaces, destinationPlaces, additionalConditions);
+		m_implementation->createTransition(
+				activationPlaces,
+				activationWeights,
+				destinationPlaces,
+				destinationWeights,
+				additionalConditions,
+				inhibitorPlaces);
+	}
+
+	void PTN_Engine::createTransition(
+			const vector<string>& activationPlaces,
+			const vector<string>& destinationPlaces,
+			const vector<ConditionFunctorPtr>& additionalConditions,
+			const vector<string>& inhibitorPlaces)
+	{
+		m_implementation->createTransition(
+				activationPlaces,
+				destinationPlaces,
+				additionalConditions,
+				inhibitorPlaces);
 	}
 
 	void PTN_Engine::execute()
@@ -43,7 +67,7 @@ namespace ptne
 		m_implementation->execute();
 	}
 
-	void PTN_Engine::addPlace(const std::string& name,
+	void PTN_Engine::addPlace(const string& name,
 			const size_t initialNumberOfTokens,
 						ActionFunctorPtr onEnterAction,
 						ActionFunctorPtr onExitAction,
@@ -56,12 +80,12 @@ namespace ptne
 				input);
 	}
 
-	size_t PTN_Engine::getNumberOfTokens(const std::string& place) const
+	size_t PTN_Engine::getNumberOfTokens(const string& place) const
 	{
 		return m_implementation->getNumberOfTokens(place);
 	}
 
-	void PTN_Engine::incrementInputPlace(const std::string& place)
+	void PTN_Engine::incrementInputPlace(const string& place)
 	{
 		m_implementation->incrementInputPlace(place);
 	}
