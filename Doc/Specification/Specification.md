@@ -79,6 +79,7 @@ C++11 specific:
  - using (replacing typedef)
  - brace-init
  - tuple
+ - to_string
 
 The *PTN Engine* relies on Google Test (https://github.com/google/googletest)
 for unit testing.
