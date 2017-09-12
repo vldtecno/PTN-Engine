@@ -47,6 +47,9 @@ private:
 	//! Petri net using weighted arcs.
 	class WeightedPetriNet;
 
+	//! Petri net using inhibitor arcs.
+	class InhibitedPetriNet;
+
 	//! For testing purposes only
 	friend class FixturePetriNet;
 
@@ -89,7 +92,7 @@ private:
 	using PtrRoundRobinPetriNet = std::unique_ptr<RoundRobinPetriNet>;
 	using PtrFreeChoicePetriNet = std::unique_ptr<FreeChoicePetriNet>;
 	using PtrWeightedPetriNet = std::unique_ptr<WeightedPetriNet>;
-
+	using PtrInhibitedPetriNet = std::unique_ptr<InhibitedPetriNet>;
 
 	//! Petri net that defines and controls the dispatcher business logic.
 	std::unique_ptr<IDispatcherPetriNet> m_pPetriNet;
@@ -143,6 +146,9 @@ public:
 	//! Select weighted Petri net.
 	void setWeightedPN();
 
+	//! Select inhibited Petri net.
+	void setInhibitedPN();
+
 };
 
 template class ptne::Action<Dispatcher>;
@@ -154,3 +160,4 @@ using DispatcherFireCondition = ptne::ActivationCondition<Dispatcher>;
 #include "Mocks/RoundRobinPetriNet.h"
 #include "Mocks/FreeChoicePetriNet.h"
 #include "Mocks/WeightedPetriNet.h"
+#include "Mocks/InhibitedPetriNet.h"

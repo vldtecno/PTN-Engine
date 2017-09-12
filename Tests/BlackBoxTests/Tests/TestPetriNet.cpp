@@ -104,3 +104,25 @@ TEST_F(FixturePetriNet, Weights_1)
 
 }
 
+TEST_F(FixturePetriNet, Inhibited_1)
+{
+	if(!m_dispatcher)
+	{
+		throw std::runtime_error("No dispatcher available");
+	}
+
+	m_dispatcher->setResetCounter(true);
+	m_dispatcher->setInhibitedPN();
+
+	m_dispatcher->dispatch();
+
+	size_t expectedState[6] = {0,0,0,0,1,1};
+	testInhibitedState(expectedState);
+
+	m_dispatcher->dispatch();
+
+	size_t expectedState_[6] = {0,1,1,1,0,0};
+	testInhibitedState(expectedState_);
+
+}
+

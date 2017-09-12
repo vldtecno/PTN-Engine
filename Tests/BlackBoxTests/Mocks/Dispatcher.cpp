@@ -120,20 +120,28 @@ void Dispatcher::setRoundRobinMode()
 {
 	m_pPetriNet = move(
 		PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this()))
-		);
+	);
 }
 
 void Dispatcher::setFreeChoiceMode()
 {
 	m_pPetriNet = move(
-			PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this()))
-		);
+		PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this()))
+	);
 }
 
 void Dispatcher::setWeightedPN()
 {
 	m_pPetriNet = move(
-			PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this()))
-		);
+		PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this()))
+	);
 }
+
+void Dispatcher::setInhibitedPN()
+{
+	m_pPetriNet = move(
+		PtrInhibitedPetriNet(new InhibitedPetriNet(shared_from_this()))
+	);
+}
+
 
