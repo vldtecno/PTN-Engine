@@ -129,3 +129,11 @@ void Dispatcher::setFreeChoiceMode()
 			PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this()))
 		);
 }
+
+void Dispatcher::setWeightedPN()
+{
+	m_pPetriNet = move(
+			PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this()))
+		);
+}
+

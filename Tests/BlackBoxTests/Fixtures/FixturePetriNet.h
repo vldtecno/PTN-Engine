@@ -36,6 +36,9 @@ public:
 	//! Total number of places in the net.
 	const static size_t s_numberOfFreeChoicePlaces = 7;
 
+	//! Total number of places in the net.
+	const static size_t s_numberOfWeightedPlaces = 4;
+
 	//! Constructor.
 	FixturePetriNet();
 
@@ -50,6 +53,12 @@ public:
 	 * \param expectedTokens Expected number of tokens in each place.
 	 */
 	void testFreeChoiceState(const size_t expectedTokens[s_numberOfFreeChoicePlaces]);
+
+	/*!
+	 * Tests the number of tokens in all places of the net.
+	 * \param expectedTokens Expected number of tokens in each place.
+	 */
+	void testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces]);
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;
