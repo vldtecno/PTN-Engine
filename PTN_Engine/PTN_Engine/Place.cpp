@@ -18,10 +18,12 @@
 
 #include "PTN_Engine/PTN_Engine/Place.h"
 #include "PTN_Engine/IActionFunctor.h"
-#include "PTN_Engine/PTN_Exception.h"
+#include "limits.h"
 
 namespace ptne
 {
+	using namespace std;
+
 	Place::Place(const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterEventHandler,
 			ActionFunctorPtr onExitEventHandler,
@@ -57,8 +59,14 @@ namespace ptne
 	{
 		if(tokens == 0)
 		{
-			throw PTN_Exception("Number of tokens must greater than 0");
+			throw NullTokensException();
 		}
+
+		if(tokens > UINT_MAX - m_numberOfTokens)
+		{
+			throw OverflowException(tokens);
+		}
+
 		m_numberOfTokens += tokens;
 	}
 
@@ -66,11 +74,11 @@ namespace ptne
 	{
 		if(tokens == 0)
 		{
-			throw PTN_Exception("Number of tokens must greater than 0");
+			throw NullTokensException();
 		}
 		if(m_numberOfTokens < tokens )
 		{
-			throw PTN_Exception("Not enough tokens in the place.");
+			throw NotEnoughTokensException();
 		}
 		m_numberOfTokens -= tokens;
 	}
@@ -89,5 +97,18 @@ namespace ptne
 	{
 		return m_isInputPlace;
 	}
+
+	Place::NullTokensException::NullTokensException():
+		PTN_Exception("Number of tokens must greater than 0")
+	{}
+
+	Place::OverflowException::OverflowException(const size_t tooBig):
+		PTN_Exception(
+			"Cannot add "+to_string(tooBig)+" tokens to place without overflowing.")
+	{}
+
+	Place::NotEnoughTokensException::NotEnoughTokensException():
+		PTN_Exception("Not enough tokens in the place.")
+	{}
 
 }
