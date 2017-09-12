@@ -44,6 +44,9 @@ private:
 	//! Randomly choses a channel to dispatch a package.
 	class FreeChoicePetriNet;
 
+	//! Petri net using weighted arcs.
+	class WeightedPetriNet;
+
 	//! For testing purposes only
 	friend class FixturePetriNet;
 
@@ -85,6 +88,8 @@ private:
 
 	using PtrRoundRobinPetriNet = std::unique_ptr<RoundRobinPetriNet>;
 	using PtrFreeChoicePetriNet = std::unique_ptr<FreeChoicePetriNet>;
+	using PtrWeightedPetriNet = std::unique_ptr<WeightedPetriNet>;
+
 
 	//! Petri net that defines and controls the dispatcher business logic.
 	std::unique_ptr<IDispatcherPetriNet> m_pPetriNet;
@@ -129,9 +134,14 @@ public:
 	//! Flag that indicates channel B is selected.
 	bool m_isChannelBSelected;
 
+	//! Select round robin Petri net.
 	void setRoundRobinMode();
 
+	//! Select free choice Petri net.
 	void setFreeChoiceMode();
+
+	//! Select weighted Petri net.
+	void setWeightedPN();
 
 };
 
@@ -143,3 +153,4 @@ using DispatcherFireCondition = ptne::ActivationCondition<Dispatcher>;
 
 #include "Mocks/RoundRobinPetriNet.h"
 #include "Mocks/FreeChoicePetriNet.h"
+#include "Mocks/WeightedPetriNet.h"

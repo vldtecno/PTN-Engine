@@ -82,3 +82,25 @@ TEST_F(FixturePetriNet, FreeChoice_1)
 
 }
 
+TEST_F(FixturePetriNet, Weights_1)
+{
+	if(!m_dispatcher)
+	{
+		throw std::runtime_error("No dispatcher available");
+	}
+
+	m_dispatcher->setResetCounter(true);
+	m_dispatcher->setWeightedPN();
+
+	m_dispatcher->dispatch();
+
+	size_t expectedState[4] = {0,1,1,0};
+	testWeightedState(expectedState);
+
+	m_dispatcher->dispatch();
+
+	size_t expectedState_[4] = {0,0,0,0};
+	testWeightedState(expectedState_);
+
+}
+
