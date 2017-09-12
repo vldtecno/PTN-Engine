@@ -1,6 +1,6 @@
 # ***PTN Engine* Specification**
 
-This document specifies the *PTN Engine* library version 1.0.0 .
+This document specifies the *PTN Engine* library version 1.1.0 .
 
 **Responsibility for the usage or integration of the *PTN Engine* belongs to its
 users alone.**
@@ -78,6 +78,7 @@ C++11 specific:
  - range-based for loops
  - using (replacing typedef)
  - brace-init
+ - tuple
 
 The *PTN Engine* relies on Google Test (https://github.com/google/googletest)
 for unit testing.
