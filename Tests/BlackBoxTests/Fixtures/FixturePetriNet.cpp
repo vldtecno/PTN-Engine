@@ -107,3 +107,33 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 	EXPECT_TRUE(metric < 0.04);
 
 }
+
+void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces])
+{
+	if(!m_dispatcher)
+	{
+		throw runtime_error("No dispatcher available");
+	}
+
+	size_t tokens[s_numberOfWeightedPlaces];
+
+	//TODO
+	//Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
+	//Nonetheless it would be nice to fix it.
+	Dispatcher::IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher->m_pPetriNet.get();
+
+	if(Dispatcher::WeightedPetriNet* weightedPetriNet = dynamic_cast<Dispatcher::WeightedPetriNet*>(dispatcherPetriNet))
+	{
+		tokens[0] = weightedPetriNet->getNumberOfTokens("InputWaitPackage");
+		tokens[1] = weightedPetriNet->getNumberOfTokens("WaitPackage");
+		tokens[2] = weightedPetriNet->getNumberOfTokens("ChannelA");
+		tokens[3] = weightedPetriNet->getNumberOfTokens("ChannelB");
+	}
+
+	for(size_t i = 0; i < s_numberOfWeightedPlaces; ++i )
+	{
+		size_t a = expectedTokens[i];
+		EXPECT_EQ(a, tokens[i]);
+	}
+
+}
