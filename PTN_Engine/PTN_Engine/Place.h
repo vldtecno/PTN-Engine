@@ -19,6 +19,7 @@
 #pragma once
 
 #include <memory>
+#include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
@@ -90,6 +91,27 @@ namespace ptne
 		 * \return If the place is an input place.
 		 */
 		bool isInputPlace() const;
+
+		//! Exception thrown if attempted to remove 0 tokens from a place.
+		class NullTokensException: public PTN_Exception
+		{
+		public:
+			NullTokensException();
+		};
+
+		//! Exception thrown if attempted to remove more tokens than available.
+		class NotEnoughTokensException: public PTN_Exception
+		{
+		public:
+			NotEnoughTokensException();
+		};
+
+		//! Exception thrown if attempted to surpass the maximum possible number of tokens.
+		class OverflowException: public PTN_Exception
+		{
+		public:
+			explicit OverflowException(const size_t tooBig);
+		};
 
 	private:
 
