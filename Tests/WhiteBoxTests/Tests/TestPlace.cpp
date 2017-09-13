@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "Fixtures/FixtureTestPlace.h"
+#include "limits.h"
 
 
 TEST_F(FixtureTestPlace, InputPlace)
@@ -54,4 +55,32 @@ TEST_F(FixtureTestPlace, ExitPlace)
 	exitPlace(2);
 	exitPlace(3);
 }
+
+TEST_F(FixtureTestPlace, Overflow)
+{
+	enterPlace(UINT_MAX);
+
+	ASSERT_THROW(
+	m_place.enterPlace(1),
+	ptne::Place::OverflowException
+	);
+}
+
+TEST_F(FixtureTestPlace, NullTokens)
+{
+	ASSERT_THROW(
+	m_place.exitPlace(0),
+	ptne::Place::NullTokensException
+	);
+}
+
+TEST_F(FixtureTestPlace, NotEnoughTokens)
+{
+	ASSERT_THROW(
+	m_place.exitPlace(1),
+	ptne::Place::NotEnoughTokensException
+	);
+}
+
+
 
