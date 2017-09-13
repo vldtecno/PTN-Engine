@@ -92,7 +92,7 @@ namespace ptne
 		 */
 		bool isInputPlace() const;
 
-		//! Exception thrown if attempted to remove tokens from an empty place.
+		//! Exception thrown if attempted to remove 0 tokens from a place.
 		class NullTokensException: public PTN_Exception
 		{
 		public:
