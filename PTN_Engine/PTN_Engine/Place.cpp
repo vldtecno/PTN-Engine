@@ -19,6 +19,7 @@
 #include "PTN_Engine/PTN_Engine/Place.h"
 #include "PTN_Engine/IActionFunctor.h"
 #include "limits.h"
+#include <string>
 
 namespace ptne
 {
