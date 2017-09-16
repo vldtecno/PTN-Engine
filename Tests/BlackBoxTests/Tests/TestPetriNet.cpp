@@ -94,13 +94,20 @@ TEST_F(FixturePetriNet, Weights_1)
 
 	m_dispatcher->dispatch();
 
-	size_t expectedState[4] = {0,1,1,0};
+	size_t expectedState[4] = {0,1,0,0};
 	testWeightedState(expectedState);
 
 	m_dispatcher->dispatch();
 
-	size_t expectedState_[4] = {0,0,0,0};
-	testWeightedState(expectedState_);
+	expectedState[1] = 2;
+	testWeightedState(expectedState);
+	
+	m_dispatcher->dispatch();
+
+	expectedState[1] = 0;
+	expectedState[2] = 4;
+	expectedState[3] = 10;
+	testWeightedState(expectedState);
 
 }
 
