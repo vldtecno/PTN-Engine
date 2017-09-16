@@ -1,6 +1,6 @@
 # ***PTN Engine* Specification**
 
-This document specifies the *PTN Engine* library version 1.x.x .
+This document specifies the *PTN Engine* library version 1.1.0 .
 
 **Responsibility for the usage or integration of the *PTN Engine* belongs to its
 users alone.**
@@ -42,7 +42,7 @@ Build instructions are scripted to be used with CMake.
 
 TODO
 
-## Remarks about *Version 1.x.x*
+## Remarks about *Version 1.1.0*
 
 This version supports only a subset of Petri nets.
 
