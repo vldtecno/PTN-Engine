@@ -29,57 +29,28 @@ Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatc
 
 	//Places
 	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
-
-	addPlace("WaitPackage",0,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
-
-	addPlace("ChannelA", 0,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
-
-	addPlace("ChannelB", 0,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
+	addPlace("WaitPackage",0, nullptr, nullptr);
+	addPlace("ChannelA", 0, nullptr, nullptr);
+	addPlace("ChannelB", 0, nullptr, nullptr);
 
 
 	//Transitions
 
-	//Use A
 	createTransition(
 			{"InputWaitPackage"}, //activation
 			{1},
 			{"WaitPackage"}, //destination
+			{1},
+			{} //additional conditions
+			);
+
+	createTransition(
+			{"WaitPackage"}, //activation
 			{3},
+			{"ChannelA", "ChannelB"}, //destination
+			{4, 10},
 			{} //additional conditions
 			);
-
-	//Use B
-	createTransition(
-			{"WaitPackage"}, //activation
-			{2},
-			{"ChannelA"}, //destination
-			{1},
-			{} //additional conditions
-			);
-
-	//From A back to waiting a package
-	createTransition(
-			{"WaitPackage"}, //activation
-			{4},
-			{"ChannelB"}, //destination
-			{1},
-			{} //additional conditions
-			);
-
-	//Finished
-	createTransition(
-			{"ChannelA", "ChannelB"}, //activation
-			{}, //destination
-			{} //additional conditions
-			);
-
-
 
 }
 
