@@ -19,7 +19,8 @@
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IConditionFunctor.h"
-#include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
+
 
 namespace ptne
 {
@@ -55,19 +56,19 @@ namespace ptne
 	{
 		if(activationPlaces.size() != activationWeights.size())
 		{
-			throw PTN_Exception("The number of activation weights must be the same as the number of activation places.");
+			throw ActivationWeightDimensionException();
 		}
 
 		if(destinationPlaces.size() != destinationWeights.size())
 		{
-			throw PTN_Exception("The number of destination weights must be the same as the number of destination places.");
+			throw DestinationWeightDimensionException();
 		}
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
 			if(activationWeights[i] == 0)
 			{
-				throw PTN_Exception("Weights cannot be 0.");
+				throw ZeroValueWeightException();
 			}
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
 		}
@@ -76,7 +77,7 @@ namespace ptne
 		{
 			if(destinationWeights[i] == 0)
 			{
-				throw PTN_Exception("Weights cannot be 0.");
+				throw ZeroValueWeightException();
 			}
 			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
 		}
@@ -118,17 +119,13 @@ namespace ptne
 	{
 		for(const WeakPtrPlace& inhibitorPlace: m_inhibitorPlaces)
 		{
-			if(SharedPtrPlace spInhibitorPlace = inhibitorPlace.lock())
+			SharedPtrPlace spInhibitorPlace = lockWeakPtrNotNull(inhibitorPlace);
+
+			if(spInhibitorPlace->getNumberOfTokens() > 0)
 			{
-				if(spInhibitorPlace->getNumberOfTokens() > 0)
-				{
-					return false;
-				}
+				return false;
 			}
-			else
-			{
-				throw PTN_Exception("Could not obtain pointer to place.");
-			}
+
 		}
 		return true;
 	}
@@ -140,17 +137,13 @@ namespace ptne
 			const WeakPtrPlace& activationPlace = get<0>(tupleActivationPlace);
 			const size_t activationWeight = get<1>(tupleActivationPlace);
 
-			if(SharedPtrPlace spPlace = activationPlace.lock())
+			SharedPtrPlace spPlace = lockWeakPtrNotNull(activationPlace);
+
+			if(spPlace->getNumberOfTokens() < activationWeight)
 			{
-				if(spPlace->getNumberOfTokens() < activationWeight)
-				{
-					return false;
-				}
+				return false;
 			}
-			else
-			{
-				throw PTN_Exception("Could not obtain pointer to place.");
-			}
+
 		}
 		return true;
 	}
@@ -187,7 +180,7 @@ namespace ptne
 			WeakPtrPlace& activationPlace = get<0>(tupleActivationPlace);
 			const size_t activationWeight = get<1>(tupleActivationPlace);
 
-			if(SharedPtrPlace spPlace = activationPlace.lock())
+			if(SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
 			{
 				spPlace->exitPlace(activationWeight);
 			}
@@ -201,11 +194,24 @@ namespace ptne
 			WeakPtrPlace& destinationPlace = get<0>(tupleDestinationPlace);
 			const size_t destinationWeight = get<1>(tupleDestinationPlace);
 
-			if(SharedPtrPlace spPlace = destinationPlace.lock())
+			if (SharedPtrPlace spPlace = lockWeakPtr(destinationPlace))
 			{
 				spPlace->enterPlace(destinationWeight);
 			}
 		}
 	}
+
+	Transition::ActivationWeightDimensionException::ActivationWeightDimensionException():
+		PTN_Exception("The number of activation weights must be the same as the number of activation places.")
+	{}
+
+	Transition::DestinationWeightDimensionException::DestinationWeightDimensionException() :
+		PTN_Exception("The number of destination weights must be the same as the number of destination places.")
+	{}
+
+	Transition::ZeroValueWeightException::ZeroValueWeightException() :
+		PTN_Exception("Weights cannot be 0.")
+	{}
+
 
 }

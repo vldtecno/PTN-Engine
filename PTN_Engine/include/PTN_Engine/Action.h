@@ -17,7 +17,8 @@
  */
 #pragma once
 
-#include "PTN_Engine/Explicit.h"
+#include "PTN_Engine/Utilities/Explicit.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include "PTN_Engine/IActionFunctor.h"
 #include <memory>
 
@@ -55,10 +56,10 @@ namespace ptne
 		 */
 		void operator()() override
 		{
-			if(std::shared_ptr<C> sptrController = m_parent.lock())
+			if(std::shared_ptr<C> sptrController = lockWeakPtr(m_parent))
 			{
 				C& controller = *(sptrController);
-				return (controller.*(m_memberFunctionPointer))();
+				(controller.*(m_memberFunctionPointer))();
 			}
 		}
 

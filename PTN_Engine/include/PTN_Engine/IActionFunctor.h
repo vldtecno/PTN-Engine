@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "PTN_Engine/Explicit.h"
+#include "PTN_Engine/Utilities/Explicit.h"
 
 namespace ptne
 {

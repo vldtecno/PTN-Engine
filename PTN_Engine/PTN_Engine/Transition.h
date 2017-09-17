@@ -21,6 +21,7 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
@@ -87,6 +88,38 @@ namespace ptne
 		 * \return True if can be fired, false if it cannot.
 		 */
 		bool isActive() const;
+
+		/*! 
+		 * Exception to be thrown when the dimension of the vector containing
+		 * the activation weights does not match the dimension of the vector
+		 * containing the names of the activation places.
+		 */
+		class ActivationWeightDimensionException : public PTN_Exception
+		{
+		public:
+
+			ActivationWeightDimensionException();
+		};
+
+		/*!
+		* Exception to be thrown when the dimension of the vector containing
+		* the destination weights does not match the dimension of the vector
+		* containing the names of the destination places.
+		*/
+		class DestinationWeightDimensionException : public PTN_Exception
+		{
+		public:
+
+			DestinationWeightDimensionException();
+		};
+
+		//! Exception to be thrown when the weight value is 0.
+		class ZeroValueWeightException : public PTN_Exception
+		{
+		public:
+
+			ZeroValueWeightException();
+		};
 
 	private:
 
