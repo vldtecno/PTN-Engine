@@ -17,6 +17,7 @@
  */
 
 #include "Controller/Controller.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 
 #include <iostream>
 
@@ -70,71 +71,51 @@ void Controller::initialize()
 
 void Controller::showMainMenu()
 {
-	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
-	{
-		mainMenu->showMenu();
-	}
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	mainMenu->showMenu();
 }
 
 void Controller::selectCallsOption()
 {
-	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
-	{
-		mainMenu->select(0);
-	}
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	mainMenu->select(0);
 }
 
 void Controller::selectMessagesOption()
 {
-	if(shared_ptr<MainMenuView> mainMenu = m_mainMenu.lock())
-	{
-		mainMenu->select(1);
-	}
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	mainMenu->select(1);
 }
 
 void Controller::showCallsMenu()
 {
-	if(shared_ptr<CallList> callLog = m_callLog.lock())
-	{
-		if(shared_ptr<CallLogView> callLogView = m_callLogView.lock())
-		{
-			callLogView->viewCallLog(*callLog);
-		}
-	}
+	shared_ptr<CallList> callLog = lockWeakPtrNotNull(m_callLog);
+	shared_ptr<CallLogView> callLogView = lockWeakPtrNotNull(m_callLogView);
+	callLogView->viewCallLog(*callLog);
 }
 
 void Controller::showMessageMenu()
 {
-	if(shared_ptr<MessageList> messageList = m_messageList.lock())
-	{
-		if(shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
-		{
-			messagesMenu->showMessagesList(*messageList, m_messageSelected);
-		}
-	}
+	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
+	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtrNotNull(m_messagesMenu);
+	messagesMenu->showMessagesList(*messageList, m_messageSelected);
 }
 
 void Controller::selectNextMessage()
 {
-	if(shared_ptr<MessageList> messageList = m_messageList.lock())
+	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
+	++m_messageSelected;
+	if(m_messageSelected == messageList->size())
 	{
-		++m_messageSelected;
-		if(m_messageSelected == messageList->size())
-		{
-			m_messageSelected = 0;
-		}
+		m_messageSelected = 0;
 	}
 }
 
 void Controller::showMessage()
 {
-	if(shared_ptr<MessageList> messageList = m_messageList.lock())
-	{
-		if(shared_ptr<MessagesMenuView> messagesMenu = m_messagesMenu.lock())
-		{
-			messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
-		}
-	}
+	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
+	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtrNotNull(m_messagesMenu);
+	messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
 }
 
 void Controller::setMessageList(shared_ptr<MessageList> messageList)
