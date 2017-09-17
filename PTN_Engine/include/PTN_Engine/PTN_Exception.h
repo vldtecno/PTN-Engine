@@ -17,12 +17,14 @@
  */
 
 #pragma once
+
+#include "PTN_Engine/Utilities/Explicit.h"
 #include <stdexcept>
 
 namespace ptne
 {
 	//! Exception base type used in the PTN Engine.
-	class PTN_Exception: public std::runtime_error
+	class DLL_PUBLIC PTN_Exception: public std::runtime_error
 	{
 	public:
 

@@ -19,7 +19,7 @@
 #include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/PTN_Engine/Transition.h"
-#include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
 
 namespace ptne
@@ -170,14 +170,8 @@ namespace ptne
 	{
 		for( const WeakPtrPlace& place : m_inputPlaces)
 		{
-			if(SharedPtrPlace spPlace = place.lock())
-			{
-				spPlace->setNumberOfTokens(0);
-			}
-			else
-			{
-				throw PTN_Exception("Could not access place.");
-			}
+			SharedPtrPlace spPlace = lockWeakPtrNotNull(place);
+			spPlace->setNumberOfTokens(0);
 		}
 	}
 
