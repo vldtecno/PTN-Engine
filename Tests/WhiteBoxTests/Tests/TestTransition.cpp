@@ -20,12 +20,12 @@
 
 #include "Fixtures/FixtureTestTransition.h"
 
+
 using namespace std;
+using namespace ptne;
 
 TEST_F(FixtureTestTransition, T1)
 {
-	using namespace ptne;
-
 	vector<size_t> inputTokens {1,1,1};
 	vector<size_t> expectedInputTokens {0,0,0};
 	vector<size_t> outputTokens {0,0,0};
@@ -38,8 +38,6 @@ TEST_F(FixtureTestTransition, T1)
 
 TEST_F(FixtureTestTransition, T2)
 {
-	using namespace ptne;
-
 	vector<size_t> inputTokens {1,0,1};
 	vector<size_t> expectedInputTokens {1,0,1};
 	vector<size_t> outputTokens {0,0,0};
@@ -52,8 +50,6 @@ TEST_F(FixtureTestTransition, T2)
 
 TEST_F(FixtureTestTransition, T3)
 {
-	using namespace ptne;
-
 	vector<size_t> inputTokens {1,1,1};
 	vector<size_t> expectedInputTokens {1,1,1};
 	vector<size_t> outputTokens {0,0,0};
@@ -65,19 +61,80 @@ TEST_F(FixtureTestTransition, T3)
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
 }
 
-TEST_F(FixtureTestTransition, T4_Weights)
+TEST_F(FixtureTestTransition, T_Weights)
 {
-	using namespace ptne;
-
 	vector<size_t> inputTokens {2,2};
 	vector<size_t> inputWeights {2,1};
 	vector<size_t> outputTokens {0};
-	vector<size_t> outputWeighs {2};
+	vector<size_t> outputWeights {2};
 	vector<size_t> expectedInputTokens{0,1};
 	vector<size_t> expectedOutputTokens {2};
 	VectorOfConditions conditions {};
 	bool expectedFireResult = true;
 
-	createTransitionWithWeights(inputTokens, inputWeights, outputTokens, outputWeighs, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
+	createTransitionWithWeights(inputTokens, inputWeights, outputTokens, outputWeights, expectedInputTokens, expectedOutputTokens, conditions, expectedFireResult);
+}
+
+TEST_F(FixtureTestTransition, T_ZeroValueWeightException)
+{
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2,1};
+	vector<size_t> outputTokens {0};
+	vector<size_t> outputWeights {0};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
+	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+
+	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
+	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+
+	ASSERT_THROW(
+	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+	Transition::ZeroValueWeightException
+	);
+}
+
+TEST_F(FixtureTestTransition, T_ActivationWeightDimensionException)
+{
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2};
+	vector<size_t> outputTokens {0};
+	vector<size_t> outputWeights {1};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
+	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+
+	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
+	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+
+	ASSERT_THROW(
+	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+	Transition::ActivationWeightDimensionException
+	);
+}
+
+TEST_F(FixtureTestTransition, T_DestinationWeightDimensionException)
+{
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2,3};
+	vector<size_t> outputTokens {0};
+	vector<size_t> outputWeights {1,5};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
+	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+
+	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
+	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+
+	ASSERT_THROW(
+	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+	Transition::DestinationWeightDimensionException
+	);
 }
 

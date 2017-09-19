@@ -74,9 +74,27 @@ public:
 			VectorOfConditions conditions,
 			const bool expectedFireResult);
 
+	/*!
+	 * Utility function. Creates vector of shared pointers to places from a vector of
+	 * initial tokens.
+	 * \param tokens Vector with initial tokens.
+	 * \return Vector of shared pointers to places with the tokens given in the input.
+	 */
+	std::vector<std::shared_ptr<ptne::Place>> createPlaces(const std::vector<size_t> tokens);
+
+	/*!
+	 * Utility function. Create a vector with weak pointers of the shared pointers of the
+	 * input vector.
+	 * \param Vector of shared pointers to places.
+	 * \return Vector of weak pointers to vector of shared pointers.
+	 */
+	std::vector<std::weak_ptr<ptne::Place>> createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> places);
+
 protected:
 
 	//!
 	std::shared_ptr<Controller> m_controller;
+
+
 
 };
