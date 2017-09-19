@@ -68,10 +68,9 @@ TEST_F(FixtureTestPlace, Overflow)
 
 TEST_F(FixtureTestPlace, NullTokens)
 {
-	ASSERT_THROW(
-	m_place.exitPlace(0),
-	ptne::Place::NullTokensException
-	);
+	m_place.enterPlace(10);
+	m_place.exitPlace(0);
+	EXPECT_EQ(0, m_place.getNumberOfTokens());
 }
 
 TEST_F(FixtureTestPlace, NotEnoughTokens)
