@@ -66,10 +66,6 @@ namespace ptne
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
-			if(activationWeights[i] == 0)
-			{
-				throw ZeroValueWeightException();
-			}
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
 		}
 
