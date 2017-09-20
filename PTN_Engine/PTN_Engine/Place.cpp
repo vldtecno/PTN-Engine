@@ -73,15 +73,18 @@ namespace ptne
 
 	void Place::decreaseNumberOfTokens(const size_t tokens)
 	{
-		if(tokens == 0)
-		{
-			throw NullTokensException();
-		}
 		if(m_numberOfTokens < tokens )
 		{
 			throw NotEnoughTokensException();
 		}
-		m_numberOfTokens -= tokens;
+		if(tokens == 0) //reset
+		{
+			m_numberOfTokens = 0;
+		}
+		else
+		{
+			m_numberOfTokens -= tokens;
+		}
 	}
 
 	void Place::setNumberOfTokens(const size_t tokens)
