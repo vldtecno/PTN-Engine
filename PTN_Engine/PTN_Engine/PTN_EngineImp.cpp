@@ -162,7 +162,7 @@ namespace ptne
 	{
 		if(m_places.find(name)!= m_places.end())
 		{
-			throw PTN_Exception("Trying to add an already existing place");
+			throw RepeatedPlaceException(name);
 		}
 
 		SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens,
@@ -203,7 +203,7 @@ namespace ptne
 		}
 		if(!m_places.at(place)->isInputPlace())
 		{
-			throw PTN_Exception(place + " is not an input place");
+			throw NotInputPlaceException(place);
 		}
 		m_places.at(place)->increaseNumberOfTokens(1);
 	}
@@ -212,7 +212,7 @@ namespace ptne
 	{
 		if(placesNames.size() != getNumberOfUniqueNames(placesNames))
 		{
-			throw PTN_Exception("Tried to create transition with repeated places.");
+			throw RepeatedPlaceNamesException();
 		}
 
 		vector<WeakPtrPlace> placesVector;
@@ -229,6 +229,18 @@ namespace ptne
 
 	PTN_EngineImp::InvalidNameException::InvalidNameException(const string& name):
 		PTN_Exception("Invalid name: " + name +".")
+	{}
+
+	PTN_EngineImp::RepeatedPlaceNamesException::RepeatedPlaceNamesException():
+		PTN_Exception("Tried to create transition with repeated places.")
+	{}
+
+	PTN_EngineImp::NotInputPlaceException::NotInputPlaceException(const string& name):
+		PTN_Exception(name + " is not an input place.")
+	{}
+
+	PTN_EngineImp::RepeatedPlaceException::RepeatedPlaceException(const string& name):
+		PTN_Exception("Trying to add an already existing place: "+name+".")
 	{}
 
 }
