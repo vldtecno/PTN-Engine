@@ -138,3 +138,47 @@ TEST_F(FixtureTestTransition, T_DestinationWeightDimensionException)
 	);
 }
 
+TEST_F(FixtureTestTransition, T_ActivationPlaceRepetitionException)
+{
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2,3,1};
+	vector<size_t> outputTokens {1,2};
+	vector<size_t> outputWeights {1,5};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
+	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+	wInputPlaces.push_back(inputPlaces.at(0));
+
+	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
+	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+
+	ASSERT_THROW(
+	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+	Transition::ActivationPlaceRepetitionException
+	);
+}
+
+TEST_F(FixtureTestTransition, T_DestinationPlaceRepetitionException)
+{
+	vector<size_t> inputTokens {2,2};
+	vector<size_t> inputWeights {2,3};
+	vector<size_t> outputTokens {1,2};
+	vector<size_t> outputWeights {1,5,3};
+	VectorOfConditions conditions {};
+	bool expectedFireResult = true;
+
+	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
+	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+
+	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
+	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+	wOutputPlaces.push_back(outputPlaces.at(0));
+
+	ASSERT_THROW(
+	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+	Transition::DestinationPlaceRepetitionException
+	);
+}
+
