@@ -121,6 +121,36 @@ namespace ptne
 			InvalidNameException(const std::string& name);
 		};
 
+		/*!
+		 * Exception to be thrown if names of places to construct
+		 * a transition are repeated.
+		 */
+		class RepeatedPlaceNamesException: public PTN_Exception
+		{
+		public:
+			RepeatedPlaceNamesException();
+		};
+
+		/*!
+		 * Exception to be thrown if the user tries to increment the
+		 * number of tokens of a non input place.
+		 */
+		class NotInputPlaceException: public PTN_Exception
+		{
+		public:
+			NotInputPlaceException(const std::string& name);
+		};
+
+		/*!
+		 * Exception to be thrown if the user tries to add a Place
+		 * to the net that with the name of an already existing one.
+		 */
+		class RepeatedPlaceException: public PTN_Exception
+		{
+		public:
+			RepeatedPlaceException(const std::string& name);
+		};
+
 	private:
 
 		/*!
