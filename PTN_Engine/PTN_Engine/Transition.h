@@ -121,6 +121,28 @@ namespace ptne
 			ZeroValueWeightException();
 		};
 
+		/*!
+		 * Exception to be thrown when activation places in the constructor
+		 * are repeated.
+		 */
+		class ActivationPlaceRepetitionException : public PTN_Exception
+		{
+		public:
+
+			ActivationPlaceRepetitionException();
+		};
+
+		/*!
+		 * Exception to be thrown when activation places in the constructor
+		 * are repeated.
+		 */
+		class DestinationPlaceRepetitionException : public PTN_Exception
+		{
+		public:
+
+			DestinationPlaceRepetitionException();
+		};
+
 	private:
 
 		/*!
@@ -161,6 +183,8 @@ namespace ptne
 
 		//! Inhibitor arcs
 		std::vector<WeakPtrPlace> m_inhibitorPlaces;
+
+
 
 	};
 }
