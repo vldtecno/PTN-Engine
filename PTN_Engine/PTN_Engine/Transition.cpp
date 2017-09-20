@@ -20,11 +20,22 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IConditionFunctor.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
+#include <set>
 
 
 namespace ptne
 {
 	using namespace std;
+
+	static size_t getNumberOfUniquePlaces(const vector<Transition::WeakPtrPlace>& places)
+	{
+		set<Transition::WeakPtrPlace, owner_less<Transition::WeakPtrPlace>> s;
+		for(Transition::WeakPtrPlace place : places)
+		{
+			s.insert(place);
+		}
+		return s.size();
+	}
 
 	Transition::Transition(const vector<WeakPtrPlace>& activationPlaces,
 		const vector<WeakPtrPlace>& destinationPlaces,
@@ -33,6 +44,16 @@ namespace ptne
 			m_additionalActivationConditions{additionalActivationConditions},
 			m_inhibitorPlaces(inhibitorPlaces)
 	{
+		if(activationPlaces.size() != getNumberOfUniquePlaces(activationPlaces))
+		{
+			throw ActivationPlaceRepetitionException();
+		}
+
+		if(destinationPlaces.size() != getNumberOfUniquePlaces(destinationPlaces))
+		{
+			throw DestinationPlaceRepetitionException();
+		}
+
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
 		{
 			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i],1));
@@ -62,6 +83,16 @@ namespace ptne
 		if(destinationPlaces.size() != destinationWeights.size())
 		{
 			throw DestinationWeightDimensionException();
+		}
+
+		if(activationPlaces.size() != getNumberOfUniquePlaces(activationPlaces))
+		{
+			throw ActivationPlaceRepetitionException();
+		}
+
+		if(destinationPlaces.size() != getNumberOfUniquePlaces(destinationPlaces))
+		{
+			throw DestinationPlaceRepetitionException();
 		}
 
 		for(size_t i = 0; i < activationPlaces.size(); ++i)
@@ -207,6 +238,14 @@ namespace ptne
 
 	Transition::ZeroValueWeightException::ZeroValueWeightException() :
 		PTN_Exception("Weights cannot be 0.")
+	{}
+
+	Transition::ActivationPlaceRepetitionException::ActivationPlaceRepetitionException() :
+		PTN_Exception("Repetition of activation places is not permitted.")
+	{}
+
+	Transition::DestinationPlaceRepetitionException::DestinationPlaceRepetitionException() :
+		PTN_Exception("Repetition of destination places is not permitted.")
 	{}
 
 
