@@ -21,10 +21,21 @@
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
+#include <set>
 
 namespace ptne
 {
 	using namespace std;
+
+	static size_t getNumberOfUniqueNames(const vector<string>& names)
+	{
+		set<string> s;
+		for(string name : names)
+		{
+			s.insert(name);
+		}
+		return s.size();
+	}
 
 	PTN_EngineImp::PTN_EngineImp():
 		m_stop{false}
@@ -199,6 +210,11 @@ namespace ptne
 
 	vector<WeakPtrPlace> PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
 	{
+		if(placesNames.size() != getNumberOfUniqueNames(placesNames))
+		{
+			throw PTN_Exception("Tried to create transition with repeated places.");
+		}
+
 		vector<WeakPtrPlace> placesVector;
 		for(const auto& placeName : placesNames)
 		{
