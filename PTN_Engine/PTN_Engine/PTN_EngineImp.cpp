@@ -81,7 +81,7 @@ namespace ptne
 		{
 			if(m_places.find(activationPlace) == m_places.end())
 			{
-				throw PTN_Exception("Invalid name: " + activationPlace);
+				throw InvalidNameException(activationPlace);
 			}
 			activationPlacesVector.push_back(m_places.at(activationPlace));
 		}
@@ -91,7 +91,7 @@ namespace ptne
 		{
 			if(m_places.find(destinationPlace) == m_places.end())
 			{
-				throw PTN_Exception("Invalid name: " + destinationPlace);
+				throw InvalidNameException(destinationPlace);
 			}
 			destinationPlacesVector.push_back(m_places.at(destinationPlace));
 		}
@@ -101,7 +101,7 @@ namespace ptne
 		{
 			if(m_places.find(inhibitorPlace) == m_places.end())
 			{
-				throw PTN_Exception("Invalid name: " + inhibitorPlace);
+				throw InvalidNameException(inhibitorPlace);
 			}
 			inhibitorPlacesVector.push_back(m_places.at(inhibitorPlace));
 		}
@@ -190,7 +190,7 @@ namespace ptne
 	{
 		if(m_places.find(place) == m_places.end())
 		{
-			throw PTN_Exception("Invalid place " + place);
+			throw InvalidNameException(place);
 		}
 		return m_places.at(place)->getNumberOfTokens();
 	}
@@ -199,7 +199,7 @@ namespace ptne
 	{
 		if(m_places.find(place) == m_places.end())
 		{
-			throw PTN_Exception("Invalid place " + place);
+			throw InvalidNameException(place);
 		}
 		if(!m_places.at(place)->isInputPlace())
 		{
@@ -220,11 +220,15 @@ namespace ptne
 		{
 			if(m_places.find(placeName) == m_places.end())
 			{
-				throw PTN_Exception("Invalid name: " + placeName);
+				throw InvalidNameException(placeName);
 			}
 			placesVector.push_back(m_places.at(placeName));
 		}
 		return placesVector;
 	}
+
+	PTN_EngineImp::InvalidNameException::InvalidNameException(const string& name):
+		PTN_Exception("Invalid name: " + name +".")
+	{}
 
 }
