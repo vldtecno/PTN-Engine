@@ -21,6 +21,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
@@ -110,6 +111,16 @@ namespace ptne
 		 */
 		void incrementInputPlace(const std::string& place);
 
+		/*!
+		 * Exception to be thrown when trying to use a place with
+		 * a wrong name.
+		 */
+		class InvalidNameException: public PTN_Exception
+		{
+		public:
+			InvalidNameException(const std::string& name);
+		};
+
 	private:
 
 		/*!
@@ -145,9 +156,10 @@ namespace ptne
 
 		//! Translates a vector of names of places to a vector of weak pointers to those places.
 		/*!
-		 *
+		 * \param names Names of the places.
+		 * \return Vector of weakt_ptr for each place given in "names".
 		 */
-		std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string>&) const;
+		std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string>& names) const;
 
 		//! Flag to stop the execution of the net.
 		/*!
