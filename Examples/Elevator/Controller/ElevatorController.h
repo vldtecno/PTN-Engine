@@ -21,6 +21,8 @@
 
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
+#include <vector>
+#include <set>
 
 
 class IElevatorPetriNet;
@@ -32,6 +34,8 @@ class IElevatorPetriNet;
  */
 class ElevatorController: public std::enable_shared_from_this<ElevatorController>
 {
+	friend class ElevatorPetriNet;
+
 public:
 
 	//! Constructor.
@@ -61,6 +65,9 @@ public:
 
 
 
+
+
+
 private:
 
 	//! Base (nested) class for a Petri net based state machine.
@@ -72,8 +79,52 @@ private:
 
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 
+	int m_currentFloor;
+	int m_destinationFloor;
+	int m_upCallerFloor;
+	int m_downCallerFloor;
+	
+	
+	bool m_goingUp;
+	bool m_goingDown;
+	bool m_endTravel;
+
+	std::set<int> m_destinations1;
+	std::set<int> m_destinations2;
+	std::set<int> m_waitingToGoUp;
+	std::set<int> m_waitingToGoDown;
+
+	bool dlCallElevatorUp(const int floor);
+	bool dlCallElevatorDown(const int floor);
+	bool dlSetDestinationFloor(const int floor);
+	void dlArrivedFloor(const int floor);
+	void dlGoUp();
+	void dlGoDown();
+
+	bool addDestination1(const int floor);
+	bool addDestination2(const int floor);
+	bool addWaitingToGoDown(const int floor);
+	bool addWaitingToGoUp(const int floor);
+	bool list1IsEmpty() const;
+
+	void rotateLists();
+	void mergeWaitingToGoUp();
+	void mergeWaitingToGoDown();
+	void mergeMaxWaitingToGoDown();
+	void mergeMinWaitingToGoUp();
+
+
 	//! The state machine of the controller.
 	PtrPetriNet m_pPetriNet;
+
+	
+	//Actions
+
+
+
+
+
+	//Conditions
 
 
 };
