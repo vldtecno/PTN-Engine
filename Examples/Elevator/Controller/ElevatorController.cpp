@@ -341,34 +341,22 @@ void ElevatorController::mergeMinWaitingToGoUp()
 //Actions
 void ElevatorController::addDestination1()
 {
-	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.cend())
-	{
-		m_destinations1.insert(m_toAddToDestination);
-	}
+	m_destinations1.insert(m_toAddToDestination);
 }
 
 void ElevatorController::addDestination2()
 {
-	if (m_destinations2.find(m_toAddToDestination) != m_destinations2.cend())
-	{
-		m_destinations2.insert(m_toAddToDestination);
-	}
+	m_destinations2.insert(m_toAddToDestination);
 }
 
 void ElevatorController::addWaitingToGoDown()
 {
-	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.cend())
-	{
-		m_waitingToGoDown.insert(m_toAddToDestination);
-	}
+	m_waitingToGoDown.insert(m_toAddToDestination);
 }
 
 void ElevatorController::addWaitingToGoUp()
 {
-	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.cend())
-	{
-		m_waitingToGoUp.insert(m_toAddToDestination);
-	}
+	m_waitingToGoUp.insert(m_toAddToDestination);
 }
 
 void ElevatorController::removeDestination()
@@ -415,7 +403,7 @@ bool ElevatorController::isFloorNotInList() const
 
 bool ElevatorController::isFloorInList() const
 {
-	return m_destinations1.find(m_toAddToDestination) != m_destinations1.cend();
+	return m_destinations1.find(m_currentFloor) != m_destinations1.cend();
 }
 
 bool ElevatorController::isDestinationListNotEmpty() const

@@ -85,8 +85,9 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 
 	/////////////////
 	//simulation
-	createTransition({"Moving", "GoingUp", "Ready"}, {"Moving", "GoingUp", "IncreaseFloor"},
-		{}
+	createTransition({"Moving", "GoingUp", "Ready", "HasDestination"}, {"Moving", "GoingUp", "IncreaseFloor", "HasDestination" },
+		{},
+		{ "ArrivedFloor", "ArrivedDestination" }
 	);
 	
 	createTransition({"IncreaseFloor"}, {"ArrivedFloor", "Ready" },
@@ -94,8 +95,9 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	);
 
 
-	createTransition({"Moving", "GoingDown", "Ready" }, {"Moving", "GoingDown", "DecreaseFloor"},
-		{}
+	createTransition({"Moving", "GoingDown", "Ready", "HasDestination" }, {"Moving", "GoingDown", "DecreaseFloor", "HasDestination" },
+		{},
+		{ "ArrivedFloor", "ArrivedDestination" }
 	);
 
 	createTransition({"DecreaseFloor"}, {"ArrivedFloor", "Ready" },
@@ -151,7 +153,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	
 
 	//////////////////
-	//Pressing a floor button inside the elevator.	
+	// Pressing a floor button inside the elevator.	
 
 	createTransition({"DestinationButton", "Ready"}, {"P1"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) },
@@ -209,7 +211,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 		{}
 	);
 
-	createTransition({ "AddToTravel" }, { "Ready" },
+	createTransition({ "AddToTravel" }, { "Ready", "HasDestination" },
 		{},
 		{ "HasDestination" }
 	);
