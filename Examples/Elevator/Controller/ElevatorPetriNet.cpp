@@ -35,24 +35,24 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	addPlace("DestinationButton", 0, nullptr, nullptr, true);
 
 	//controller places
-	addPlace("Stopped", 1, nullptr, nullptr);
-	addPlace("Moving", 0, nullptr, nullptr);
-	addPlace("DoorsOpened", 1, nullptr, nullptr);
-	addPlace("DoorsClosed", 0, nullptr, nullptr);
-	addPlace("ArrivedFloor", 0, nullptr, nullptr);
-	addPlace("HasDestination", 0, nullptr, nullptr);
+	addPlace("Stopped", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorStopped), nullptr);
+	addPlace("Moving", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorMoving), nullptr);
+	addPlace("DoorsOpened", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreOpen), nullptr);
+	addPlace("DoorsClosed", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreClosed), nullptr);
+	addPlace("ArrivedFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::arrivedFloor), nullptr);
+	addPlace("HasDestination", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::hasDestination), nullptr);
 
 	addPlace("GoingUp", 0, nullptr, nullptr);
 	addPlace("GoingDown", 0, nullptr, nullptr);
-	addPlace("AddToTravel", 0, nullptr, nullptr); //needs function
-	addPlace("AddToNextTravel", 0, nullptr, nullptr); //needs function
-	addPlace("WaitToGoUp", 0, nullptr, nullptr); 
-	addPlace("WaitToGoDown", 0, nullptr, nullptr);
+	addPlace("AddToTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination1), nullptr); 
+	addPlace("AddToNextTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination2), nullptr); //needs function
+	addPlace("WaitToGoUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoUp), nullptr);
+	addPlace("WaitToGoDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoDown), nullptr);
 	addPlace("ArrivedDestination", 0, nullptr, nullptr);
-	addPlace("RemoveFromList", 0, nullptr, nullptr); //needs function
-	addPlace("SwapLists", 0, nullptr, nullptr); //needs function
-	addPlace("ProcessGoUp", 0, nullptr, nullptr); //needs function
-	addPlace("ProcessGoDown", 0, nullptr, nullptr); //needs function
+	addPlace("RemoveFromList", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::removeDestination), nullptr); //needs function
+	addPlace("SwapLists", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::rotateLists), nullptr); //needs function
+	addPlace("ProcessGoUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::processWaitingToGoUp), nullptr); //needs function
+	addPlace("ProcessGoDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::processWaitingToGoDown), nullptr); //needs function
 	addPlace("Ready", 1, nullptr, nullptr);
 	addPlace("Aux1", 0, nullptr, nullptr);
 	addPlace("Aux2", 0, nullptr, nullptr);
@@ -61,8 +61,8 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	addPlace("P2", 0, nullptr, nullptr);
 
 	//simulation
-	addPlace("IncreaseFloor", 0, nullptr, nullptr); //needs function
-	addPlace("DecreaseFloor", 0, nullptr, nullptr); //needs function
+	addPlace("IncreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::increaseFloor), nullptr); //needs function
+	addPlace("DecreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::decreaseFloor), nullptr); //needs function
 
 	
 	//Create transitions
@@ -85,72 +85,66 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 
 	/////////////////
 	//simulation
-	createTransition({"Moving", "IncreaseFloor", "GoingUp"}, {"Moving", "OpenDoors"},
+	createTransition({"Moving", "GoingUp", "Ready"}, {"Moving", "GoingUp", "IncreaseFloor"},
 		{}
 	);
 	
-	createTransition({"IncreaseFloor"}, {"IncreaseFloor"},
-		{} //needs function
+	createTransition({"IncreaseFloor"}, {"ArrivedFloor", "Ready" },
+		{} 
 	);
 
-	createTransition({"IncreaseFloor" }, {"ArrivedDestination"},
-		{} //needs function
-	);
 
-	createTransition({"Moving", "DecreaseFloor", "GoingDown"}, {"Moving", "OpenDoors"},
+	createTransition({"Moving", "GoingDown", "Ready" }, {"Moving", "GoingDown", "DecreaseFloor"},
 		{}
 	);
 
-	createTransition({"DecreaseFloor"}, {"DecreaseFloor"},
-		{} //needs function
+	createTransition({"DecreaseFloor"}, {"ArrivedFloor", "Ready" },
+		{}
 	);
 
-	createTransition({"DecreaseFloor"}, {"ArrivedDestination"},
-		{} //needs function
-	);
 	////////////
 
 	//////////////////
 	//Arriving a floor.	
 
 	createTransition({"Ready", "ArrivedFloor"}, { "Ready" },
-		{} //needs function: floor not in list
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorNotInList) }
 	); //arrived floor not in list
 
 	createTransition({"Ready", "ArrivedFloor", "HasDestination"}, { "RemoveFromList" },
-		{} //needs function: floor in list
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) }
 	); //arrived floor in list
 
 	createTransition({"RemoveFromList"}, {"ArrivedDestination", "HasDestination"},
-		{} //needs function: list not empty
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) }
 	); //arrived floor not in list
 
-	createTransition({"RemoveFromList"}, {"Swap"},
-		{} //needs function: list not empty
+	createTransition({"RemoveFromList"}, {"SwapLists"},
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) } 
 	); //arrived floor in list
 
-	createTransition({"Swap", "GoingUp"}, {"ProcessGoDown"},
+	createTransition({"SwapLists", "GoingUp"}, {"ProcessGoDown"},
 		{}
 	); 
 
-	createTransition({"Swap", "GoingDown"}, {"ProcessGoUp"},
+	createTransition({"SwapLists", "GoingDown"}, {"ProcessGoUp"},
 		{}
 	);
 
 	createTransition({"ProcessGoDown"},	{"ArrivedDestination"},
-		{} //needs function: list is empty
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) } 
 	);
 
 	createTransition({"ProcessGoUp"}, {"ArrivedDestination"},
-		{} //needs function: list is empty
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) } 
 	);
 
 	createTransition({"ProcessGoDown"},	{"ArrivedDestination", "HasDestination", "GoingDown"},
-		{} //needs function: list is not empty
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) } 
 	);
 
 	createTransition({"ProcessGoUp"}, {"ArrivedDestination", "HasDestination", "GoingUp"},
-		{} //needs function: list is not empty
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) } 
 	);
 
 	//////////////////
@@ -160,26 +154,26 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//Pressing a floor button inside the elevator.	
 
 	createTransition({"DestinationButton", "Ready"}, {"P1"},
-		{}, //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) },
 		{"GoingUp", "GoingDown"}
 	);
 
 	createTransition({"DestinationButton", "Ready", "GoingUp"}, {"Aux1", "GoingUp"},
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } 
 	);
 
 	createTransition({"DestinationButton", "Ready", "GoingDown"}, {"Aux2", "GoingDown"},
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } 
 	);
 	
 	//has no destination
 
 	createTransition({ "P1" }, {"P2", "GoingUp" },
-		{} //needs function: pressed floor button > current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) } 
 	);
 
 	createTransition({ "P1" }, { "P2", "GoingDown" },
-		{} //needs function: pressed floor button < current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) } 
 	);
 
 	createTransition({ "P2" }, { "AddToTravel" },
@@ -189,21 +183,21 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//is moving up
 
 	createTransition({"Aux1"}, {"AddToTravel"},
-		{} //needs function: pressed floor button > current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) } 
 	);
 
 	createTransition({"Aux1"}, { "AddToNextTravel"},
-		{} //needs function: pressed floor button < current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) } 
 	);
 
 	//is moving down
 
 	createTransition({ "Aux2" }, { "AddToTravel" },
-		{} //needs function: pressed floor button < current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) } 
 	);
 
 	createTransition({ "Aux2" }, { "AddToNextTravel" },
-		{} //needs function: pressed floor button > current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) } 
 	);
 
 
@@ -227,24 +221,24 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//Calling the elevator to go up.	
 
 	createTransition({ "CallButtonUp", "Ready", "GoingUp" }, { "Aux2", "GoingUp" },
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } 
 	);
 
 	createTransition({ "CallButtonUp", "Ready", "GoingDown" }, { "AddToNextTravel", "GoingDown" },
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } 
 	);
 
 	createTransition({ "CallButtonUp", "Ready" }, { "P1" },
-		{}, //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }, 
 		{ "GoingUp", "GoingDown" }
 	);
 
 	createTransition({ "Aux2" }, { "AddToTravel" },
-		{} //needs function: floor > current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) } 
 	);
 
 	createTransition({ "Aux2" }, { "WaitToGoUp" },
-		{} //needs function: floor < current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) } 
 	);
 
 	createTransition({ "WaitToGoUp" }, { "Ready" },
@@ -257,24 +251,24 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//Calling the elevator to go down.	
 
 	createTransition({ "CallButtonDown", "Ready", "GoingDown" }, { "Aux3", "GoingDown" },
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }
 	);
 
 	createTransition({ "CallButtonDown", "Ready", "GoingUp" }, { "AddToNextTravel", "GoingUp" },
-		{} //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } 
 	);
 
 	createTransition({ "CallButtonDown", "Ready" }, { "P1" },
-		{}, //needs function: marked floor != current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }, 
 		{ "GoingUp", "GoingDown" }
 	);
 
 	createTransition({ "Aux3" }, { "AddToTravel" },
-		{} //needs function: floor > current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) }
 	);
 
 	createTransition({ "Aux3" }, { "WaitToGoDown" },
-		{} //needs function: floor < current floor
+		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) }
 	);
 
 	createTransition({ "WaitToGoDown" }, { "Ready" },
@@ -287,26 +281,31 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 void ElevatorPetriNet::closeDoors()
 {
 	incrementInputPlace("CloseDoors");
+	execute();
 }
 
 void ElevatorPetriNet::openDoors()
 {
 	incrementInputPlace("OpenDoors");
+	execute();
 }
 
 void ElevatorPetriNet::callButtonUp()
 {
 	incrementInputPlace("CallButtonUp");
+	execute();
 }
 
 void ElevatorPetriNet::callButtonDown()
 {
 	incrementInputPlace("CallButtonDown");
+	execute();
 }
 
 void ElevatorPetriNet::destinationButton()
 {
 	incrementInputPlace("DestinationButton");
+	execute();
 }
 
 //void Controller::MenuStateMachine::pressA()

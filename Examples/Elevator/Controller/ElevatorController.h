@@ -22,15 +22,14 @@
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
 #include <vector>
-#include <set>
+#include <unordered_set>
 
 
 class IElevatorPetriNet;
 
 //! Example of a controller class
 /*!
- * Controls the display of a simplified hypothetical phone's menus,
- * using only three keys.
+ *
  */
 class ElevatorController: public std::enable_shared_from_this<ElevatorController>
 {
@@ -80,34 +79,18 @@ private:
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 
 	int m_currentFloor;
-	int m_destinationFloor;
-	int m_upCallerFloor;
-	int m_downCallerFloor;
+	int m_toAddToDestination;
 	
 	
 	bool m_goingUp;
 	bool m_goingDown;
-	bool m_endTravel;
+	//bool m_endTravel;
 
-	std::set<int> m_destinations1;
-	std::set<int> m_destinations2;
-	std::set<int> m_waitingToGoUp;
-	std::set<int> m_waitingToGoDown;
-
-	bool dlCallElevatorUp(const int floor);
-	bool dlCallElevatorDown(const int floor);
-	bool dlSetDestinationFloor(const int floor);
-	void dlArrivedFloor(const int floor);
-	void dlGoUp();
-	void dlGoDown();
-
-	bool addDestination1(const int floor);
-	bool addDestination2(const int floor);
-	bool addWaitingToGoDown(const int floor);
-	bool addWaitingToGoUp(const int floor);
-	bool list1IsEmpty() const;
-
-	void rotateLists();
+	std::unordered_set<int> m_destinations1;
+	std::unordered_set<int> m_destinations2;
+	std::unordered_set<int> m_waitingToGoUp;
+	std::unordered_set<int> m_waitingToGoDown;
+	
 	void mergeWaitingToGoUp();
 	void mergeWaitingToGoDown();
 	void mergeMaxWaitingToGoDown();
@@ -119,20 +102,44 @@ private:
 
 	
 	//Actions
-
-
+	void addDestination1();
+	void addDestination2();
+	void addWaitingToGoDown();
+	void addWaitingToGoUp();
+	void removeDestination();
+	void rotateLists();
+	void processWaitingToGoUp();
+	void processWaitingToGoDown();
+	void increaseFloor();
+	void decreaseFloor();
+	
+	//info
+	void elevatorStopped();
+	void elevatorMoving();
+	void doorsAreOpen();
+	void doorsAreClosed();
+	void arrivedFloor();
+	void hasDestination();
 
 
 
 	//Conditions
-
+	bool isFloorNotInList() const;
+	bool isFloorInList() const;
+	bool isDestinationListNotEmpty() const;
+	bool isDestinationListEmpty() const;
+	bool isMarkedFloorNotCurrentFloor() const;
+	bool isMarkedFloorCurrentFloor() const;
+	bool isMarkedFloorGreaterThanCurrentFloor() const;
+	bool isMarkedFloorSmallerThanCurrentFloor() const;
 
 };
 
 template class ptne::Action<ElevatorController>;
 
 //!
-using Action = ptne::Action<ElevatorController>;
+using ControllerAction = ptne::Action<ElevatorController>;
+using ControllerActionPtr = std::shared_ptr<ControllerAction>;
 
 template class ptne::ActivationCondition<ElevatorController>;
 
