@@ -48,7 +48,7 @@ void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
 		wOutputPlaces.push_back(newPlace);
 	}
 
-	Transition transition(wInputPlaces, wOutputPlaces, conditions);
+	Transition transition(wInputPlaces, {}, wOutputPlaces, {}, {}, conditions);
 
 	EXPECT_EQ(expectedFireResult, transition.execute());
 
@@ -92,7 +92,7 @@ void FixtureTestTransition::createTransitionWithWeights(
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	//Create transition
-	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, conditions);
+	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, {}, conditions);
 
 	//Test transition
 	EXPECT_EQ(expectedFireResult, transition.execute());

@@ -37,50 +37,22 @@ namespace ptne
 		return s.size();
 	}
 
-	Transition::Transition(const vector<WeakPtrPlace>& activationPlaces,
-		const vector<WeakPtrPlace>& destinationPlaces,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions,
-		const vector<WeakPtrPlace>& inhibitorPlaces):
-			m_additionalActivationConditions{additionalActivationConditions},
-			m_inhibitorPlaces(inhibitorPlaces)
-	{
-		if(activationPlaces.size() != getNumberOfUniquePlaces(activationPlaces))
-		{
-			throw ActivationPlaceRepetitionException();
-		}
-
-		if(destinationPlaces.size() != getNumberOfUniquePlaces(destinationPlaces))
-		{
-			throw DestinationPlaceRepetitionException();
-		}
-
-		for(size_t i = 0; i < activationPlaces.size(); ++i)
-		{
-			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i],1));
-		}
-
-		for(size_t i = 0; i < destinationPlaces.size(); ++i)
-		{
-			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i],1));
-		}
-	}
-
 	Transition::Transition(
 		const vector<WeakPtrPlace>& activationPlaces,
 		const vector<size_t>& activationWeights,
 		const vector<WeakPtrPlace>& destinationPlaces,
-		const vector<size_t>& destinationWeights,
-		const vector<ConditionFunctorPtr>& additionalActivationConditions,
-		const vector<WeakPtrPlace>& inhibitorPlaces):
+		const vector<size_t>& destinationWeights,		
+		const vector<WeakPtrPlace>& inhibitorPlaces,
+		const vector<ConditionFunctorPtr>& additionalActivationConditions):
 			m_additionalActivationConditions{additionalActivationConditions},
 			m_inhibitorPlaces(inhibitorPlaces)
 	{
-		if(activationPlaces.size() != activationWeights.size())
+		if(activationPlaces.size() != activationWeights.size() && activationWeights.size() != 0)
 		{
 			throw ActivationWeightDimensionException();
 		}
 
-		if(destinationPlaces.size() != destinationWeights.size())
+		if(destinationPlaces.size() != destinationWeights.size() && destinationWeights.size() != 0)
 		{
 			throw DestinationWeightDimensionException();
 		}
@@ -95,18 +67,38 @@ namespace ptne
 			throw DestinationPlaceRepetitionException();
 		}
 
-		for(size_t i = 0; i < activationPlaces.size(); ++i)
+		if (activationWeights.size() != 0)
 		{
-			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
+			for (size_t i = 0; i < activationPlaces.size(); ++i)
+			{
+				m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
+			}
+		}
+		else
+		{
+			for (const auto& ap : activationPlaces)
+			{
+				m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(ap, 1));
+			}
 		}
 
-		for(size_t i = 0; i < destinationPlaces.size(); ++i)
+		if (destinationWeights.size() != 0)
 		{
-			if(destinationWeights[i] == 0)
+			for (size_t i = 0; i < destinationPlaces.size(); ++i)
 			{
-				throw ZeroValueWeightException();
+				if (destinationWeights[i] == 0)
+				{
+					throw ZeroValueWeightException();
+				}
+				m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
 			}
-			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
+		}
+		else
+		{
+			for (const auto& dp : destinationPlaces)
+			{
+				m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(dp, 1));
+			}
 		}
 	}
 

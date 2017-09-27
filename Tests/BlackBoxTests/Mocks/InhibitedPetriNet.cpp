@@ -28,43 +28,39 @@ Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispa
 {
 
 	//Places
-	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("P1",1, nullptr, nullptr);
-	addPlace("P2",1, nullptr, nullptr);
-	addPlace("P3",1, nullptr, nullptr);
-	addPlace("P4",0, nullptr, nullptr);
-	addPlace("P5",0, nullptr, nullptr);
+	createPlace("P1",1);
+	createPlace("P2",1);
+	createPlace("P3",1);
+	createPlace("P4",0);
+	createPlace("P5",0);
 
 	//Transitions
 
 
 	createTransition(
 			{"InputWaitPackage", "P1", "P3"}, //activation
-			{"P4"}, //destination
-			{} //additional conditions
+			{"P4"} //destination
 			);
 
 
 	createTransition(
 			{"P2"}, //activation
 			{"P5"}, //destination
-			{}, //additional conditions
 			{"P3"} //inhibitor arc
 			);
 
 
 	createTransition(
 			{"InputWaitPackage", "P4"}, //activation
-			{"P1", "P3"}, //destination
-			{} //additional conditions
+			{"P1", "P3"} //destination
 			);
 
 
 	createTransition(
 			{"P5"}, //activation
 			{"P2"}, //destination
-			{}, //additional conditions
 			{"P4"} //inhibitor arc
 			);
 
