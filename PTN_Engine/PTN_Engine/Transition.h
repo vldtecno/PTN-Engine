@@ -49,20 +49,6 @@ namespace ptne
 		/*!
 		 * Constructor.
 		 * \param activationPlaces Collection of incoming places.
-		 * \param destinationPlaces Collection of outgoing places.
-		 * \param additionalActivationConditions Boolean function from the controller that can block firing.
-		 * \param inhibitorPlaces Places that must be empty for the transition to fire.
-		 */
-		Transition(
-			const std::vector<WeakPtrPlace>& activationPlaces,
-			const std::vector<WeakPtrPlace>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalActivationConditions,
-			const std::vector<WeakPtrPlace>& inhibitorPlaces = {});
-
-		//! Constructor.
-		/*!
-		 * Constructor.
-		 * \param activationPlaces Collection of incoming places.
 		 * \param activationWeights Weights of each activation place.
 		 * \param destinationPlaces Collection of outgoing places.
 		 * \param destinationWeights Weights of each destination place.
@@ -73,9 +59,9 @@ namespace ptne
 			const std::vector<WeakPtrPlace>& activationPlaces,
 			const std::vector<size_t>& activationWeights,
 			const std::vector<WeakPtrPlace>& destinationPlaces,
-			const std::vector<size_t>& destinationWeights,
-			const std::vector<ConditionFunctorPtr>& additionalActivationConditions,
-			const std::vector<WeakPtrPlace>& inhibitorPlaces = {});
+			const std::vector<size_t>& destinationWeights,			
+			const std::vector<WeakPtrPlace>& inhibitorPlaces,
+			const std::vector<ConditionFunctorPtr>& additionalActivationConditions);
 
 		/*!
 		 * Evaluate the activation places and transit the tokens if possible.
@@ -102,10 +88,10 @@ namespace ptne
 		};
 
 		/*!
-		* Exception to be thrown when the dimension of the vector containing
-		* the destination weights does not match the dimension of the vector
-		* containing the names of the destination places.
-		*/
+		 * Exception to be thrown when the dimension of the vector containing
+		 * the destination weights does not match the dimension of the vector
+		 * containing the names of the destination places.
+		 */
 		class DestinationWeightDimensionException : public PTN_Exception
 		{
 		public:

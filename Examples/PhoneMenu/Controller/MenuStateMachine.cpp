@@ -28,105 +28,85 @@ Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMe
 	using namespace std;
 
 	//Places
-	addPlace("InputA",0, nullptr, nullptr, true);
-	addPlace("InputB",0, nullptr, nullptr, true);
-	addPlace("InputC", 0, nullptr, nullptr, true);
-	addPlace("CallsMenuSelected", 1,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu),
-			nullptr);
-	addPlace("MessagesMenuSelected", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu),
-			nullptr);
-	addPlace("SelectMessagesOption", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectMessagesOption),
-			nullptr);
-	addPlace("SelectCallsOption", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectCallsOption),
-			nullptr);
-	addPlace("CallsLog", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showCallsMenu),
-			nullptr);
-	addPlace("MessagesMenu", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMessageMenu),
-			nullptr);
-	addPlace("NextMessage", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectNextMessage),
-			nullptr);
-	addPlace("ShowMessage", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMessage),
-			nullptr);
+	createPlace("InputA",0, true);
+	createPlace("InputB",0, true);
+	createPlace("InputC", 0, true);
+	createPlace("CallsMenuSelected", 1,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
+	createPlace("MessagesMenuSelected", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
+	createPlace("SelectMessagesOption", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectMessagesOption));
+	createPlace("SelectCallsOption", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectCallsOption));
+	createPlace("CallsLog", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showCallsMenu));
+	createPlace("MessagesMenu", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessageMenu));
+	createPlace("NextMessage", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectNextMessage));
+	createPlace("ShowMessage", 0,
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessage));
 
 
 	//Transitions
 
 	//Switch menu
 	createTransition(
-			{"InputA", "CallsMenuSelected"},
-			{"SelectMessagesOption"},
-			{});
+		{"InputA", "CallsMenuSelected"},
+		{"SelectMessagesOption"});
 
 	createTransition(
-			{"SelectMessagesOption"},
-			{"MessagesMenuSelected"},
-			{});
+		{"SelectMessagesOption"},
+		{"MessagesMenuSelected"});
 
 	//Switch menu
 	createTransition(
-			{"InputA", "MessagesMenuSelected"},
-			{"SelectCallsOption"},
-			{});
+		{"InputA", "MessagesMenuSelected"},
+		{"SelectCallsOption"});
 
 	createTransition(
-			{"SelectCallsOption"},
-			{"CallsMenuSelected"},
-			{});
+		{"SelectCallsOption"},
+		{"CallsMenuSelected"});
 
 	//Select calls log
 	createTransition(
-			{"InputB", "CallsMenuSelected"},
-			{"CallsLog"},
-			{});
+		{"InputB", "CallsMenuSelected"},
+		{"CallsLog"});
 
 	//Leave calls log
 	createTransition(
-			{"InputC", "CallsLog"},
-			{"CallsMenuSelected"},
-			{});
+		{"InputC", "CallsLog"},
+		{"CallsMenuSelected"});
 
 	//Select messages menu
 	createTransition(
-			{"InputB", "MessagesMenuSelected"},
-			{"MessagesMenu"},
-			{});
+		{"InputB", "MessagesMenuSelected"},
+		{"MessagesMenu"});
 
 	//Leave messages menu
 	createTransition(
-			{"InputC", "MessagesMenu"},
-			{"MessagesMenuSelected"},
-			{});
+		{"InputC", "MessagesMenu"},
+		{"MessagesMenuSelected"});
 
 	//Select next message
 	createTransition(
-			{"InputA", "MessagesMenu"},
-			{"NextMessage"},
-			{});
+		{"InputA", "MessagesMenu"},
+		{"NextMessage"});
 
 	createTransition(
-			{"NextMessage"},
-			{"MessagesMenu"},
-			{});
+		{"NextMessage"},
+		{"MessagesMenu"});
 
 	//Show message
 	createTransition(
-			{"InputB", "MessagesMenu"},
-			{"ShowMessage"},
-			{});
+		{"InputB", "MessagesMenu"},
+		{"ShowMessage"});
 
 	//Leave show message
 	createTransition(
-			{"InputC", "ShowMessage"},
-			{"MessagesMenu"},
-			{});
+		{"InputC", "ShowMessage"},
+		{"MessagesMenu"});
 }
 
 void Controller::MenuStateMachine::pressA()

@@ -29,29 +29,29 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 
 
 	//Places
-	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("WaitPackage",1,
+	createPlace("WaitPackage",1,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	addPlace("ChannelA", 0,
+	createPlace("ChannelA", 0,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
-	addPlace("ChannelB", 0,
+	createPlace("ChannelB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
 
-	addPlace("SelectA", 1,
+	createPlace("SelectA", 1,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectA),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelA));
 
-	addPlace("SelectB", 0,
+	createPlace("SelectB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelB));
 
-	addPlace("PackageCounter", 0, nullptr, nullptr);
+	createPlace("PackageCounter", 0);
 
 
 	//Transitions
@@ -59,35 +59,30 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 	//Use A
 	createTransition(
 			{"InputWaitPackage", "WaitPackage", "SelectA"}, //activation
-			{ "ChannelA", "PackageCounter"}, //destination
-			{} //additional conditions
+			{ "ChannelA", "PackageCounter"} //destination
 			);
 
 	//Use B
 	createTransition(
 			{"InputWaitPackage", "WaitPackage", "SelectB"}, //activation
-			{"ChannelB", "PackageCounter"}, //destination
-			{} //additional conditions
+			{"ChannelB", "PackageCounter"}//destination
 			);
 
 	//Switch to A
 	createTransition({"ChannelA"}, //activation
-			{"SelectB", "WaitPackage"}, //destination
-			{} //additional conditions
+			{"SelectB", "WaitPackage"} //destination
 			);
 
 	//Switch to B
 	createTransition(
 			{"ChannelB"}, //activation
-			{"SelectA", "WaitPackage"}, //destination
-			{} //additional conditions
+			{"SelectA", "WaitPackage"} //destination
 			);
 
 	//Reset Counter
 	createTransition(
 			{"PackageCounter"}, //activation
 			{}, //destination
-			//additional conditions
 			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
 			);
 

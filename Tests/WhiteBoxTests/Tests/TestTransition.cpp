@@ -91,7 +91,7 @@ TEST_F(FixtureTestTransition, T_ZeroValueWeightException)
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	ASSERT_THROW(
-	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+		Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions),
 	Transition::ZeroValueWeightException
 	);
 }
@@ -112,7 +112,7 @@ TEST_F(FixtureTestTransition, T_ActivationWeightDimensionException)
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	ASSERT_THROW(
-	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+		Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions),
 	Transition::ActivationWeightDimensionException
 	);
 }
@@ -133,7 +133,7 @@ TEST_F(FixtureTestTransition, T_DestinationWeightDimensionException)
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	ASSERT_THROW(
-	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+		Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions),
 	Transition::DestinationWeightDimensionException
 	);
 }
@@ -155,7 +155,7 @@ TEST_F(FixtureTestTransition, T_ActivationPlaceRepetitionException)
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	ASSERT_THROW(
-	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+		Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions),
 	Transition::ActivationPlaceRepetitionException
 	);
 }
@@ -177,7 +177,7 @@ TEST_F(FixtureTestTransition, T_DestinationPlaceRepetitionException)
 	wOutputPlaces.push_back(outputPlaces.at(0));
 
 	ASSERT_THROW(
-	Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, conditions),
+		Transition(wInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions),
 	Transition::DestinationPlaceRepetitionException
 	);
 }
