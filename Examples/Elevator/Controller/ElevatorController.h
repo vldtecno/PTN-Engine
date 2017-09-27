@@ -120,6 +120,9 @@ private:
 	void doorsAreClosed();
 	void arrivedFloor();
 	void hasDestination();
+	void printCurrentFloor() const;
+	void goingUp();
+	void goingDown();
 
 
 

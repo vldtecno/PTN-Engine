@@ -118,190 +118,6 @@ bool ElevatorController::setDestinationFloor(const int floor)
 	return true;
 }
 
-//
-//
-//bool ElevatorController::dlCallElevatorUp(const int floor)
-//{
-//	bool addedDestination = false;
-//	if (m_goingUp && !m_goingDown)
-//	{
-//		if (floor > m_currentFloor)
-//		{
-//			addedDestination = addDestination1(floor);
-//		}
-//		else if (floor < m_currentFloor)
-//		{
-//			addedDestination = addWaitingToGoUp(floor);
-//		}
-//	}
-//	else if (m_goingDown && !m_goingUp)
-//	{
-//		addedDestination = addDestination2(floor);
-//	}
-//	else if (!m_goingUp && !m_goingDown)
-//	{
-//		addedDestination = addDestination1(floor);
-//	}
-//	else
-//	{
-//		throw runtime_error("Messed up.");
-//	}
-//	return addedDestination;
-//
-//}
-//
-//bool ElevatorController::dlCallElevatorDown(const int floor)
-//{
-//	bool addedDestination = false;
-//	if (m_goingDown && !m_goingUp)
-//	{
-//		if (floor < m_currentFloor)
-//		{
-//			addedDestination = addDestination1(floor);
-//		}
-//		else if (floor > m_currentFloor)
-//		{
-//			addedDestination = addWaitingToGoDown(floor);
-//		}
-//	}
-//	else if (m_goingUp && !m_goingDown)
-//	{
-//		addedDestination = addDestination2(floor);
-//	}
-//	else if (!m_goingUp && !m_goingDown)
-//	{
-//		addedDestination = addDestination1(floor);
-//	}
-//	else
-//	{
-//		throw runtime_error("Messed up.");
-//	}
-//	return addedDestination;
-//
-//}
-//
-//
-//bool ElevatorController::dlSetDestinationFloor(const int floor)
-//{
-//	bool addedDestination = false;
-//	if (m_goingUp && !m_goingDown)
-//	{
-//		if (floor > m_currentFloor)
-//		{
-//			addedDestination = addDestination1(floor);
-//		}
-//		else if (floor < m_currentFloor)
-//		{
-//			addedDestination = addDestination2(floor); //no replace
-//		}
-//	}
-//	else if (m_goingDown && !m_goingUp)
-//	{
-//		if (floor < m_currentFloor)
-//		{
-//			addedDestination = addDestination1(floor);
-//		}
-//		else if (floor > m_currentFloor)
-//		{
-//			addedDestination = addDestination2(floor); //no replace
-//		}
-//	}
-//	else if (!m_goingUp && !m_goingDown)
-//	{
-//		addedDestination = addDestination1(floor);
-//	}
-//	else
-//	{
-//		throw runtime_error("Messed up.");
-//	}
-//	return addedDestination;
-//
-//}
-//
-//void ElevatorController::dlArrivedFloor(const int floor)
-//{
-//	m_destinations1.erase(floor);
-//	if (list1IsEmpty())
-//	{
-//		m_endTravel = true;
-//	}
-//}
-//
-//
-//void ElevatorController::dlGoUp()
-//{
-//	m_goingUp = true;
-//	m_endTravel = false;
-//
-//	if (list1IsEmpty())
-//	{
-//		rotateLists();
-//	}
-//
-//	mergeWaitingToGoUp();
-//	mergeMaxWaitingToGoDown();
-//
-//
-//
-//}
-//
-//void ElevatorController::dlGoDown()
-//{
-//	m_goingDown = true;
-//	m_endTravel = false;
-//
-//	if (list1IsEmpty())
-//	{
-//		rotateLists();
-//	}
-//
-//	mergeWaitingToGoDown();
-//	mergeMinWaitingToGoUp();
-//
-//
-//}
-//
-//bool ElevatorController::addDestination1(const int floor)
-//{
-//	if (m_destinations1.find(floor) != m_destinations1.end())
-//	{
-//		m_destinations1.insert(floor);
-//		return true;
-//	}
-//	return false;
-//}
-//
-//bool ElevatorController::addDestination2(const int floor)
-//{
-//	if (m_destinations2.find(floor) != m_destinations2.end())
-//	{
-//		m_destinations2.insert(floor);
-//		return true;
-//	}
-//	return false;
-//}
-//
-//bool ElevatorController::addWaitingToGoDown(const int floor)
-//{
-//	if (m_waitingToGoDown.find(floor) != m_waitingToGoDown.end())
-//	{
-//		m_waitingToGoDown.insert(floor);
-//		return true;
-//	}
-//	return false;
-//}
-//
-//bool ElevatorController::addWaitingToGoUp(const int floor)
-//{
-//	if (m_waitingToGoUp.find(floor) != m_waitingToGoUp.end())
-//	{
-//		m_waitingToGoUp.insert(floor);
-//		return true;
-//	}
-//	return false;
-//}
-
-
 void ElevatorController::mergeWaitingToGoUp()
 {
 	m_destinations1.insert(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
@@ -318,7 +134,7 @@ void ElevatorController::mergeMaxWaitingToGoDown()
 	{
 		return;
 	}
-	auto it = max_element(m_destinations1.begin(), m_destinations1.end());
+	auto it = max_element(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
 	const int maxFloor = *it;	
 	m_destinations1.insert(maxFloor);
 	m_waitingToGoDown.erase(it);
@@ -330,7 +146,7 @@ void ElevatorController::mergeMinWaitingToGoUp()
 	{
 		return;
 	}
-	auto it = min_element(m_destinations1.begin(), m_destinations1.end());
+	auto it = min_element(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
 	const int minFloor = *it;	
 	m_destinations1.insert(minFloor);
 	m_waitingToGoUp.erase(it);
@@ -341,60 +157,134 @@ void ElevatorController::mergeMinWaitingToGoUp()
 //Actions
 void ElevatorController::addDestination1()
 {
+	cout << "Added destination"<< m_toAddToDestination << endl;
 	m_destinations1.insert(m_toAddToDestination);
+
+	cout << "Destinations: ";
+	for (const auto& d : m_destinations1)
+	{
+		cout << d << ", " ;
+	}
+	cout << endl;
 }
 
 void ElevatorController::addDestination2()
 {
+	cout << "Added next destination" << m_toAddToDestination << endl;
 	m_destinations2.insert(m_toAddToDestination);
+
+	cout << "Next destinations: ";
+	for (const auto& d : m_destinations2)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::addWaitingToGoDown()
 {
+	cout << "Added waiting to go down: " << m_toAddToDestination << endl;
 	m_waitingToGoDown.insert(m_toAddToDestination);
+
+	cout << "Waiting to go down: ";
+	for (const auto& d : m_waitingToGoDown)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::addWaitingToGoUp()
 {
+	cout << "Added waiting to go up: " << m_toAddToDestination << endl;
+
 	m_waitingToGoUp.insert(m_toAddToDestination);
+
+	cout << "Waiting to go up: ";
+	for (const auto& d : m_waitingToGoUp)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::removeDestination()
 {
+	cout << "Removed destination: " << m_currentFloor << endl;
+
 	auto it = m_destinations1.find(m_currentFloor);
 	if (it != m_destinations1.end())
 	{
 		m_destinations1.erase(it);
 	}
+
+	cout << "Destinations: ";
+	for (const auto& d : m_destinations1)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::rotateLists()
 {
+	cout << "Rotated lists " << endl;
 	swap(m_destinations1, m_destinations2);
+	cout << "Destinations: ";
+	for (const auto& d : m_destinations1)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
+	cout << "Next destinations: ";
+	for (const auto& d : m_destinations2)
+	{
+		cout << d << ", ";
+	}	
+	cout << endl;
 }
 
 void ElevatorController::processWaitingToGoUp()
 {
+	cout << "processWaitingToGoUp" << endl;
 	mergeMaxWaitingToGoDown();
 	mergeWaitingToGoUp();
+
+	cout << "Destinations: ";
+	for (const auto& d : m_destinations1)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::processWaitingToGoDown()
 {
+	cout << "processWaitingToGoDown" << endl;
 	mergeMinWaitingToGoUp();
 	mergeWaitingToGoDown();
+
+	cout << "Destinations: ";
+	for (const auto& d : m_destinations1)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 void ElevatorController::increaseFloor()
 {
+	cout << "Increase floor" << endl;
 	++m_currentFloor;
+	printCurrentFloor();
 }
 
 void ElevatorController::decreaseFloor()
 {
+	cout << "Decrease floor" << endl;
 	--m_currentFloor;
+	printCurrentFloor();
 }
-
 
 bool ElevatorController::isFloorNotInList() const
 {
@@ -466,6 +356,21 @@ void ElevatorController::arrivedFloor()
 void ElevatorController::hasDestination()
 {
 	cout << "Elevator has destination" << endl;
+}
+
+void ElevatorController::printCurrentFloor() const
+{
+	cout << "Current floor: " << m_currentFloor << endl;
+}
+
+void ElevatorController::goingUp()
+{
+	cout << "Going up: " << endl;
+}
+
+void ElevatorController::goingDown()
+{
+	cout << "Going down: " << endl;
 }
 
 

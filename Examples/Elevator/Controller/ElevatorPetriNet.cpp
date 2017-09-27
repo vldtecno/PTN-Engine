@@ -42,8 +42,8 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("ArrivedFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::arrivedFloor));
 	createPlace("HasDestination", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::hasDestination));
 
-	createPlace("GoingUp", 0);
-	createPlace("GoingDown", 0);
+	createPlace("GoingUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingUp));
+	createPlace("GoingDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingDown));
 	createPlace("AddToTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination1)); 
 	createPlace("AddToNextTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination2));
 	createPlace("WaitToGoUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoUp));
@@ -57,6 +57,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("Aux1", 0);
 	createPlace("Aux2", 0);
 	createPlace("Aux3", 0);
+	createPlace("Aux4", 0);
 	createPlace("P1", 0);
 	createPlace("P2", 0);
 
@@ -179,7 +180,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//////////////////
 	//Calling the elevator to go up.	
 
-	createTransition({ "CallButtonUp", "Ready", "GoingUp" }, { "Aux2", "GoingUp" },
+	createTransition({ "CallButtonUp", "Ready", "GoingUp" }, { "Aux3", "GoingUp" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
 	createTransition({ "CallButtonUp", "Ready", "GoingDown" }, { "AddToNextTravel", "GoingDown" },
@@ -188,10 +189,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({ "CallButtonUp", "Ready" }, { "P1" }, { "GoingUp", "GoingDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
-	createTransition({ "Aux2" }, { "AddToTravel" },
+	createTransition({ "Aux3" }, { "AddToTravel" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
 
-	createTransition({ "Aux2" }, { "WaitToGoUp" },
+	createTransition({ "Aux3" }, { "WaitToGoUp" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
 
 	createTransition({ "WaitToGoUp" }, { "Ready" });
@@ -201,7 +202,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//////////////////
 	//Calling the elevator to go down.	
 
-	createTransition({ "CallButtonDown", "Ready", "GoingDown" }, { "Aux3", "GoingDown" },
+	createTransition({ "CallButtonDown", "Ready", "GoingDown" }, { "Aux4", "GoingDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }
 	);
 
@@ -212,10 +213,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({ "CallButtonDown", "Ready" }, { "P1" }, { "GoingUp", "GoingDown" }, 
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } );
 
-	createTransition({ "Aux3" }, { "AddToTravel" },
+	createTransition({ "Aux4" }, { "AddToTravel" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) } );
 
-	createTransition({ "Aux3" }, { "WaitToGoDown" },
+	createTransition({ "Aux4" }, { "WaitToGoDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
 
 	createTransition({ "WaitToGoDown" }, { "Ready" });
@@ -226,31 +227,36 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 void ElevatorPetriNet::closeDoors()
 {
 	incrementInputPlace("CloseDoors");
-	execute(true);
+	//execute(true);
+	execute();
 }
 
 void ElevatorPetriNet::openDoors()
 {
 	incrementInputPlace("OpenDoors");
-	execute(true);
+	//execute(true);
+	execute();
 }
 
 void ElevatorPetriNet::callButtonUp()
 {
 	incrementInputPlace("CallButtonUp");
-	execute(true);
+	//execute(true);
+	execute();
 }
 
 void ElevatorPetriNet::callButtonDown()
 {
 	incrementInputPlace("CallButtonDown");
-	execute(true);
+	//execute(true);
+	execute();
 }
 
 void ElevatorPetriNet::destinationButton()
 {
 	incrementInputPlace("DestinationButton");
-	execute(true);
+	//execute(true);
+	execute();
 }
 
 //void Controller::MenuStateMachine::pressA()
