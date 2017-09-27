@@ -54,29 +54,25 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	//Use A
 	createTransition(
 			{"InputWaitPackage", "WaitPackage"}, //activation
-			{ "ChannelA", "PackageCounter"}, //destination
-			{} //additional conditions
+			{ "ChannelA", "PackageCounter"} //destination
 			);
 
 	//Use B
 	createTransition(
 			{"InputWaitPackage", "WaitPackage"}, //activation
-			{"ChannelB", "PackageCounter"}, //destination
-			{} //additional conditions
+			{"ChannelB", "PackageCounter"} //destination
 			);
 
 	//From A back to waiting a package
 	createTransition(
 			{"ChannelA"}, //activation
-			{"WaitPackage", "CounterA"}, //destination
-			{} //additional conditions
+			{"WaitPackage", "CounterA"} //destination
 			);
 
 	//From B back to waiting a package
 	createTransition(
 			{"ChannelB"}, //activation
-			{"WaitPackage", "CounterB"}, //destination
-			{} //additional conditions
+			{"WaitPackage", "CounterB"} //destination
 			);
 
 	//Reset Counters

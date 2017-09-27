@@ -28,38 +28,128 @@ namespace ptne
 	{}
 
 	PTN_Engine::PTN_Engine():
-			m_implementation(new PTN_EngineImp())
+		m_implementation(new PTN_EngineImp())
+	{}
+
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<string>& inhibitorPlaces,
+		const vector<ConditionFunctorPtr>& additionalConditions)
 	{
+		m_implementation->createTransition(
+			activationPlaces,
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			inhibitorPlaces,
+			additionalConditions);
 	}
 
 	void PTN_Engine::createTransition(
-			const vector<string>& activationPlaces,
-			const vector<size_t>& activationWeights,
-			const vector<string>& destinationPlaces,
-			const vector<size_t>& destinationWeights,
-			const vector<ConditionFunctorPtr>& additionalConditions,
-			const vector<string>& inhibitorPlaces)
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights)
 	{
 		m_implementation->createTransition(
-				activationPlaces,
-				activationWeights,
-				destinationPlaces,
-				destinationWeights,
-				additionalConditions,
-				inhibitorPlaces);
+			activationPlaces, 
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			vector<string>{},
+			vector<ConditionFunctorPtr>{});
 	}
 
 	void PTN_Engine::createTransition(
-			const vector<string>& activationPlaces,
-			const vector<string>& destinationPlaces,
-			const vector<ConditionFunctorPtr>& additionalConditions,
-			const vector<string>& inhibitorPlaces)
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<string>& inhibitorPlaces)
 	{
 		m_implementation->createTransition(
-				activationPlaces,
-				destinationPlaces,
-				additionalConditions,
-				inhibitorPlaces);
+			activationPlaces,
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			inhibitorPlaces,
+			vector<ConditionFunctorPtr>{});
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<ConditionFunctorPtr>& additionalConditions)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			vector<string>{},
+			additionalConditions);
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			vector<string>{},
+			vector<ConditionFunctorPtr>{});
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces,
+		const vector<string>& inhibitorPlaces)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			vector<ConditionFunctorPtr>{});
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces,
+		const vector<ConditionFunctorPtr>& additionalConditions)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			vector<string>{},
+			additionalConditions);
+	}
+	
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces,
+		const vector<string>& inhibitorPlaces,
+		const vector<ConditionFunctorPtr>& additionalConditions)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			additionalConditions);
 	}
 
 	void PTN_Engine::execute()

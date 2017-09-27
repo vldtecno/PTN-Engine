@@ -40,17 +40,13 @@ Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatc
 			{"InputWaitPackage"}, //activation
 			{1},
 			{"WaitPackage"}, //destination
-			{1},
-			{} //additional conditions
-			);
+			{1});
 
 	createTransition(
 			{"WaitPackage"}, //activation
 			{3},
 			{"ChannelA", "ChannelB"}, //destination
-			{4, 10},
-			{} //additional conditions
-			);
+			{4, 10});
 
 }
 
