@@ -29,7 +29,7 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 
 
 	//Places
-	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
+	addPlace("InputWaitPackage", 0, true);
 
 	addPlace("WaitPackage",1,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
@@ -51,7 +51,7 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelB));
 
-	addPlace("PackageCounter", 0, nullptr, nullptr);
+	addPlace("PackageCounter", 0);
 
 
 	//Transitions
