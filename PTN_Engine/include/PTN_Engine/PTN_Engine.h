@@ -174,6 +174,30 @@ namespace ptne
 				const bool input = false);
 
 		/*!
+		 * Add place a place to the net.
+		 * \param name The name of the place.
+		 * \param initialNumberOfTokens The number of tokens to be initialized with.
+		 * \param input A flag determining if this place can have tokens added manually.
+		 */
+		void addPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			const bool input = false);
+
+		/*!
+		 * Add place a place to the net.
+		 * \param name The name of the place.
+		 * \param initialNumberOfTokens The number of tokens to be initialized with.
+		 * \param onEnterAction The functor to be called once a token enters the place.
+		 * \param input A flag determining if this place can have tokens added manually.
+		 */
+		void addPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			ActionFunctorPtr onEnterAction,
+			const bool input = false);
+
+		/*!
 		 * Return the number of tokens in a given place.
 		 * \param place The name of the place to get the number of tokens from.
 		 * \return The number of tokens present in the place.

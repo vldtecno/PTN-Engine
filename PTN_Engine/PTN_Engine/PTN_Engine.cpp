@@ -164,10 +164,33 @@ namespace ptne
 						const bool input)
 	{
 		m_implementation->addPlace(name,
-				initialNumberOfTokens,
-				onEnterAction,
-				onExitAction,
-				input);
+			initialNumberOfTokens,
+			onEnterAction,
+			onExitAction,
+			input);
+	}
+
+	void PTN_Engine::addPlace(const string& name,
+		const size_t initialNumberOfTokens,
+		const bool input)
+	{
+		m_implementation->addPlace(name,
+			initialNumberOfTokens,
+			nullptr,
+			nullptr,
+			input);
+	}
+
+	void PTN_Engine::addPlace(const string& name,
+		const size_t initialNumberOfTokens,
+		ActionFunctorPtr onEnterAction,
+		const bool input)
+	{
+		m_implementation->addPlace(name,
+			initialNumberOfTokens,
+			onEnterAction,
+			nullptr,
+			input);
 	}
 
 	size_t PTN_Engine::getNumberOfTokens(const string& place) const

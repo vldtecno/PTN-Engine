@@ -222,6 +222,23 @@ namespace ptne
 		}
 	}
 
+	void PTN_EngineImp::addPlace(
+		const string& name,
+		const size_t initialNumberOfTokens,
+		const bool input)
+	{
+		addPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
+	}
+
+	void PTN_EngineImp::addPlace(
+		const string& name,
+		const size_t initialNumberOfTokens,
+		ActionFunctorPtr onEnterAction,
+		const bool input)
+	{
+		addPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
+	}
+
 	void PTN_EngineImp::clearInputPlaces()
 	{
 		for( const WeakPtrPlace& place : m_inputPlaces)

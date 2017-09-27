@@ -28,93 +28,85 @@ Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMe
 	using namespace std;
 
 	//Places
-	addPlace("InputA",0, nullptr, nullptr, true);
-	addPlace("InputB",0, nullptr, nullptr, true);
-	addPlace("InputC", 0, nullptr, nullptr, true);
+	addPlace("InputA",0, true);
+	addPlace("InputB",0, true);
+	addPlace("InputC", 0, true);
 	addPlace("CallsMenuSelected", 1,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
 	addPlace("MessagesMenuSelected", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
 	addPlace("SelectMessagesOption", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectMessagesOption),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectMessagesOption));
 	addPlace("SelectCallsOption", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectCallsOption),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectCallsOption));
 	addPlace("CallsLog", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showCallsMenu),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showCallsMenu));
 	addPlace("MessagesMenu", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMessageMenu),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessageMenu));
 	addPlace("NextMessage", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::selectNextMessage),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::selectNextMessage));
 	addPlace("ShowMessage", 0,
-			make_shared<ControllerAction>(ptrMenuController, &Controller::showMessage),
-			nullptr);
+		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessage));
 
 
 	//Transitions
 
 	//Switch menu
 	createTransition(
-			{"InputA", "CallsMenuSelected"},
-			{"SelectMessagesOption"});
+		{"InputA", "CallsMenuSelected"},
+		{"SelectMessagesOption"});
 
 	createTransition(
-			{"SelectMessagesOption"},
-			{"MessagesMenuSelected"});
+		{"SelectMessagesOption"},
+		{"MessagesMenuSelected"});
 
 	//Switch menu
 	createTransition(
-			{"InputA", "MessagesMenuSelected"},
-			{"SelectCallsOption"});
+		{"InputA", "MessagesMenuSelected"},
+		{"SelectCallsOption"});
 
 	createTransition(
-			{"SelectCallsOption"},
-			{"CallsMenuSelected"});
+		{"SelectCallsOption"},
+		{"CallsMenuSelected"});
 
 	//Select calls log
 	createTransition(
-			{"InputB", "CallsMenuSelected"},
-			{"CallsLog"});
+		{"InputB", "CallsMenuSelected"},
+		{"CallsLog"});
 
 	//Leave calls log
 	createTransition(
-			{"InputC", "CallsLog"},
-			{"CallsMenuSelected"});
+		{"InputC", "CallsLog"},
+		{"CallsMenuSelected"});
 
 	//Select messages menu
 	createTransition(
-			{"InputB", "MessagesMenuSelected"},
-			{"MessagesMenu"});
+		{"InputB", "MessagesMenuSelected"},
+		{"MessagesMenu"});
 
 	//Leave messages menu
 	createTransition(
-			{"InputC", "MessagesMenu"},
-			{"MessagesMenuSelected"});
+		{"InputC", "MessagesMenu"},
+		{"MessagesMenuSelected"});
 
 	//Select next message
 	createTransition(
-			{"InputA", "MessagesMenu"},
-			{"NextMessage"});
+		{"InputA", "MessagesMenu"},
+		{"NextMessage"});
 
 	createTransition(
-			{"NextMessage"},
-			{"MessagesMenu"});
+		{"NextMessage"},
+		{"MessagesMenu"});
 
 	//Show message
 	createTransition(
-			{"InputB", "MessagesMenu"},
-			{"ShowMessage"});
+		{"InputB", "MessagesMenu"},
+		{"ShowMessage"});
 
 	//Leave show message
 	createTransition(
-			{"InputC", "ShowMessage"},
-			{"MessagesMenu"});
+		{"InputC", "ShowMessage"},
+		{"MessagesMenu"});
 }
 
 void Controller::MenuStateMachine::pressA()
