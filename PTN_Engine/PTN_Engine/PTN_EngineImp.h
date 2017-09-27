@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include "PTN_Engine/PTN_Exception.h"
+#include <iostream>
 
 namespace ptne
 {
@@ -156,7 +157,17 @@ namespace ptne
 			const std::vector<std::string>& inhibitorPlaces,
 			const std::vector<ConditionFunctorPtr>& additionalConditions);
 
-		//! Run until it no more transitions can be fired or stop is flagged.
+		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * \param log Flag logging the state of the net on or off.
+		 * \param o Log output stream.
+		 */
+		void execute(const bool log, std::ostream& o = std::cout);
+
+		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * No state logging performed.
+		 */
 		void execute();
 
 		/*!
@@ -210,6 +221,12 @@ namespace ptne
 		 * \param place Name of the place to be incremented.
 		 */
 		void incrementInputPlace(const std::string& place);
+
+		/*!
+		 * Print the petri net places and number of tokens.
+		 * \param o Output stream.
+		 */
+		void printState(std::ostream& o) const;
 
 		/*!
 		 * Exception to be thrown when trying to use a place with
@@ -297,6 +314,7 @@ namespace ptne
 		 * Will probably become atomic.
 		 */
 		bool m_stop;
+
 	};		
 
 
