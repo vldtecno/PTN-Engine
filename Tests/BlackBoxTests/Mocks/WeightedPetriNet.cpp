@@ -28,10 +28,10 @@ Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatc
 {
 
 	//Places
-	addPlace("InputWaitPackage", 0, true);
-	addPlace("WaitPackage",0);
-	addPlace("ChannelA", 0);
-	addPlace("ChannelB", 0);
+	createPlace("InputWaitPackage", 0, true);
+	createPlace("WaitPackage",0);
+	createPlace("ChannelA", 0);
+	createPlace("ChannelB", 0);
 
 
 	//Transitions

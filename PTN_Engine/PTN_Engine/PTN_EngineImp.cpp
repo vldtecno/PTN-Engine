@@ -198,7 +198,7 @@ namespace ptne
 	}
 
 
-	void PTN_EngineImp::addPlace(
+	void PTN_EngineImp::createPlace(
 			const string& name,
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
@@ -222,21 +222,21 @@ namespace ptne
 		}
 	}
 
-	void PTN_EngineImp::addPlace(
+	void PTN_EngineImp::createPlace(
 		const string& name,
 		const size_t initialNumberOfTokens,
 		const bool input)
 	{
-		addPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
+		createPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
 	}
 
-	void PTN_EngineImp::addPlace(
+	void PTN_EngineImp::createPlace(
 		const string& name,
 		const size_t initialNumberOfTokens,
 		ActionFunctorPtr onEnterAction,
 		const bool input)
 	{
-		addPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
+		createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
 	}
 
 	void PTN_EngineImp::clearInputPlaces()

@@ -29,29 +29,29 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 
 
 	//Places
-	addPlace("InputWaitPackage", 0, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("WaitPackage",1,
+	createPlace("WaitPackage",1,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	addPlace("ChannelA", 0,
+	createPlace("ChannelA", 0,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
-	addPlace("ChannelB", 0,
+	createPlace("ChannelB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
 
-	addPlace("SelectA", 1,
+	createPlace("SelectA", 1,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectA),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelA));
 
-	addPlace("SelectB", 0,
+	createPlace("SelectB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelB));
 
-	addPlace("PackageCounter", 0);
+	createPlace("PackageCounter", 0);
 
 
 	//Transitions

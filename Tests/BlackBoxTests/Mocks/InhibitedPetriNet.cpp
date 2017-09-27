@@ -28,13 +28,13 @@ Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispa
 {
 
 	//Places
-	addPlace("InputWaitPackage", 0, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("P1",1);
-	addPlace("P2",1);
-	addPlace("P3",1);
-	addPlace("P4",0);
-	addPlace("P5",0);
+	createPlace("P1",1);
+	createPlace("P2",1);
+	createPlace("P3",1);
+	createPlace("P4",0);
+	createPlace("P5",0);
 
 	//Transitions
 
