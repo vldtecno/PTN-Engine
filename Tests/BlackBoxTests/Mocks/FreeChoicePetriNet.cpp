@@ -28,25 +28,25 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 {
 
 	//Places
-	addPlace("InputWaitPackage", 0, nullptr, nullptr, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("WaitPackage",1,
+	createPlace("WaitPackage",1,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	addPlace("ChannelA", 0,
+	createPlace("ChannelA", 0,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
-	addPlace("CounterA", 0,	nullptr, nullptr);
+	createPlace("CounterA", 0);
 
-	addPlace("ChannelB", 0,
+	createPlace("ChannelB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
 
-	addPlace("CounterB", 0,	nullptr, nullptr);
+	createPlace("CounterB", 0);
 
-	addPlace("PackageCounter", 0, nullptr, nullptr);
+	createPlace("PackageCounter", 0);
 
 
 	//Transitions
@@ -54,29 +54,25 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	//Use A
 	createTransition(
 			{"InputWaitPackage", "WaitPackage"}, //activation
-			{ "ChannelA", "PackageCounter"}, //destination
-			{} //additional conditions
+			{ "ChannelA", "PackageCounter"} //destination
 			);
 
 	//Use B
 	createTransition(
 			{"InputWaitPackage", "WaitPackage"}, //activation
-			{"ChannelB", "PackageCounter"}, //destination
-			{} //additional conditions
+			{"ChannelB", "PackageCounter"} //destination
 			);
 
 	//From A back to waiting a package
 	createTransition(
 			{"ChannelA"}, //activation
-			{"WaitPackage", "CounterA"}, //destination
-			{} //additional conditions
+			{"WaitPackage", "CounterA"} //destination
 			);
 
 	//From B back to waiting a package
 	createTransition(
 			{"ChannelB"}, //activation
-			{"WaitPackage", "CounterB"}, //destination
-			{} //additional conditions
+			{"WaitPackage", "CounterB"} //destination
 			);
 
 	//Reset Counters
