@@ -62,71 +62,59 @@ Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMe
 	//Switch menu
 	createTransition(
 			{"InputA", "CallsMenuSelected"},
-			{"SelectMessagesOption"},
-			{});
+			{"SelectMessagesOption"});
 
 	createTransition(
 			{"SelectMessagesOption"},
-			{"MessagesMenuSelected"},
-			{});
+			{"MessagesMenuSelected"});
 
 	//Switch menu
 	createTransition(
 			{"InputA", "MessagesMenuSelected"},
-			{"SelectCallsOption"},
-			{});
+			{"SelectCallsOption"});
 
 	createTransition(
 			{"SelectCallsOption"},
-			{"CallsMenuSelected"},
-			{});
+			{"CallsMenuSelected"});
 
 	//Select calls log
 	createTransition(
 			{"InputB", "CallsMenuSelected"},
-			{"CallsLog"},
-			{});
+			{"CallsLog"});
 
 	//Leave calls log
 	createTransition(
 			{"InputC", "CallsLog"},
-			{"CallsMenuSelected"},
-			{});
+			{"CallsMenuSelected"});
 
 	//Select messages menu
 	createTransition(
 			{"InputB", "MessagesMenuSelected"},
-			{"MessagesMenu"},
-			{});
+			{"MessagesMenu"});
 
 	//Leave messages menu
 	createTransition(
 			{"InputC", "MessagesMenu"},
-			{"MessagesMenuSelected"},
-			{});
+			{"MessagesMenuSelected"});
 
 	//Select next message
 	createTransition(
 			{"InputA", "MessagesMenu"},
-			{"NextMessage"},
-			{});
+			{"NextMessage"});
 
 	createTransition(
 			{"NextMessage"},
-			{"MessagesMenu"},
-			{});
+			{"MessagesMenu"});
 
 	//Show message
 	createTransition(
 			{"InputB", "MessagesMenu"},
-			{"ShowMessage"},
-			{});
+			{"ShowMessage"});
 
 	//Leave show message
 	createTransition(
 			{"InputC", "ShowMessage"},
-			{"MessagesMenu"},
-			{});
+			{"MessagesMenu"});
 }
 
 void Controller::MenuStateMachine::pressA()

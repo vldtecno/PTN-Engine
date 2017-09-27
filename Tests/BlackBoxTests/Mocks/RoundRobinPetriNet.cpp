@@ -59,35 +59,30 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 	//Use A
 	createTransition(
 			{"InputWaitPackage", "WaitPackage", "SelectA"}, //activation
-			{ "ChannelA", "PackageCounter"}, //destination
-			{} //additional conditions
+			{ "ChannelA", "PackageCounter"} //destination
 			);
 
 	//Use B
 	createTransition(
 			{"InputWaitPackage", "WaitPackage", "SelectB"}, //activation
-			{"ChannelB", "PackageCounter"}, //destination
-			{} //additional conditions
+			{"ChannelB", "PackageCounter"}//destination
 			);
 
 	//Switch to A
 	createTransition({"ChannelA"}, //activation
-			{"SelectB", "WaitPackage"}, //destination
-			{} //additional conditions
+			{"SelectB", "WaitPackage"} //destination
 			);
 
 	//Switch to B
 	createTransition(
 			{"ChannelB"}, //activation
-			{"SelectA", "WaitPackage"}, //destination
-			{} //additional conditions
+			{"SelectA", "WaitPackage"} //destination
 			);
 
 	//Reset Counter
 	createTransition(
 			{"PackageCounter"}, //activation
 			{}, //destination
-			//additional conditions
 			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
 			);
 
