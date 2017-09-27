@@ -28,25 +28,25 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 {
 
 	//Places
-	addPlace("InputWaitPackage", 0, true);
+	createPlace("InputWaitPackage", 0, true);
 
-	addPlace("WaitPackage",1,
+	createPlace("WaitPackage",1,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	addPlace("ChannelA", 0,
+	createPlace("ChannelA", 0,
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
 			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
-	addPlace("CounterA", 0);
+	createPlace("CounterA", 0);
 
-	addPlace("ChannelB", 0,
+	createPlace("ChannelB", 0,
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
 			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
 
-	addPlace("CounterB", 0);
+	createPlace("CounterB", 0);
 
-	addPlace("PackageCounter", 0);
+	createPlace("PackageCounter", 0);
 
 
 	//Transitions

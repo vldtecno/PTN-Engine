@@ -160,39 +160,39 @@ namespace ptne
 		void execute();
 
 		/*!
-		 * Add place a place to the net.
+		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
 		 * \param onEnterAction The functor to be called once a token enters the place.
 		 * \param onExitAction The functor to be called once a token leaves the place.
 		 * \param input A flag determining if this place can have tokens added manually.
 		 */
-		void addPlace(
-				const std::string& name,
-				const size_t initialNumberOfTokens,
-				ActionFunctorPtr onEnterAction,
-				ActionFunctorPtr onExitAction,
-				const bool input = false);
+		void createPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			ActionFunctorPtr onEnterAction,
+			ActionFunctorPtr onExitAction,
+			const bool input = false);
 
 		/*!
-		 * Add place a place to the net.
+		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
 		 * \param input A flag determining if this place can have tokens added manually.
 		 */
-		void addPlace(
+		void createPlace(
 			const std::string& name,
 			const size_t initialNumberOfTokens,
 			const bool input = false);
 
 		/*!
-		 * Add place a place to the net.
+		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
 		 * \param onEnterAction The functor to be called once a token enters the place.
 		 * \param input A flag determining if this place can have tokens added manually.
 		 */
-		void addPlace(
+		void createPlace(
 			const std::string& name,
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,

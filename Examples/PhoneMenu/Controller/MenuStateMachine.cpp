@@ -28,24 +28,24 @@ Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMe
 	using namespace std;
 
 	//Places
-	addPlace("InputA",0, true);
-	addPlace("InputB",0, true);
-	addPlace("InputC", 0, true);
-	addPlace("CallsMenuSelected", 1,
+	createPlace("InputA",0, true);
+	createPlace("InputB",0, true);
+	createPlace("InputC", 0, true);
+	createPlace("CallsMenuSelected", 1,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
-	addPlace("MessagesMenuSelected", 0,
+	createPlace("MessagesMenuSelected", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::showMainMenu));
-	addPlace("SelectMessagesOption", 0,
+	createPlace("SelectMessagesOption", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::selectMessagesOption));
-	addPlace("SelectCallsOption", 0,
+	createPlace("SelectCallsOption", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::selectCallsOption));
-	addPlace("CallsLog", 0,
+	createPlace("CallsLog", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::showCallsMenu));
-	addPlace("MessagesMenu", 0,
+	createPlace("MessagesMenu", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessageMenu));
-	addPlace("NextMessage", 0,
+	createPlace("NextMessage", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::selectNextMessage));
-	addPlace("ShowMessage", 0,
+	createPlace("ShowMessage", 0,
 		make_shared<ControllerAction>(ptrMenuController, &Controller::showMessage));
 
 
