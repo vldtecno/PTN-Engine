@@ -152,11 +152,6 @@ namespace ptne
 			additionalConditions);
 	}
 
-	void PTN_Engine::execute()
-	{
-		m_implementation->execute();
-	}
-
 	void PTN_Engine::createPlace(const string& name,
 			const size_t initialNumberOfTokens,
 						ActionFunctorPtr onEnterAction,
@@ -193,6 +188,16 @@ namespace ptne
 			input);
 	}
 
+	void PTN_Engine::execute(const bool log, ostream& o)
+	{
+		m_implementation->execute(log, o);
+	}
+
+	void PTN_Engine::execute()
+	{
+		m_implementation->execute(false);
+	}
+
 	size_t PTN_Engine::getNumberOfTokens(const string& place) const
 	{
 		return m_implementation->getNumberOfTokens(place);
@@ -201,6 +206,11 @@ namespace ptne
 	void PTN_Engine::incrementInputPlace(const string& place)
 	{
 		m_implementation->incrementInputPlace(place);
+	}
+
+	void PTN_Engine::printState(ostream& o) const
+	{
+		m_implementation->printState(o);
 	}
 
 }

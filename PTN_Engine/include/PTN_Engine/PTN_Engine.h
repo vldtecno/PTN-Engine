@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace ptne
 {
@@ -155,9 +156,6 @@ namespace ptne
 			const std::vector<std::string>& inhibitorPlaces,
 			const std::vector<ConditionFunctorPtr>& additionalConditions);
 
-		//! Run until it no more transitions can be fired or stop is flagged.
-		void execute();
-
 		/*!
 		 * Create a new place in the net.
 		 * \param name The name of the place.
@@ -198,6 +196,19 @@ namespace ptne
 			const bool input = false);
 
 		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * \param log Flag logging the state of the net on or off.
+		 * \param o Log output stream.
+		 */
+		void execute(const bool log, std::ostream& o = std::cout);
+
+		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * No state logging performed.
+		 */
+		void execute();
+
+		/*!
 		 * Return the number of tokens in a given place.
 		 * \param place The name of the place to get the number of tokens from.
 		 * \return The number of tokens present in the place.
@@ -209,6 +220,12 @@ namespace ptne
 		 * \param place Name of the place to be incremented.
 		 */
 		void incrementInputPlace(const std::string& place);
+
+		/*!
+		 * Print the petri net places and number of tokens.
+		 * \param o Output stream.
+		 */
+		void printState(std::ostream& o) const;
 
 	private:
 

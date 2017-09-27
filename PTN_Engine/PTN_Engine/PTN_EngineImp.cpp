@@ -158,31 +158,6 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	void PTN_EngineImp::execute()
-	{
-		m_stop = false;
-		bool transitionFired;
-
-		do
-		{
-			//Safe to use raw pointers here. Nothing justifies deleting a
-			// transition from m_transitions, so there should never be an
-			// invalid pointer. At this moment this is single threaded, so
-			// synchronization problems are not an issue.
-			vector<Transition*> activeTransitions(move(
-					collectActiveTransitionsRandomly()));
-
-			transitionFired = false;
-			for(Transition* transition : activeTransitions)
-			{
-				transitionFired |= transition->execute();
-			}
-		} while(transitionFired && !m_stop);
-
-		clearInputPlaces();
-		m_stop = false;
-	}
-
 	vector<Transition*> PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
 		vector<Transition*> activeTransitions;
@@ -237,6 +212,41 @@ namespace ptne
 		const bool input)
 	{
 		createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
+	}
+
+	void PTN_EngineImp::execute(const bool log, ostream& o)
+	{
+		m_stop = false;
+		bool transitionFired;
+
+		do
+		{
+			if (log)
+			{
+				printState(cout);
+			}
+
+			//Safe to use raw pointers here. Nothing justifies deleting a
+			// transition from m_transitions, so there should never be an
+			// invalid pointer. At the moment this is only single threaded, 
+			// so synchronization problems are not an issue.
+			vector<Transition*> activeTransitions(move(
+				collectActiveTransitionsRandomly()));
+
+			transitionFired = false;
+			for (Transition* transition : activeTransitions)
+			{
+				transitionFired |= transition->execute();
+			}
+		} while (transitionFired && !m_stop);
+
+		clearInputPlaces();
+		m_stop = false;
+	}
+
+	void PTN_EngineImp::execute()
+	{
+		execute(false);
 	}
 
 	void PTN_EngineImp::clearInputPlaces()
@@ -304,5 +314,15 @@ namespace ptne
 	PTN_EngineImp::RepeatedPlaceException::RepeatedPlaceException(const string& name):
 		PTN_Exception("Trying to add an already existing place: "+name+".")
 	{}
+
+	void PTN_EngineImp::printState(ostream& o ) const
+	{
+		o << "Place; Tokens" << endl;
+		for (const auto& p : m_places)
+		{
+			o << p.first.c_str() << ": " << p.second->getNumberOfTokens() << endl;
+		}
+		o << endl << endl;
+	}
 
 }
