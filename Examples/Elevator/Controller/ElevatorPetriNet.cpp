@@ -39,7 +39,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("DoorsOpened", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreOpen));
 	createPlace("DoorsClosed", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreClosed));
 	createPlace("ArrivedFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::arrivedFloor));
-	createPlace("HasDestination", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::hasDestination));
+	createPlace("HasDestination", 0);
 
 	createPlace("GoingUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingUp));
 	createPlace("GoingDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingDown));
@@ -245,35 +245,30 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 void ElevatorPetriNet::closeDoors()
 {
 	incrementInputPlace("CloseDoors");
-	//execute(true);
 	execute();
 }
 
 void ElevatorPetriNet::openDoors()
 {
 	incrementInputPlace("OpenDoors");
-	//execute(true);
 	execute();
 }
 
 void ElevatorPetriNet::callButtonUp()
 {
 	incrementInputPlace("CallButtonUp");
-	//execute(true);
 	execute();
 }
 
 void ElevatorPetriNet::callButtonDown()
 {
 	incrementInputPlace("CallButtonDown");
-	//execute(true);
 	execute();
 }
 
 void ElevatorPetriNet::destinationButton()
 {
 	incrementInputPlace("DestinationButton");
-	//execute(true);
 	execute();
 }
 

@@ -37,9 +37,7 @@ ElevatorController::ElevatorController():
 	m_destinations2(),
 	m_waitingToGoUp(),
 	m_waitingToGoDown()
-{
-
-}
+{}
 
 ElevatorController::~ElevatorController()
 {}
@@ -156,150 +154,91 @@ void ElevatorController::mergeMinWaitingToGoUp()
 	m_waitingToGoUp.erase(it);
 }
 
-
-
 //Actions
 void ElevatorController::addDestination1()
 {
-	cout << "Added destination: "<< m_toAddToDestination << endl;
-
 	if (m_destinations2.find(m_toAddToDestination) != m_destinations2.end())
 	{
-		cout << "Remove from m_destinations2: " << m_toAddToDestination << endl;
 		m_destinations2.erase(m_toAddToDestination);
 	}
 	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
 	{
-		cout << "Remove from m_waitingToGoDown: " << m_toAddToDestination << endl;
 		m_waitingToGoDown.erase(m_toAddToDestination);
 	}
 	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
 	{
-		cout << "Remove from m_waitingToGoUp: " << m_toAddToDestination << endl;
 		m_waitingToGoUp.erase(m_toAddToDestination);
 	}
 
-
 	m_destinations1.insert(m_toAddToDestination);
 
-	cout << "Destinations: ";
-	for (const auto& d : m_destinations1)
-	{
-		cout << d << ", " ;
-	}
-	cout << endl;
+	printDestinations();
 }
 
 void ElevatorController::addDestination2()
 {
 	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
 	{
-		cout << "Add Destination 2: nothing added." << endl;
 		return;
 	}
 
 	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
 	{
-		cout << "Remove from m_waitingToGoDown: " << m_toAddToDestination << endl;
 		m_waitingToGoDown.erase(m_toAddToDestination);
 	}
 	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
 	{
-		cout << "Remove from m_waitingToGoUp: " << m_toAddToDestination << endl;
 		m_waitingToGoUp.erase(m_toAddToDestination);
 	}
 
-
-
-	cout << "Added next destination: " << m_toAddToDestination << endl;
 	m_destinations2.insert(m_toAddToDestination);
-
-	cout << "Next destinations: ";
-	for (const auto& d : m_destinations2)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	
+	printNextDestinations();
 }
 
 void ElevatorController::addWaitingToGoDown()
 {
 	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
 	{
-		cout << "addWaitingToGoDown: nothing added." << endl;
 		return;
 	}
 
-	cout << "Added waiting to go down: " << m_toAddToDestination << endl;
 	m_waitingToGoDown.insert(m_toAddToDestination);
-
-	cout << "Waiting to go down: ";
-	for (const auto& d : m_waitingToGoDown)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	printWaitingGoDown();
 }
 
 void ElevatorController::addWaitingToGoUp()
 {
 	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
 	{
-		cout << "addWaitingToGoUp: nothing added." << endl;
 		return;
 	}
 
-	cout << "Added waiting to go up: " << m_toAddToDestination << endl;
-
 	m_waitingToGoUp.insert(m_toAddToDestination);
-
-	cout << "Waiting to go up: ";
-	for (const auto& d : m_waitingToGoUp)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	printWaitingGoUp();
 }
 
 void ElevatorController::removeDestination()
 {
-	cout << "Removed destination: " << m_currentFloor << endl;
-
 	auto it = m_destinations1.find(m_currentFloor);
 	if (it != m_destinations1.end())
 	{
 		m_destinations1.erase(it);
 	}
 
-	cout << "Destinations: ";
-	for (const auto& d : m_destinations1)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	printDestinations();
 }
 
 void ElevatorController::rotateLists()
 {
-	cout << "Rotated lists " << endl;
 	swap(m_destinations1, m_destinations2);
-	cout << "Destinations: ";
-	for (const auto& d : m_destinations1)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
-	cout << "Next destinations: ";
-	for (const auto& d : m_destinations2)
-	{
-		cout << d << ", ";
-	}	
-	cout << endl;
+	
+	printDestinations();
+	printNextDestinations();
 }
 
 void ElevatorController::processWaitingToGoUp()
 {
-	cout << "processWaitingToGoUp" << endl;
 	mergeMaxWaitingToGoDown();
 	mergeWaitingToGoUp();
 
@@ -308,19 +247,11 @@ void ElevatorController::processWaitingToGoUp()
 		m_minimumFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
 	}
 
-	cout << "Destinations: ";
-	for (const auto& d : m_destinations1)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	printDestinations();
 }
 
 void ElevatorController::processWaitingToGoDown()
 {
-	cout << "processWaitingToGoDown" << endl;
-
-
 	mergeMinWaitingToGoUp();
 	mergeWaitingToGoDown();
 
@@ -329,26 +260,17 @@ void ElevatorController::processWaitingToGoDown()
 		m_maximumFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
 	}
 
-	cout << "Destinations: ";
-	for (const auto& d : m_destinations1)
-	{
-		cout << d << ", ";
-	}
-	cout << endl;
+	printDestinations();
 }
 
 void ElevatorController::increaseFloor()
 {
-	cout << "Increase floor" << endl;
 	++m_currentFloor;
-	printCurrentFloor();
 }
 
 void ElevatorController::decreaseFloor()
 {
-	cout << "Decrease floor" << endl;
 	--m_currentFloor;
-	printCurrentFloor();
 }
 
 void ElevatorController::setMinimum()
@@ -357,7 +279,6 @@ void ElevatorController::setMinimum()
 	{
 		m_minimumFloor = m_toAddToDestination;
 	}
-	cout << "Minimum floor: " << m_minimumFloor << endl;
 }
 
 void ElevatorController::setMaximum()
@@ -366,19 +287,16 @@ void ElevatorController::setMaximum()
 	{
 		m_maximumFloor = m_toAddToDestination;
 	}
-	cout << "Maximum floor: " << m_maximumFloor << endl;
 }
 
 void ElevatorController::resetMinimum()
 {
 	m_minimumFloor = s_bottomFloor - 1;
-	cout << "Reset minimum" << endl;
 }
 
 void ElevatorController::resetMaximum()
 {
 	m_maximumFloor = s_topFloor + 1;
-	cout << "Reset maximum" << endl;
 }
 
 bool ElevatorController::isFloorNotInList() const
@@ -510,12 +428,17 @@ void ElevatorController::doorsAreClosed()
 
 void ElevatorController::arrivedFloor()
 {
-	cout << "Arrived floor: " << m_currentFloor << endl;
+	printCurrentFloor();
 }
 
-void ElevatorController::hasDestination()
+void ElevatorController::goingUp()
 {
-	cout << "Elevator has destination" << endl;
+	cout << "Going up " << endl;
+}
+
+void ElevatorController::goingDown()
+{
+	cout << "Going down " << endl;
 }
 
 void ElevatorController::printCurrentFloor() const
@@ -523,14 +446,42 @@ void ElevatorController::printCurrentFloor() const
 	cout << "Current floor: " << m_currentFloor << endl;
 }
 
-void ElevatorController::goingUp()
+void ElevatorController::printDestinations() const
 {
-	cout << "Going up: " << endl;
+	cout << "Destinations: ";
+	printFloorList(m_destinations1);
 }
 
-void ElevatorController::goingDown()
+void ElevatorController::printNextDestinations() const
 {
-	cout << "Going down: " << endl;
+	cout << "Next travel destinations: ";
+	printFloorList(m_destinations2);
+}
+
+void ElevatorController::printWaitingGoDown() const
+{
+	cout << "Floors with people waiting to go down: ";
+	printFloorList(m_waitingToGoDown);
+}
+
+void ElevatorController::printWaitingGoUp() const
+{
+	cout << "Floors with people waiting to go down: ";
+	printFloorList(m_waitingToGoUp);
+}
+
+void ElevatorController::printFloorList(const unordered_set<int>& floors) const
+{
+	if (floors.empty())
+	{
+		cout << "Empty" << endl;
+		return;
+	}
+	for (const auto& d : floors)
+	{
+		cout << d << ", ";
+	}
+	cout << endl;
 }
 
 

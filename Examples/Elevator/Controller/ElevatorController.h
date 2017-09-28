@@ -124,10 +124,16 @@ private:
 	void doorsAreOpen();
 	void doorsAreClosed();
 	void arrivedFloor();
-	void hasDestination();
-	void printCurrentFloor() const;
 	void goingUp();
 	void goingDown();
+
+	void printCurrentFloor() const;
+	void printDestinations() const;
+	void printNextDestinations() const;
+	void printWaitingGoDown() const;
+	void printWaitingGoUp() const;
+	void printFloorList(const std::unordered_set<int>& floors) const;
+
 
 
 
