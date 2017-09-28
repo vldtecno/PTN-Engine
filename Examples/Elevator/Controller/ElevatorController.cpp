@@ -316,7 +316,7 @@ void ElevatorController::resetMinimum()
 
 void ElevatorController::resetMaximum()
 {
-	m_maximumFloor = s_topFloor - 1;
+	m_maximumFloor = s_topFloor + 1;
 	cout << "Reset maximum" << endl;
 }
 
@@ -383,8 +383,7 @@ bool ElevatorController::isSmallerThanMaximumFloor() const
 bool ElevatorController::conditionAux1_T1() const
 {
 	return isMarkedFloorGreaterThanCurrentFloor() &&
-		isSmallerThanMaximumFloor() &&
-		isGreaterThanMinimumFloor();
+		isSmallerThanMaximumFloor();
 }
 
 bool ElevatorController::conditionAux1_T2() const
@@ -395,7 +394,6 @@ bool ElevatorController::conditionAux1_T2() const
 bool ElevatorController::conditionAux2_T1() const
 {
 	return isMarkedFloorSmallerThanCurrentFloor() &&
-		isSmallerThanMaximumFloor() &&
 		isGreaterThanMinimumFloor();
 }
 
