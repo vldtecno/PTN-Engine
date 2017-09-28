@@ -19,12 +19,11 @@
 #include "Controller/ElevatorPetriNet.h"
 
 using namespace ptne;
+using namespace std;
 
 ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrController):
 	PTN_Engine{}
 {
-	using namespace std;
-
 	//Create places
 
 	//inputs
@@ -66,18 +65,21 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("DecreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::decreaseFloor)); 
 
 	
-	//Create transitions
+	//////////////////
+	// Cabine
 
 	createTransition({"CloseDoors", "Stopped", "DoorsOpened"}, {"Stopped", "DoorsClosed"});
 
 	createTransition({"OpenDoors", "Stopped", "DoorsClosed"}, {"Stopped", "DoorsOpened"});
 
-	createTransition({"HasDestination", "Stopped", "DoorsClosed" }, {"HasDestination", "DoorsClosed", "Moving"});
+	createTransition({ "HasDestination", "Stopped", "DoorsClosed" }, { "HasDestination", "DoorsClosed", "Moving" }, 
+		vector<string>({ "OpenDoors" }));
 
-	createTransition({"ArrivedDestination", "Moving"}, {"Stopped", "OpenDoors", "Ready"});
+	createTransition({"ArrivedDestination", "Moving"}, {"Stopped", "OpenDoors", "Ready"});	
+	//////////////////
 
 	/////////////////
-	//simulation
+	// Simulation
 	createTransition({"Moving", "GoingUp", "Ready", "HasDestination"}, {"Moving", "GoingUp", "IncreaseFloor", "HasDestination" },
 		vector<string>({ "ArrivedFloor", "ArrivedDestination" }) );
 	
@@ -88,11 +90,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 		vector<string>({ "ArrivedFloor", "ArrivedDestination" }) );
 
 	createTransition({"DecreaseFloor"}, {"ArrivedFloor", "Ready" });
-
-	////////////
+	//////////////////
 
 	//////////////////
-	//Arriving a floor.	
+	// Arriving a floor.	
 
 	//arrived floor not in list
 	createTransition({"Ready", "ArrivedFloor"}, { "Ready" },
@@ -102,7 +103,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({"Ready", "ArrivedFloor", "HasDestination"}, { "RemoveFromList" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) }); 	
 
-	//arrived floor not in list
+	//arrived floor in list
 	createTransition({"RemoveFromList"}, {"ArrivedDestination", "HasDestination"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) }); 
 	
@@ -125,9 +126,7 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 
 	createTransition({"ProcessGoUp"}, {"ArrivedDestination", "HasDestination", "GoingUp"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
-
-	//////////////////
-	
+	//////////////////	
 
 	//////////////////
 	// Pressing a floor button inside the elevator.	
@@ -173,12 +172,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({ "AddToTravel", "HasDestination" }, { "Ready", "HasDestination" });
 
 	createTransition({ "AddToTravel" }, { "Ready", "HasDestination" }, { "HasDestination" });
-
 	//////////////////
 
-
 	//////////////////
-	//Calling the elevator to go up.	
+	// Calling the elevator to go up.	
 
 	createTransition({ "CallButtonUp", "Ready", "GoingUp" }, { "Aux3", "GoingUp" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
@@ -196,11 +193,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
 
 	createTransition({ "WaitToGoUp" }, { "Ready" });
-
 	//////////////////
 
 	//////////////////
-	//Calling the elevator to go down.	
+	// Calling the elevator to go down.	
 
 	createTransition({ "CallButtonDown", "Ready", "GoingDown" }, { "Aux4", "GoingDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }
