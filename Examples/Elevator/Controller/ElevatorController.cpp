@@ -162,6 +162,24 @@ void ElevatorController::mergeMinWaitingToGoUp()
 void ElevatorController::addDestination1()
 {
 	cout << "Added destination: "<< m_toAddToDestination << endl;
+
+	if (m_destinations2.find(m_toAddToDestination) != m_destinations2.end())
+	{
+		cout << "Remove from m_destinations2: " << m_toAddToDestination << endl;
+		m_destinations2.erase(m_toAddToDestination);
+	}
+	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
+	{
+		cout << "Remove from m_waitingToGoDown: " << m_toAddToDestination << endl;
+		m_waitingToGoDown.erase(m_toAddToDestination);
+	}
+	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
+	{
+		cout << "Remove from m_waitingToGoUp: " << m_toAddToDestination << endl;
+		m_waitingToGoUp.erase(m_toAddToDestination);
+	}
+
+
 	m_destinations1.insert(m_toAddToDestination);
 
 	cout << "Destinations: ";
@@ -174,6 +192,25 @@ void ElevatorController::addDestination1()
 
 void ElevatorController::addDestination2()
 {
+	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
+	{
+		cout << "Add Destination 2: nothing added." << endl;
+		return;
+	}
+
+	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
+	{
+		cout << "Remove from m_waitingToGoDown: " << m_toAddToDestination << endl;
+		m_waitingToGoDown.erase(m_toAddToDestination);
+	}
+	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
+	{
+		cout << "Remove from m_waitingToGoUp: " << m_toAddToDestination << endl;
+		m_waitingToGoUp.erase(m_toAddToDestination);
+	}
+
+
+
 	cout << "Added next destination: " << m_toAddToDestination << endl;
 	m_destinations2.insert(m_toAddToDestination);
 
@@ -187,6 +224,12 @@ void ElevatorController::addDestination2()
 
 void ElevatorController::addWaitingToGoDown()
 {
+	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
+	{
+		cout << "addWaitingToGoDown: nothing added." << endl;
+		return;
+	}
+
 	cout << "Added waiting to go down: " << m_toAddToDestination << endl;
 	m_waitingToGoDown.insert(m_toAddToDestination);
 
@@ -200,6 +243,12 @@ void ElevatorController::addWaitingToGoDown()
 
 void ElevatorController::addWaitingToGoUp()
 {
+	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
+	{
+		cout << "addWaitingToGoUp: nothing added." << endl;
+		return;
+	}
+
 	cout << "Added waiting to go up: " << m_toAddToDestination << endl;
 
 	m_waitingToGoUp.insert(m_toAddToDestination);
@@ -254,6 +303,11 @@ void ElevatorController::processWaitingToGoUp()
 	mergeMaxWaitingToGoDown();
 	mergeWaitingToGoUp();
 
+	if (!m_destinations1.empty())
+	{
+		m_minimumFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
+	}
+
 	cout << "Destinations: ";
 	for (const auto& d : m_destinations1)
 	{
@@ -265,8 +319,15 @@ void ElevatorController::processWaitingToGoUp()
 void ElevatorController::processWaitingToGoDown()
 {
 	cout << "processWaitingToGoDown" << endl;
+
+
 	mergeMinWaitingToGoUp();
 	mergeWaitingToGoDown();
+
+	if (!m_destinations1.empty())
+	{
+		m_maximumFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
+	}
 
 	cout << "Destinations: ";
 	for (const auto& d : m_destinations1)
