@@ -172,10 +172,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 
 	//is moving up
 
-	createTransition({"Aux1"}, {"AddToTravel"},
+	createTransition({"Aux1"}, { "AddToTravel" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::conditionAux1_T1) });
 
-	createTransition({"Aux1"}, { "AddToNextTravel"},
+	createTransition({"Aux1"}, { "WaitToGoUp" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::conditionAux1_T2) });
 
 	//is moving down
@@ -183,10 +183,9 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({ "Aux2" }, { "AddToTravel" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::conditionAux2_T1) });
 
-	createTransition({ "Aux2" }, { "AddToNextTravel" },
+	createTransition({ "Aux2" }, { "WaitToGoDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::conditionAux2_T2) });
-
-
+	
 	createTransition({ "AddToNextTravel" }, { "Ready" });
 
 	createTransition({ "AddToTravel", "HasDestination" }, { "Ready", "HasDestination" });
