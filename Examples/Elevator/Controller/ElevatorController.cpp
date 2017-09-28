@@ -121,11 +121,13 @@ bool ElevatorController::setDestinationFloor(const int floor)
 void ElevatorController::mergeWaitingToGoUp()
 {
 	m_destinations1.insert(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
+	m_waitingToGoUp.clear();
 }
 
 void ElevatorController::mergeWaitingToGoDown()
 {
 	m_destinations1.insert(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
+	m_waitingToGoDown.clear();
 }
 
 void ElevatorController::mergeMaxWaitingToGoDown()
