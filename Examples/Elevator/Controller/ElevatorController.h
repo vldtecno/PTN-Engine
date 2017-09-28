@@ -80,11 +80,12 @@ private:
 
 	int m_currentFloor;
 	int m_toAddToDestination;
+	int m_minimumFloor;
+	int m_maximumFloor;
 	
 	
 	bool m_goingUp;
 	bool m_goingDown;
-	//bool m_endTravel;
 
 	std::unordered_set<int> m_destinations1;
 	std::unordered_set<int> m_destinations2;
@@ -112,6 +113,10 @@ private:
 	void processWaitingToGoDown();
 	void increaseFloor();
 	void decreaseFloor();
+	void setMinimum();
+	void setMaximum();
+	void resetMinimum();
+	void resetMaximum();
 	
 	//info
 	void elevatorStopped();
@@ -135,6 +140,19 @@ private:
 	bool isMarkedFloorCurrentFloor() const;
 	bool isMarkedFloorGreaterThanCurrentFloor() const;
 	bool isMarkedFloorSmallerThanCurrentFloor() const;
+	bool isGreaterThanMinimumFloor() const;
+	bool isSmallerThanMaximumFloor() const;
+	bool hasDestinationGreaterThanCurrent() const;
+	bool hasDestinationSmallerThanCurrent() const;
+
+	bool conditionAux1_T1() const;
+	bool conditionAux1_T2() const;
+	bool conditionAux2_T1() const;
+	bool conditionAux2_T2() const;
+	bool conditionAux3_T1() const;
+	bool conditionAux3_T2() const;
+	bool conditionAux4_T1() const;
+	bool conditionAux4_T2() const;
 
 };
 

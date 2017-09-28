@@ -29,6 +29,8 @@ ElevatorController::ElevatorController():
 	m_pPetriNet{nullptr},
 	m_currentFloor(s_bottomFloor),
 	m_toAddToDestination(s_bottomFloor),
+	m_minimumFloor(s_bottomFloor-1),
+	m_maximumFloor(s_topFloor+1),
 	m_goingUp(false),
 	m_goingDown(false),
 	m_destinations1(),
@@ -159,7 +161,7 @@ void ElevatorController::mergeMinWaitingToGoUp()
 //Actions
 void ElevatorController::addDestination1()
 {
-	cout << "Added destination"<< m_toAddToDestination << endl;
+	cout << "Added destination: "<< m_toAddToDestination << endl;
 	m_destinations1.insert(m_toAddToDestination);
 
 	cout << "Destinations: ";
@@ -172,7 +174,7 @@ void ElevatorController::addDestination1()
 
 void ElevatorController::addDestination2()
 {
-	cout << "Added next destination" << m_toAddToDestination << endl;
+	cout << "Added next destination: " << m_toAddToDestination << endl;
 	m_destinations2.insert(m_toAddToDestination);
 
 	cout << "Next destinations: ";
@@ -288,6 +290,36 @@ void ElevatorController::decreaseFloor()
 	printCurrentFloor();
 }
 
+void ElevatorController::setMinimum()
+{
+	if (m_toAddToDestination < m_minimumFloor || m_minimumFloor == s_bottomFloor-1)
+	{
+		m_minimumFloor = m_toAddToDestination;
+	}
+	cout << "Minimum floor: " << m_minimumFloor << endl;
+}
+
+void ElevatorController::setMaximum()
+{
+	if (m_toAddToDestination > m_maximumFloor || m_maximumFloor == s_topFloor+1)
+	{
+		m_maximumFloor = m_toAddToDestination;
+	}
+	cout << "Maximum floor: " << m_maximumFloor << endl;
+}
+
+void ElevatorController::resetMinimum()
+{
+	m_minimumFloor = s_bottomFloor - 1;
+	cout << "Reset minimum" << endl;
+}
+
+void ElevatorController::resetMaximum()
+{
+	m_maximumFloor = s_topFloor - 1;
+	cout << "Reset maximum" << endl;
+}
+
 bool ElevatorController::isFloorNotInList() const
 {
 	return !isFloorInList();
@@ -301,6 +333,16 @@ bool ElevatorController::isFloorInList() const
 bool ElevatorController::isDestinationListNotEmpty() const
 {
 	return !isDestinationListEmpty();
+}
+
+bool ElevatorController::hasDestinationGreaterThanCurrent() const
+{
+	return isDestinationListNotEmpty() && m_currentFloor <= *min_element(m_destinations1.begin(), m_destinations1.end());
+}
+
+bool ElevatorController::hasDestinationSmallerThanCurrent() const
+{
+	return isDestinationListNotEmpty() && m_currentFloor >= *max_element(m_destinations1.begin(), m_destinations1.end());
 }
 
 bool ElevatorController::isDestinationListEmpty() const
@@ -327,6 +369,63 @@ bool ElevatorController::isMarkedFloorSmallerThanCurrentFloor() const
 {
 	return m_toAddToDestination < m_currentFloor;
 }
+
+bool ElevatorController::isGreaterThanMinimumFloor() const
+{
+	return m_toAddToDestination > m_minimumFloor;
+}
+
+bool ElevatorController::isSmallerThanMaximumFloor() const
+{
+	return m_toAddToDestination < m_maximumFloor;
+}
+
+bool ElevatorController::conditionAux1_T1() const
+{
+	return isMarkedFloorGreaterThanCurrentFloor() &&
+		isSmallerThanMaximumFloor() &&
+		isGreaterThanMinimumFloor();
+}
+
+bool ElevatorController::conditionAux1_T2() const
+{
+	return !conditionAux1_T1();
+}
+
+bool ElevatorController::conditionAux2_T1() const
+{
+	return isMarkedFloorSmallerThanCurrentFloor() &&
+		isSmallerThanMaximumFloor() &&
+		isGreaterThanMinimumFloor();
+}
+
+bool ElevatorController::conditionAux2_T2() const
+{
+	return !conditionAux2_T1();
+}
+
+bool ElevatorController::conditionAux3_T1() const
+{
+	return isMarkedFloorGreaterThanCurrentFloor() &&
+		isSmallerThanMaximumFloor();
+}
+
+bool ElevatorController::conditionAux3_T2() const
+{
+	return !conditionAux3_T1();
+}
+
+bool ElevatorController::conditionAux4_T1() const
+{
+	return isMarkedFloorSmallerThanCurrentFloor() &&
+		isGreaterThanMinimumFloor();
+}
+
+bool ElevatorController::conditionAux4_T2() const
+{
+	return !conditionAux4_T1();
+}
+
 
 //Info
 
