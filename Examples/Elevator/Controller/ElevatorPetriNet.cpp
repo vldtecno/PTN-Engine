@@ -34,15 +34,20 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("DestinationButton", 0, true);
 
 	//controller places
-	createPlace("Stopped", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorStopped));
+	createPlace("Stopped", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorStopped));
+	createPlace("Stopped_", 1);
 	createPlace("Moving", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorMoving));
-	createPlace("DoorsOpened", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreOpen));
+	createPlace("Moving_", 0);
+	createPlace("DoorsOpened", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreOpen));	
 	createPlace("DoorsClosed", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreClosed));
+	createPlace("DoorsClosed_", 0);
 	createPlace("ArrivedFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::arrivedFloor));
 	createPlace("HasDestination", 0);
 
 	createPlace("GoingUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingUp));
+	createPlace("GoingUp_", 0);
 	createPlace("GoingDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingDown));
+	createPlace("GoingDown_", 0);
 	createPlace("AddToTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination1)); 
 	createPlace("AddToNextTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination2));
 	createPlace("WaitToGoUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoUp));
@@ -69,29 +74,37 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createPlace("IncreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::increaseFloor)); 
 	createPlace("DecreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::decreaseFloor)); 
 
+	//////////////////
+	// Trick to prevent read arcs from executing multiple times one place
+	createTransition({ "DoorsClosed" }, { "DoorsClosed_" });
+	createTransition({ "Moving" }, { "Moving_" });
+	createTransition({ "Stopped" }, { "Stopped_" });
+	createTransition({ "GoingUp" }, { "GoingUp_" });
+	createTransition({ "GoingDown" }, { "GoingDown_" });
+
 	
 	//////////////////
 	// Cabine
 
-	createTransition({"CloseDoors", "Stopped", "DoorsOpened"}, {"Stopped", "DoorsClosed"});
+	createTransition({"CloseDoors", "Stopped_", "DoorsOpened"}, {"Stopped_", "DoorsClosed"});
 
-	createTransition({"OpenDoors", "Stopped", "DoorsClosed"}, {"Stopped", "DoorsOpened"});
+	createTransition({"OpenDoors", "Stopped_", "DoorsClosed_"}, {"Stopped_", "DoorsOpened"});
 
-	createTransition({ "HasDestination", "Stopped", "DoorsClosed" }, { "HasDestination", "DoorsClosed", "Moving" }, 
+	createTransition({ "HasDestination", "Stopped_", "DoorsClosed_" }, { "HasDestination", "DoorsClosed_", "Moving" }, 
 		vector<string>({ "OpenDoors" }));
 
-	createTransition({"ArrivedDestination", "Moving"}, {"Stopped", "OpenDoors", "Ready"});	
+	createTransition({"ArrivedDestination", "Moving_"}, {"Stopped", "OpenDoors", "Ready"});	
 	//////////////////
 
 	/////////////////
 	// Simulation
-	createTransition({"Moving", "GoingUp", "Ready", "HasDestination"}, {"Moving", "GoingUp", "IncreaseFloor", "HasDestination" },
+	createTransition({"Moving_", "GoingUp_", "Ready", "HasDestination"}, {"Moving_", "GoingUp_", "IncreaseFloor", "HasDestination" },
 		vector<string>({ "ArrivedFloor", "ArrivedDestination" }) );
 	
 	createTransition({"IncreaseFloor"}, {"ArrivedFloor", "Ready" });
 
 
-	createTransition({"Moving", "GoingDown", "Ready", "HasDestination" }, {"Moving", "GoingDown", "DecreaseFloor", "HasDestination" },
+	createTransition({"Moving_", "GoingDown_", "Ready", "HasDestination" }, {"Moving_", "GoingDown_", "DecreaseFloor", "HasDestination" },
 		vector<string>({ "ArrivedFloor", "ArrivedDestination" }) );
 
 	createTransition({"DecreaseFloor"}, {"ArrivedFloor", "Ready" });
@@ -116,11 +129,11 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({"RemoveFromList"}, {"SwapLists"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) } ); 
 	
-	createTransition({"SwapLists", "GoingUp"}, { "ResetMaximum"}); 
+	createTransition({"SwapLists", "GoingUp_"}, { "ResetMaximum"}); 
 
 	createTransition({ "ResetMaximum" }, { "ProcessGoDown" });
 
-	createTransition({"SwapLists", "GoingDown"}, { "ResetMinimum"});
+	createTransition({"SwapLists", "GoingDown_"}, { "ResetMinimum"});
 
 	createTransition({ "ResetMinimum" }, { "ProcessGoUp" });
 
@@ -154,10 +167,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	createTransition({"DestinationButton", "Ready"}, {"P1"}, { "GoingUp", "GoingDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
-	createTransition({"DestinationButton", "Ready", "GoingUp"}, {"Aux1", "GoingUp"},
+	createTransition({"DestinationButton", "Ready", "GoingUp_"}, {"Aux1", "GoingUp_"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
-	createTransition({"DestinationButton", "Ready", "GoingDown"}, {"Aux2", "GoingDown"},
+	createTransition({"DestinationButton", "Ready", "GoingDown_"}, {"Aux2", "GoingDown_"},
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 	
 	//has no destination
@@ -196,10 +209,10 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//////////////////
 	// Calling the elevator to go up.	
 
-	createTransition({ "CallButtonUp", "Ready", "GoingUp" }, { "Aux3", "GoingUp" },
+	createTransition({ "CallButtonUp", "Ready", "GoingUp_" }, { "Aux3", "GoingUp_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
-	createTransition({ "CallButtonUp", "Ready", "GoingDown" }, { "WaitToGoUp", "GoingDown" },
+	createTransition({ "CallButtonUp", "Ready", "GoingDown_" }, { "WaitToGoUp", "GoingDown_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
 	createTransition({ "CallButtonUp", "Ready" }, { "SetMinimum" }, { "GoingUp", "GoingDown" },
@@ -219,11 +232,11 @@ ElevatorPetriNet::ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrContro
 	//////////////////
 	// Calling the elevator to go down.	
 
-	createTransition({ "CallButtonDown", "Ready", "GoingDown" }, { "Aux4", "GoingDown" },
+	createTransition({ "CallButtonDown", "Ready", "GoingDown_" }, { "Aux4", "GoingDown_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) }
 	);
 
-	createTransition({ "CallButtonDown", "Ready", "GoingUp" }, { "WaitToGoDown", "GoingUp" },
+	createTransition({ "CallButtonDown", "Ready", "GoingUp_" }, { "WaitToGoDown", "GoingUp_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) } );
 
 	createTransition({ "CallButtonDown", "Ready" }, { "SetMaximum" }, { "GoingUp", "GoingDown" }, 
