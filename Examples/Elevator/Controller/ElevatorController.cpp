@@ -225,16 +225,15 @@ void ElevatorController::removeDestination()
 	{
 		m_destinations1.erase(it);
 	}
-
-	printDestinations();
+	//printDestinations();
 }
 
 void ElevatorController::rotateLists()
 {
 	swap(m_destinations1, m_destinations2);
 	
-	printDestinations();
-	printNextDestinations();
+	//printDestinations();
+	//printNextDestinations();
 }
 
 void ElevatorController::processWaitingToGoUp()
@@ -247,7 +246,7 @@ void ElevatorController::processWaitingToGoUp()
 		m_minimumFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
 	}
 
-	printDestinations();
+	//printDestinations();
 }
 
 void ElevatorController::processWaitingToGoDown()
@@ -260,7 +259,7 @@ void ElevatorController::processWaitingToGoDown()
 		m_maximumFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
 	}
 
-	printDestinations();
+	//printDestinations();
 }
 
 void ElevatorController::increaseFloor()
@@ -403,17 +402,20 @@ bool ElevatorController::conditionAux4_T2() const
 	return !conditionAux4_T1();
 }
 
-
 //Info
 
 void ElevatorController::elevatorStopped()
 {
 	cout << "Elevator stopped" << endl;
+	printDestinations();
+	printNextDestinations();
 }
 
 void ElevatorController::elevatorMoving()
 {
 	cout << "Elevator moving" << endl;
+	printDestinations();
+	printNextDestinations();
 }
 
 void ElevatorController::doorsAreOpen()
@@ -479,7 +481,7 @@ void ElevatorController::printFloorList(const unordered_set<int>& floors) const
 	}
 	for (const auto& d : floors)
 	{
-		cout << d << ", ";
+		cout << d << " ";
 	}
 	cout << endl;
 }

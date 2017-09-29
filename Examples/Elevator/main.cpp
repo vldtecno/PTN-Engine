@@ -88,7 +88,7 @@ void callElevatorDownMenu(shared_ptr<ElevatorController> controller)
 
 				if (controller->callElevatorDown(callerFloor))
 				{
-					exit = true;
+					exit = true;					
 				}
 				else
 				{
@@ -103,6 +103,7 @@ void callElevatorDownMenu(shared_ptr<ElevatorController> controller)
 		}
 
 	} while (!exit);
+	
 }
 
 void setDestinationMenu(shared_ptr<ElevatorController> controller)
@@ -149,10 +150,11 @@ void setDestinationMenu(shared_ptr<ElevatorController> controller)
 
 
 void programLoop(shared_ptr<ElevatorController> controller)
-{
+{	
 	bool exit = false;
 	do
 	{
+		cout << endl;
 		cout << "Commands:" << endl;
 		cout << "1 - Open elevator doors" << endl;
 		cout << "2 - Close elevator doors" << endl;
