@@ -21,16 +21,12 @@
 
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
-#include <vector>
 #include <unordered_set>
 
 
 class IElevatorPetriNet;
 
-//! Example of a controller class
-/*!
- *
- */
+//! Elevator controller class
 class ElevatorController: public std::enable_shared_from_this<ElevatorController>
 {
 	friend class ElevatorPetriNet;
@@ -49,19 +45,23 @@ public:
 	 */
 	void initialize();	
 
+	//! Command to open elevator doors.
 	void openDoors();
 
+	//! Command to close elevator doors.
 	void closeDoors();
 
+	//! Command to call elevator to go up from a given floor.
 	bool callElevatorUp(const int floor);
 
+	//! Command to call elevator to go down from a given floor.
 	bool callElevatorDown(const int floor);
 
+	//! Command to press a floor button in the elevator.
 	bool setDestinationFloor(const int floor);
 
 	static const int s_bottomFloor = 0;
 	static const int s_topFloor = 10;
-
 
 private:
 
@@ -71,58 +71,36 @@ private:
 	//! One concrete (nested) class of a Petri net based state machine.
 	class MenuStateMachine;
 
-
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 
+	//! Floor where the elevator currently is.
 	int m_currentFloor;
+
+	//! Floor pressed in the button.
 	int m_toAddToDestination;
+
+	//! List of destinations in the current travel.
+	std::unordered_set<int> m_destinations;
 	
-	bool m_goingUp;
-	bool m_goingDown;
+	//! List of destinations for the next travel.
+	std::unordered_set<int> m_nextTravelDestinations;
 
-	std::unordered_set<int> m_destinations1;
-	std::unordered_set<int> m_destinations2;
-	std::unordered_set<int> m_waitingToGoUp;
-	std::unordered_set<int> m_waitingToGoDown;
+	//! List of destinations that want to catch the elevator to go up.
+	std::unordered_set<int> m_floorsWaitingToGoUp;
 
-	//! The state machine of the controller.
-	PtrPetriNet m_pPetriNet;
+	//! List of destinations that want to catch the elevator to go down.
+	std::unordered_set<int> m_floorsWaitingToGoDown;
 
-	
-	//Actions
+	//! Merge set to m_destinations and delete the merged items.
+	void mergeToDestinations(std::unordered_set<int>& toAdd, const bool lessThan);
 
-	void removeDestinationGU();
-	void removeDestinationGD();
-	void removeDestination();
-	void removeWaitingToGoDown();
-	void removeWaitingToGoUp();
-	void rotateLists();
+	//! Remove current floor from m_floorsWaitingToGoDown
+	void removeCurrentFromWaitingToGoDown();
 
-	void addDestination1();
-	void addDestination2();
-	void addWaitingToGoDown();
-	void addWaitingToGoUp();
-	void increaseFloor();
-	void decreaseFloor();
+	//! Remove current floor from m_floorsWaitingToGoUp
+	void removeCurrentFromWaitingToGoUp();
 
-	void mergeGoingUpGTCurrent();
-	void mergeMinGoingUp();
-	void mergeMaxGoingDown();
-	void mergePostponedToCurrent();
-	void mergeGoingDownSTCurrent();
-
-	
-
-	
-	//info
-	void processedLists();
-	void elevatorStopped();
-	void elevatorMoving();
-	void doorsAreOpen();
-	void doorsAreClosed();
-	void goingUp();
-	void goingDown();
-
+	//Information
 	void printCurrentFloor() const;
 	void printDestinations() const;
 	void printNextDestinations() const;
@@ -131,7 +109,35 @@ private:
 	void printFloorList(const std::unordered_set<int>& floors) const;
 	void printSchedule() const;
 
-
+	//! The state machine of the controller.
+	PtrPetriNet m_pPetriNet;
+	
+	////////////////////
+	//Methods used by the petri net
+	
+	//Actions
+	void removeDestinationGU();
+	void removeDestinationGD();
+	void removeDestination();
+	void rotateLists();
+	void addDestination1();
+	void addDestination2();
+	void addWaitingToGoDown();
+	void addWaitingToGoUp();
+	void increaseFloor();
+	void decreaseFloor();
+	void mergeGoingUpGTCurrent();
+	void mergeMinGoingUp();
+	void mergeMaxGoingDown();
+	void mergePostponedToCurrent();
+	void mergeGoingDownSTCurrent();	
+	void processedLists();
+	void elevatorStopped();
+	void elevatorMoving();
+	void doorsAreOpen();
+	void doorsAreClosed();
+	void goingUp();
+	void goingDown();
 
 	//Conditions
 	bool isFloorNotInList() const;
@@ -139,7 +145,6 @@ private:
 	bool isDestinationListNotEmpty() const;
 	bool isDestinationListEmpty() const;
 	bool isMarkedFloorNotCurrentFloor() const;
-	bool isMarkedFloorCurrentFloor() const;
 	bool isMarkedFloorGreaterThanCurrentFloor() const;
 	bool isMarkedFloorSmallerThanCurrentFloor() const;
 	bool isMinSmallerThanCurrent() const;

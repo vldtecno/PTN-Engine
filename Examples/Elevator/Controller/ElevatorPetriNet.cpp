@@ -148,7 +148,7 @@ void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> pt
 	createTransition({ "OpenDoors", "Stopped_", "DoorsClosed_" }, { "Stopped_", "DoorsOpened" });
 
 	createTransition({ "Stopped_", "DoorsClosed_", "ProcessedLists" }, { "DoorsClosed_", "Moving" },
-		{ "OpenDoors"/*, "ProcessLists"*/ },
+		{ "OpenDoors" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
 	createTransition({ "ArrivedDestination", "Moving_" }, { "Stopped", "OpenDoors" });
@@ -178,7 +178,7 @@ void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController
 	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
 
-	createTransition({ "RemoveFromListGU"/*, "GoingUp_"*/ }, { "ProcessLists", "ArrivedDestination", "Ready" },
+	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" },
@@ -188,7 +188,7 @@ void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController
 	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
 
-	createTransition({ "RemoveFromListGD"/*, "GoingDown_"*/ }, { "ProcessLists", "ArrivedDestination", "Ready" },
+	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" },
@@ -240,12 +240,6 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "MergePostponedToCurrent12" }, { "Ready", "ProcessedLists", "GoingDown" });
 
-
-	//
-	//createTransition({ "Ready", "ProcessLists", "DoorsClosed_" },
-	//	{ "DoorsClosed_", "SwapGU" },
-	//	{ "OpenDoors", "GoingUp_", "GoingDown_" },
-	//	{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	// Arriving a floor going up.	
 
