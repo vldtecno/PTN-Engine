@@ -205,6 +205,13 @@ int main(int argc, char** argv)
 	shared_ptr<ElevatorController> controller = make_shared<ElevatorController>();
 	controller->initialize();
 
+	cout << "This program is part of the PTN Engine distribution." << endl;
+	cout << "The PTN Engine is available at: https://github.com/vldtecno/PTN-Engine" << endl;
+	cout << endl;
+	cout << "The \"Elevator\" example implements a simplified elevator controller " << endl;
+	cout << "using the PTN Engine. It also simulates the elevator's movement." << endl;
+	cout << endl << endl;
+
 	programLoop(controller);
 
 	cout << "Successfully terminated" << endl;

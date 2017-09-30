@@ -120,10 +120,7 @@ void ElevatorController::addDestination1()
 	if (m_nextTravelDestinations.find(m_toAddToDestination) != m_nextTravelDestinations.end())
 	{
 		m_nextTravelDestinations.erase(m_toAddToDestination);
-	}
-
-	//m_floorsWaitingToGoDown.erase(m_toAddToDestination);
-	//m_floorsWaitingToGoUp.erase(m_toAddToDestination);	
+	}	
 
 	m_destinations.insert(m_toAddToDestination);
 
