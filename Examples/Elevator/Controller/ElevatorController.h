@@ -94,6 +94,8 @@ private:
 	void removeDestinationGU();
 	void removeDestinationGD();
 	void removeDestination();
+	void removeWaitingToGoDown();
+	void removeWaitingToGoUp();
 	void rotateLists();
 
 	void addDestination1();
@@ -110,7 +112,10 @@ private:
 	void mergeGoingDownSTCurrent();
 
 	
+
+	
 	//info
+	void processedLists();
 	void elevatorStopped();
 	void elevatorMoving();
 	void doorsAreOpen();
@@ -124,6 +129,8 @@ private:
 	void printWaitingGoDown() const;
 	void printWaitingGoUp() const;
 	void printFloorList(const std::unordered_set<int>& floors) const;
+	void printSchedule() const;
+
 
 
 	//Conditions
