@@ -201,100 +201,94 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
 		{ "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
+		{ "OpenDoors" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
-	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
-		{ "DoorsClosed_", "SwapGD" },
+	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
+		{ "OpenDoors" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "SwapGD" },
-		{ "MergeGoingUpGTCurrent" },
+	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
-	createTransition({ "SwapGD" },
-		{ "MergeMinGoingUp1" },
+	createTransition({ "SwapGD" }, { "MergeMinGoingUp1" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "MergeGoingUpGTCurrent" }, { "Ready", "ProcessedLists", "GoingUp" });
 
-	createTransition({ "MergeMinGoingUp1" },
-		{ "MergeMaxGoingDown1" },
+	createTransition({ "MergeMinGoingUp1" }, { "MergeMaxGoingDown1" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "MergeMinGoingUp1" },
-		{ "GoingDown", "Ready", "ProcessedLists" },
+	createTransition({ "MergeMinGoingUp1" }, { "GoingDown", "Ready", "ProcessedLists" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMinSmallerThanCurrent) });
 
-	createTransition({ "MergeMinGoingUp1" },
-		{ "MergePostponedToCurrent11" },
+	createTransition({ "MergeMinGoingUp1" }, { "MergePostponedToCurrent11" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMinGreaterThanCurrent) });
 
-	createTransition({ "MergeMaxGoingDown1" },
-		{ "Ready", "ProcessedLists" },
+	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "MergeMaxGoingDown1" },
-		{ "MergePostponedToCurrent12" },
+	createTransition({ "MergeMaxGoingDown1" }, { "MergePostponedToCurrent12" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		make_shared<FireCondition>(ptrController, &ElevatorController::isMaxSmallerThanCurrent) });
+		  make_shared<FireCondition>(ptrController, &ElevatorController::isMaxSmallerThanCurrent) });
 
-	createTransition({ "MergeMaxGoingDown1" },
-		{ "Ready", "ProcessedLists", "GoingUp" },
+	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists", "GoingUp" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		make_shared<FireCondition>(ptrController, &ElevatorController::isMaxGreaterThanCurrent) });
+		  make_shared<FireCondition>(ptrController, &ElevatorController::isMaxGreaterThanCurrent) });
 
-	createTransition({ "MergePostponedToCurrent12" },
-		{ "Ready", "ProcessedLists", "GoingDown" });
+	createTransition({ "MergePostponedToCurrent11" }, { "Ready", "ProcessedLists", "GoingUp" });
 
+	createTransition({ "MergePostponedToCurrent12" }, { "Ready", "ProcessedLists", "GoingDown" });
+
+
+	//
+	//createTransition({ "Ready", "ProcessLists", "DoorsClosed_" },
+	//	{ "DoorsClosed_", "SwapGU" },
+	//	{ "OpenDoors", "GoingUp_", "GoingDown_" },
+	//	{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	// Arriving a floor going up.	
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
 		{ "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
+		{ "OpenDoors" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
-	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
-		{ "DoorsClosed_", "SwapGU" },
+	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
+		{ "OpenDoors" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "SwapGU" },
-		{ "MergeGoingDownSTCurrent" },
+	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
-	createTransition({ "SwapGU" },
-		{ "MergeMaxGoingDown2" },
+	createTransition({ "SwapGU" }, { "MergeMaxGoingDown2" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "MergeGoingDownSTCurrent" }, { "Ready", "ProcessedLists", "GoingDown" });
 
-	createTransition({ "MergeMaxGoingDown2" },
-		{ "MergeMinGoingUp2" },
+	createTransition({ "MergeMaxGoingDown2" }, { "MergeMinGoingUp2" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "MergeMaxGoingDown2" },
-		{ "GoingUp", "Ready", "ProcessedLists" },
+	createTransition({ "MergeMaxGoingDown2" }, { "GoingUp", "Ready", "ProcessedLists" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMaxGreaterThanCurrent) });
 
-	createTransition({ "MergeMaxGoingDown2" },
-		{ "MergePostponedToCurrent21" },
+	createTransition({ "MergeMaxGoingDown2" }, { "MergePostponedToCurrent21" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMaxSmallerThanCurrent) });
 
-	createTransition({ "MergeMinGoingUp2" },
-		{ "Ready", "ProcessedLists" },
+	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
-	createTransition({ "MergeMinGoingUp2" },
-		{ "MergePostponedToCurrent22" },
+	createTransition({ "MergeMinGoingUp2" }, { "MergePostponedToCurrent22" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		make_shared<FireCondition>(ptrController, &ElevatorController::isMinGreaterThanCurrent) });
+		  make_shared<FireCondition>(ptrController, &ElevatorController::isMinGreaterThanCurrent) });
 
-	createTransition({ "MergeMinGoingUp2" },
-		{ "Ready", "ProcessedLists", "GoingDown" },
+	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists", "GoingDown" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		make_shared<FireCondition>(ptrController, &ElevatorController::isMinSmallerThanCurrent) });
+		  make_shared<FireCondition>(ptrController, &ElevatorController::isMinSmallerThanCurrent) });
 
-	createTransition({ "MergePostponedToCurrent22" },
-		{ "Ready", "ProcessedLists", "GoingUp" });
+	createTransition({ "MergePostponedToCurrent21" }, { "Ready", "ProcessedLists", "GoingDown" });
+
+	createTransition({ "MergePostponedToCurrent22" }, { "Ready", "ProcessedLists", "GoingUp" });
 
 }
 
