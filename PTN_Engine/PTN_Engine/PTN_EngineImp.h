@@ -49,7 +49,7 @@ namespace ptne
 		//! Constructor.
 		PTN_EngineImp();
 
-		virtual ~PTN_EngineImp();
+		~PTN_EngineImp();
 
 		/*!
 		 * Create a new transition
@@ -295,9 +295,9 @@ namespace ptne
 
 		//! Map of places.
 		/*!
-		 * Insertion in only performed on construction and no removals
-		 * during the lifetime of the net. Otherwise there are many
-		 * access operations.
+		 * Insertion is only performed on construction and there are no 
+		 * removals during the lifetime of the net. Otherwise many
+		 * access operations are expected.
 		 */
 		std::map<std::string, SharedPtrPlace> m_places;
 
