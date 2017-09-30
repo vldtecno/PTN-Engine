@@ -164,10 +164,10 @@ void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> pt
 void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController> ptrController)
 {
 	createTransition({ "GoingUp_", "Ready", "Moving_" }, { "Moving_", "GoingUp_", "IncreaseFloor" },
-		vector<string>({ "ArrivedDestination" }));
+		vector<string>{ "ArrivedDestination" });
 
 	createTransition({ "GoingDown_", "Ready", "Moving_" }, { "Moving_", "GoingDown_", "DecreaseFloor" },
-		vector<string>({ "ArrivedDestination" }));
+		vector<string>{ "ArrivedDestination" });
 
 	createTransition({ "IncreaseFloor" }, { "Ready" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorNotInList) });
@@ -281,7 +281,7 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 void ElevatorPetriNet::createButtonPressingTransitions(shared_ptr<ElevatorController> ptrController)
 {
 	createTransition({ "DestinationButton", "Ready" }, { "D3" },
-		vector<string>({ "GoingUp_", "GoingDown_" }),
+		vector<string>{ "GoingUp_", "GoingDown_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
 	createTransition({ "DestinationButton", "GoingUp_", "Ready" }, { "D1", "GoingUp_" },
@@ -318,7 +318,7 @@ void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorControl
 	// Calling the elevator to go up.
 
 	createTransition({ "CallButtonUp", "Ready" }, { "D3" },
-		vector<string>({ "GoingUp_", "GoingDown_" }),
+		vector<string>{ "GoingUp_", "GoingDown_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
 	createTransition({ "CallButtonUp", "GoingUp_", "Ready" }, { "D4", "GoingUp_" },
@@ -338,7 +338,7 @@ void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorControl
 	// Calling the elevator to go down.	
 
 	createTransition({ "CallButtonDown", "Ready" }, { "D3" },
-		vector<string>({ "GoingUp_", "GoingDown_" }),
+		vector<string>{ "GoingUp_", "GoingDown_" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
 
 	createTransition({ "CallButtonDown", "GoingDown_", "Ready" }, { "D5", "GoingDown_" },

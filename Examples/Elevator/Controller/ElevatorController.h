@@ -164,4 +164,5 @@ template class ptne::ActivationCondition<ElevatorController>;
 
 //!
 using FireCondition = ptne::ActivationCondition<ElevatorController>;
+using FireConditionPtr = std::shared_ptr<FireCondition>;
 
