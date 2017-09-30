@@ -94,7 +94,7 @@ void ElevatorPetriNet::createCabinePlaces(shared_ptr<ElevatorController> ptrCont
 	createPlace("ArrivedDestination", 0);
 
 	createPlace("ProcessLists", 0);
-	createPlace("ProcessedLists", 1);
+	createPlace("ProcessedLists", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::processedLists));
 	
 	createPlace("GoingUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingUp));
 	createPlace("GoingUp_", 0);
