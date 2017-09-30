@@ -193,11 +193,11 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
 		{ "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
-		{ "OpenDoors" },
+		{ "OpenDoors", "ArrivedDestination" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
-		{ "OpenDoors" },
+		{ "OpenDoors", "ArrivedDestination" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
@@ -237,11 +237,11 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
 		{ "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
-		{ "OpenDoors" },
+		{ "OpenDoors", "ArrivedDestination" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
-		{ "OpenDoors" },
+		{ "OpenDoors", "ArrivedDestination" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
 
 	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
