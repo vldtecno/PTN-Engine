@@ -84,12 +84,6 @@ private:
 	std::unordered_set<int> m_destinations2;
 	std::unordered_set<int> m_waitingToGoUp;
 	std::unordered_set<int> m_waitingToGoDown;
-	
-	void mergeWaitingToGoUp();
-	void mergeWaitingToGoDown();
-	void mergeMaxWaitingToGoDown();
-	void mergeMinWaitingToGoUp();
-
 
 	//! The state machine of the controller.
 	PtrPetriNet m_pPetriNet;

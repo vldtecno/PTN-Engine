@@ -116,42 +116,6 @@ bool ElevatorController::setDestinationFloor(const int floor)
 	return true;
 }
 
-void ElevatorController::mergeWaitingToGoUp()
-{
-	m_destinations1.insert(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
-	m_waitingToGoUp.clear();
-}
-
-void ElevatorController::mergeWaitingToGoDown()
-{
-	m_destinations1.insert(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
-	m_waitingToGoDown.clear();
-}
-
-void ElevatorController::mergeMaxWaitingToGoDown()
-{
-	if (m_waitingToGoDown.empty())
-	{
-		return;
-	}
-	auto it = max_element(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
-	const int maxFloor = *it;	
-	m_destinations1.insert(maxFloor);
-	m_waitingToGoDown.erase(it);
-}
-
-void ElevatorController::mergeMinWaitingToGoUp()
-{
-	if (m_waitingToGoUp.empty())
-	{
-		return;
-	}
-	auto it = min_element(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
-	const int minFloor = *it;	
-	m_destinations1.insert(minFloor);
-	m_waitingToGoUp.erase(it);
-}
-
 //Actions
 void ElevatorController::addDestination1()
 {
@@ -223,6 +187,7 @@ void ElevatorController::removeDestinationGU()
 	auto it = m_waitingToGoUp.find(m_currentFloor);
 	if (it != m_waitingToGoUp.end())
 	{
+		cout << "Removed " << m_currentFloor << " from waiting to go up" << endl;
 		m_waitingToGoUp.erase(it);
 	}
 }
@@ -234,25 +199,27 @@ void ElevatorController::removeDestinationGD()
 	auto it = m_waitingToGoDown.find(m_currentFloor);
 	if (it != m_waitingToGoDown.end())
 	{
+		cout << "Removed " << m_currentFloor << " from waiting to go down" << endl;
 		m_waitingToGoDown.erase(it);
 	}
 }
 
 void ElevatorController::removeDestination()
 {
+	cout << "Removed " << m_currentFloor << " from destinations" << endl;
 	auto it = m_destinations1.find(m_currentFloor);
 	if (it != m_destinations1.end())
 	{
 		m_destinations1.erase(it);
 	}
-	//printDestinations();
+	printDestinations();
 }
 
 void ElevatorController::rotateLists()
 {
 	swap(m_destinations1, m_destinations2);	
-	//printDestinations();
-	//printNextDestinations();
+	printDestinations();
+	printNextDestinations();
 }
 
 void ElevatorController::increaseFloor()
@@ -294,7 +261,10 @@ void ElevatorController::mergeMinGoingUp()
 	}
 	const int minWaiting = *min_element(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
 	m_destinations1.insert(minWaiting);
-	m_waitingToGoDown.erase(minWaiting);
+	m_waitingToGoUp.erase(minWaiting);
+
+	m_destinations2.insert(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
+	m_waitingToGoUp.clear();
 }
 
 void ElevatorController::mergeMaxGoingDown()
@@ -306,6 +276,9 @@ void ElevatorController::mergeMaxGoingDown()
 	const int maxWaiting = *max_element(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
 	m_destinations1.insert(maxWaiting);
 	m_waitingToGoDown.erase(maxWaiting);
+
+	m_destinations2.insert(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
+	m_waitingToGoDown.clear();
 }
 
 void ElevatorController::mergePostponedToCurrent()
@@ -325,7 +298,7 @@ void ElevatorController::mergeGoingDownSTCurrent()
 			if (floor < m_currentFloor)
 			{
 				m_destinations1.insert(floor);
-				m_waitingToGoUp.erase(floor);
+				m_waitingToGoDown.erase(floor);
 				deleted = true;
 				break;
 			}
