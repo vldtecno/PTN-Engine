@@ -63,10 +63,6 @@ public:
 	static const int s_topFloor = 10;
 
 
-
-
-
-
 private:
 
 	//! Base (nested) class for a Petri net based state machine.
@@ -80,9 +76,6 @@ private:
 
 	int m_currentFloor;
 	int m_toAddToDestination;
-	int m_minimumFloor;
-	int m_maximumFloor;
-	
 	
 	bool m_goingUp;
 	bool m_goingDown;
@@ -103,27 +96,31 @@ private:
 
 	
 	//Actions
+
+	void removeDestinationGU();
+	void removeDestinationGD();
+	void removeDestination();
+	void rotateLists();
+
 	void addDestination1();
 	void addDestination2();
 	void addWaitingToGoDown();
 	void addWaitingToGoUp();
-	void removeDestination();
-	void rotateLists();
-	void processWaitingToGoUp();
-	void processWaitingToGoDown();
 	void increaseFloor();
 	void decreaseFloor();
-	void setMinimum();
-	void setMaximum();
-	void resetMinimum();
-	void resetMaximum();
+
+	void mergeGoingUpGTCurrent();
+	void mergeMinGoingUp();
+	void mergeMaxGoingDown();
+	void mergePostponedToCurrent();
+	void mergeGoingDownSTCurrent();
+
 	
 	//info
 	void elevatorStopped();
 	void elevatorMoving();
 	void doorsAreOpen();
 	void doorsAreClosed();
-	void arrivedFloor();
 	void goingUp();
 	void goingDown();
 
@@ -135,8 +132,6 @@ private:
 	void printFloorList(const std::unordered_set<int>& floors) const;
 
 
-
-
 	//Conditions
 	bool isFloorNotInList() const;
 	bool isFloorInList() const;
@@ -146,19 +141,10 @@ private:
 	bool isMarkedFloorCurrentFloor() const;
 	bool isMarkedFloorGreaterThanCurrentFloor() const;
 	bool isMarkedFloorSmallerThanCurrentFloor() const;
-	bool isGreaterThanMinimumFloor() const;
-	bool isSmallerThanMaximumFloor() const;
-	bool hasDestinationGreaterThanCurrent() const;
-	bool hasDestinationSmallerThanCurrent() const;
-
-	bool conditionAux1_T1() const;
-	bool conditionAux1_T2() const;
-	bool conditionAux2_T1() const;
-	bool conditionAux2_T2() const;
-	bool conditionAux3_T1() const;
-	bool conditionAux3_T2() const;
-	bool conditionAux4_T1() const;
-	bool conditionAux4_T2() const;
+	bool isMinSmallerThanCurrent() const;
+	bool isMinGreaterThanCurrent() const;
+	bool isMaxSmallerThanCurrent() const;
+	bool isMaxGreaterThanCurrent() const;
 
 };
 

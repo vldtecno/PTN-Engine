@@ -29,8 +29,6 @@ ElevatorController::ElevatorController():
 	m_pPetriNet{nullptr},
 	m_currentFloor(s_bottomFloor),
 	m_toAddToDestination(s_bottomFloor),
-	m_minimumFloor(s_bottomFloor-1),
-	m_maximumFloor(s_topFloor+1),
 	m_goingUp(false),
 	m_goingDown(false),
 	m_destinations1(),
@@ -218,6 +216,28 @@ void ElevatorController::addWaitingToGoUp()
 	printWaitingGoUp();
 }
 
+void ElevatorController::removeDestinationGU()
+{
+	removeDestination();
+
+	auto it = m_waitingToGoUp.find(m_currentFloor);
+	if (it != m_waitingToGoUp.end())
+	{
+		m_waitingToGoUp.erase(it);
+	}
+}
+
+void ElevatorController::removeDestinationGD()
+{
+	removeDestination();
+
+	auto it = m_waitingToGoDown.find(m_currentFloor);
+	if (it != m_waitingToGoDown.end())
+	{
+		m_waitingToGoDown.erase(it);
+	}
+}
+
 void ElevatorController::removeDestination()
 {
 	auto it = m_destinations1.find(m_currentFloor);
@@ -230,72 +250,87 @@ void ElevatorController::removeDestination()
 
 void ElevatorController::rotateLists()
 {
-	swap(m_destinations1, m_destinations2);
-	
+	swap(m_destinations1, m_destinations2);	
 	//printDestinations();
 	//printNextDestinations();
-}
-
-void ElevatorController::processWaitingToGoUp()
-{
-	mergeMaxWaitingToGoDown();
-	mergeWaitingToGoUp();
-
-	if (!m_destinations1.empty())
-	{
-		m_minimumFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
-	}
-
-	//printDestinations();
-}
-
-void ElevatorController::processWaitingToGoDown()
-{
-	mergeMinWaitingToGoUp();
-	mergeWaitingToGoDown();
-
-	if (!m_destinations1.empty())
-	{
-		m_maximumFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
-	}
-
-	//printDestinations();
 }
 
 void ElevatorController::increaseFloor()
 {
 	++m_currentFloor;
+	printCurrentFloor();
 }
 
 void ElevatorController::decreaseFloor()
 {
 	--m_currentFloor;
+	printCurrentFloor();
 }
 
-void ElevatorController::setMinimum()
+void ElevatorController::mergeGoingUpGTCurrent()
 {
-	if (m_toAddToDestination < m_minimumFloor || m_minimumFloor == s_bottomFloor-1)
+	bool deleted = false;
+	do
 	{
-		m_minimumFloor = m_toAddToDestination;
-	}
+		deleted = false;
+		for (const int floor : m_waitingToGoUp)
+		{
+			if (floor > m_currentFloor)
+			{
+				m_destinations1.insert(floor);
+				m_waitingToGoUp.erase(floor);
+				deleted = true;
+				break;
+			}
+		}
+	} while (deleted);
 }
 
-void ElevatorController::setMaximum()
+void ElevatorController::mergeMinGoingUp()
 {
-	if (m_toAddToDestination > m_maximumFloor || m_maximumFloor == s_topFloor+1)
+	if (m_waitingToGoUp.empty())
 	{
-		m_maximumFloor = m_toAddToDestination;
+		return;
 	}
+	const int minWaiting = *min_element(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
+	m_destinations1.insert(minWaiting);
+	m_waitingToGoDown.erase(minWaiting);
 }
 
-void ElevatorController::resetMinimum()
+void ElevatorController::mergeMaxGoingDown()
 {
-	m_minimumFloor = s_bottomFloor - 1;
+	if (m_waitingToGoDown.empty())
+	{
+		return;
+	}
+	const int maxWaiting = *max_element(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
+	m_destinations1.insert(maxWaiting);
+	m_waitingToGoDown.erase(maxWaiting);
 }
 
-void ElevatorController::resetMaximum()
+void ElevatorController::mergePostponedToCurrent()
 {
-	m_maximumFloor = s_topFloor + 1;
+	m_destinations1.insert(m_destinations2.begin(), m_destinations2.end());
+	m_destinations2.clear();
+}
+
+void ElevatorController::mergeGoingDownSTCurrent()
+{
+	bool deleted = false;
+	do
+	{
+		deleted = false;
+		for (const int floor : m_waitingToGoDown)
+		{
+			if (floor < m_currentFloor)
+			{
+				m_destinations1.insert(floor);
+				m_waitingToGoUp.erase(floor);
+				deleted = true;
+				break;
+			}
+		}
+	} while (deleted);
 }
 
 bool ElevatorController::isFloorNotInList() const
@@ -311,16 +346,6 @@ bool ElevatorController::isFloorInList() const
 bool ElevatorController::isDestinationListNotEmpty() const
 {
 	return !isDestinationListEmpty();
-}
-
-bool ElevatorController::hasDestinationGreaterThanCurrent() const
-{
-	return isDestinationListNotEmpty() && m_currentFloor <= *min_element(m_destinations1.begin(), m_destinations1.end());
-}
-
-bool ElevatorController::hasDestinationSmallerThanCurrent() const
-{
-	return isDestinationListNotEmpty() && m_currentFloor >= *max_element(m_destinations1.begin(), m_destinations1.end());
 }
 
 bool ElevatorController::isDestinationListEmpty() const
@@ -348,59 +373,46 @@ bool ElevatorController::isMarkedFloorSmallerThanCurrentFloor() const
 	return m_toAddToDestination < m_currentFloor;
 }
 
-bool ElevatorController::isGreaterThanMinimumFloor() const
+bool ElevatorController::isMinSmallerThanCurrent() const
 {
-	return m_toAddToDestination > m_minimumFloor;
+	if (m_destinations1.empty())
+	{
+		return false;
+	}
+	int minFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
+	return minFloor < m_currentFloor;
 }
 
-bool ElevatorController::isSmallerThanMaximumFloor() const
+bool ElevatorController::isMinGreaterThanCurrent() const
 {
-	return m_toAddToDestination < m_maximumFloor;
+	if (m_destinations1.empty())
+	{
+		return false;
+	}
+	int minFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
+	return minFloor > m_currentFloor;
 }
 
-bool ElevatorController::conditionAux1_T1() const
+bool ElevatorController::isMaxSmallerThanCurrent() const
 {
-	return isMarkedFloorGreaterThanCurrentFloor() &&
-		isSmallerThanMaximumFloor();
+	if (m_destinations1.empty())
+	{
+		return false;
+	}
+	int maxFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
+	return maxFloor < m_currentFloor;
 }
 
-bool ElevatorController::conditionAux1_T2() const
+bool ElevatorController::isMaxGreaterThanCurrent() const
 {
-	return !conditionAux1_T1();
+	if (m_destinations1.empty())
+	{
+		return false;
+	}
+	int maxFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
+	return maxFloor > m_currentFloor;
 }
 
-bool ElevatorController::conditionAux2_T1() const
-{
-	return isMarkedFloorSmallerThanCurrentFloor() &&
-		isGreaterThanMinimumFloor();
-}
-
-bool ElevatorController::conditionAux2_T2() const
-{
-	return !conditionAux2_T1();
-}
-
-bool ElevatorController::conditionAux3_T1() const
-{
-	return isMarkedFloorGreaterThanCurrentFloor() &&
-		isSmallerThanMaximumFloor();
-}
-
-bool ElevatorController::conditionAux3_T2() const
-{
-	return !conditionAux3_T1();
-}
-
-bool ElevatorController::conditionAux4_T1() const
-{
-	return isMarkedFloorSmallerThanCurrentFloor() &&
-		isGreaterThanMinimumFloor();
-}
-
-bool ElevatorController::conditionAux4_T2() const
-{
-	return !conditionAux4_T1();
-}
 
 //Info
 
@@ -426,11 +438,6 @@ void ElevatorController::doorsAreOpen()
 void ElevatorController::doorsAreClosed()
 {
 	cout << "Elevator doors are closed" << endl;
-}
-
-void ElevatorController::arrivedFloor()
-{
-	printCurrentFloor();
 }
 
 void ElevatorController::goingUp()
@@ -468,7 +475,7 @@ void ElevatorController::printWaitingGoDown() const
 
 void ElevatorController::printWaitingGoUp() const
 {
-	cout << "Floors with people waiting to go down: ";
+	cout << "Floors with people waiting to go up: ";
 	printFloorList(m_waitingToGoUp);
 }
 
