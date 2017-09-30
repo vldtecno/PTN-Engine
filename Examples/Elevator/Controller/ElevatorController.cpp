@@ -29,12 +29,10 @@ ElevatorController::ElevatorController():
 	m_pPetriNet{nullptr},
 	m_currentFloor(s_bottomFloor),
 	m_toAddToDestination(s_bottomFloor),
-	m_goingUp(false),
-	m_goingDown(false),
-	m_destinations1(),
-	m_destinations2(),
-	m_waitingToGoUp(),
-	m_waitingToGoDown()
+	m_destinations(),
+	m_nextTravelDestinations(),
+	m_floorsWaitingToGoUp(),
+	m_floorsWaitingToGoDown()
 {}
 
 ElevatorController::~ElevatorController()
@@ -119,103 +117,91 @@ bool ElevatorController::setDestinationFloor(const int floor)
 //Actions
 void ElevatorController::addDestination1()
 {
-	if (m_destinations2.find(m_toAddToDestination) != m_destinations2.end())
+	if (m_nextTravelDestinations.find(m_toAddToDestination) != m_nextTravelDestinations.end())
 	{
-		m_destinations2.erase(m_toAddToDestination);
-	}
-	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
-	{
-		m_waitingToGoDown.erase(m_toAddToDestination);
-	}
-	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
-	{
-		m_waitingToGoUp.erase(m_toAddToDestination);
+		m_nextTravelDestinations.erase(m_toAddToDestination);
 	}
 
-	m_destinations1.insert(m_toAddToDestination);
+	m_floorsWaitingToGoDown.erase(m_toAddToDestination);
+	m_floorsWaitingToGoUp.erase(m_toAddToDestination);	
+
+	m_destinations.insert(m_toAddToDestination);
 
 	printDestinations();
 }
 
 void ElevatorController::addDestination2()
 {
-	if (m_destinations1.find(m_toAddToDestination) != m_destinations1.end())
+	if (m_destinations.find(m_toAddToDestination) != m_destinations.end())
 	{
 		return;
 	}
+	m_floorsWaitingToGoDown.erase(m_toAddToDestination);
+	m_floorsWaitingToGoUp.erase(m_toAddToDestination);
 
-	if (m_waitingToGoDown.find(m_toAddToDestination) != m_waitingToGoDown.end())
-	{
-		m_waitingToGoDown.erase(m_toAddToDestination);
-	}
-	if (m_waitingToGoUp.find(m_toAddToDestination) != m_waitingToGoUp.end())
-	{
-		m_waitingToGoUp.erase(m_toAddToDestination);
-	}
-
-	m_destinations2.insert(m_toAddToDestination);
+	m_nextTravelDestinations.insert(m_toAddToDestination);
 	
 	printNextDestinations();
 }
 
 void ElevatorController::addWaitingToGoDown()
 {
-	m_waitingToGoDown.insert(m_toAddToDestination);
+	m_floorsWaitingToGoDown.insert(m_toAddToDestination);
 	printWaitingGoDown();
 }
 
 void ElevatorController::addWaitingToGoUp()
 {
-	m_waitingToGoUp.insert(m_toAddToDestination);
+	m_floorsWaitingToGoUp.insert(m_toAddToDestination);
 	printWaitingGoUp();
 }
 
 void ElevatorController::removeDestinationGU()
 {
 	removeDestination();
-	removeWaitingToGoUp();
+	removeCurrentFromWaitingToGoUp();
 }
 
 void ElevatorController::removeDestinationGD()
 {
 	removeDestination();
-	removeWaitingToGoDown();
+	removeCurrentFromWaitingToGoDown();
 }
 
 void ElevatorController::removeDestination()
 {
 	cout << "Removed " << m_currentFloor << " from destinations" << endl;
-	auto it = m_destinations1.find(m_currentFloor);
-	if (it != m_destinations1.end())
+	auto it = m_destinations.find(m_currentFloor);
+	if (it != m_destinations.end())
 	{
-		m_destinations1.erase(it);
+		m_destinations.erase(it);
 	}
 }
 
-void ElevatorController::removeWaitingToGoDown()
+void ElevatorController::removeCurrentFromWaitingToGoDown()
 {
-	auto it = m_waitingToGoDown.find(m_currentFloor);
-	if (it != m_waitingToGoDown.end())
+	auto it = m_floorsWaitingToGoDown.find(m_currentFloor);
+	if (it != m_floorsWaitingToGoDown.end())
 	{
 		cout << "Removed " << m_currentFloor << " from waiting to go down" << endl;
-		m_waitingToGoDown.erase(it);
+		m_floorsWaitingToGoDown.erase(it);
 	}
 }
 
-void ElevatorController::removeWaitingToGoUp()
+void ElevatorController::removeCurrentFromWaitingToGoUp()
 {
-	auto it = m_waitingToGoUp.find(m_currentFloor);
-	if (it != m_waitingToGoUp.end())
+	auto it = m_floorsWaitingToGoUp.find(m_currentFloor);
+	if (it != m_floorsWaitingToGoUp.end())
 	{
 		cout << "Removed " << m_currentFloor << " from waiting to go up" << endl;
-		m_waitingToGoUp.erase(it);
+		m_floorsWaitingToGoUp.erase(it);
 	}
 }
 
 void ElevatorController::rotateLists()
 {
-	swap(m_destinations1, m_destinations2);	
-	m_destinations1.erase(m_currentFloor);
+	swap(m_destinations, m_nextTravelDestinations);	
+	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::increaseFloor()
@@ -234,84 +220,74 @@ void ElevatorController::decreaseFloor()
 
 void ElevatorController::mergeGoingUpGTCurrent()
 {
-	bool deleted = false;
-	do
-	{
-		deleted = false;
-		for (const int floor : m_waitingToGoUp)
-		{
-			if (floor > m_currentFloor)
-			{
-				m_destinations1.insert(floor);
-				m_waitingToGoUp.erase(floor);
-				deleted = true;
-				break;
-			}
-		}
-	} while (deleted);
-
-	m_destinations1.erase(m_currentFloor);
+	mergeToDestinations(m_floorsWaitingToGoDown, false);
 }
 
 void ElevatorController::mergeMinGoingUp()
 {
-	if (m_waitingToGoUp.empty())
+	if (m_floorsWaitingToGoUp.empty())
 	{
 		return;
 	}
-	const int minWaiting = *min_element(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
-	m_destinations1.insert(minWaiting);
-	m_waitingToGoUp.erase(minWaiting);
+	const int minWaiting = *min_element(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
+	m_destinations.insert(minWaiting);
+	m_floorsWaitingToGoUp.erase(minWaiting);
 
-	m_destinations2.insert(m_waitingToGoUp.begin(), m_waitingToGoUp.end());
-	m_waitingToGoUp.clear();
+	m_nextTravelDestinations.insert(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
+	m_floorsWaitingToGoUp.clear();
 
-	m_destinations1.erase(m_currentFloor);
+	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::mergeMaxGoingDown()
 {
-	if (m_waitingToGoDown.empty())
+	if (m_floorsWaitingToGoDown.empty())
 	{
 		return;
 	}
-	const int maxWaiting = *max_element(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
-	m_destinations1.insert(maxWaiting);
-	m_waitingToGoDown.erase(maxWaiting);
+	const int maxWaiting = *max_element(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
+	m_destinations.insert(maxWaiting);
+	m_floorsWaitingToGoDown.erase(maxWaiting);
 
-	m_destinations2.insert(m_waitingToGoDown.begin(), m_waitingToGoDown.end());
-	m_waitingToGoDown.clear();
+	m_nextTravelDestinations.insert(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
+	m_floorsWaitingToGoDown.clear();
 
-	m_destinations1.erase(m_currentFloor);
+	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::mergePostponedToCurrent()
 {
-	m_destinations1.insert(m_destinations2.begin(), m_destinations2.end());
-	m_destinations2.clear();
+	m_destinations.insert(m_nextTravelDestinations.begin(), m_nextTravelDestinations.end());
+	m_nextTravelDestinations.clear();
 
-	m_destinations1.erase(m_currentFloor);
+	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::mergeGoingDownSTCurrent()
+{
+	mergeToDestinations(m_floorsWaitingToGoDown, true);
+}
+
+void ElevatorController::mergeToDestinations(unordered_set<int>& toAdd, const bool lessThan)
 {
 	bool deleted = false;
 	do
 	{
 		deleted = false;
-		for (const int floor : m_waitingToGoDown)
+		for (const int floor : toAdd)
 		{
-			if (floor < m_currentFloor)
+			if ( ( lessThan && floor < m_currentFloor) ||
+				 (!lessThan && floor > m_currentFloor) )
 			{
-				m_destinations1.insert(floor);
-				m_waitingToGoDown.erase(floor);
+				m_destinations.insert(floor);
+				toAdd.erase(floor);
 				deleted = true;
 				break;
 			}
 		}
 	} while (deleted);
 
-	m_destinations1.erase(m_currentFloor);
+	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::processedLists()
@@ -326,7 +302,7 @@ bool ElevatorController::isFloorNotInList() const
 
 bool ElevatorController::isFloorInList() const
 {
-	return m_destinations1.find(m_currentFloor) != m_destinations1.cend();
+	return m_destinations.find(m_currentFloor) != m_destinations.cend();
 }
 
 bool ElevatorController::isDestinationListNotEmpty() const
@@ -336,17 +312,12 @@ bool ElevatorController::isDestinationListNotEmpty() const
 
 bool ElevatorController::isDestinationListEmpty() const
 {
-	return m_destinations1.empty();
+	return m_destinations.empty();
 }
 
 bool ElevatorController::isMarkedFloorNotCurrentFloor() const
 {
-	return !isMarkedFloorCurrentFloor();
-}
-
-bool ElevatorController::isMarkedFloorCurrentFloor() const
-{
-	return m_toAddToDestination == m_currentFloor;
+	return m_toAddToDestination != m_currentFloor;
 }
 
 bool ElevatorController::isMarkedFloorGreaterThanCurrentFloor() const
@@ -361,41 +332,41 @@ bool ElevatorController::isMarkedFloorSmallerThanCurrentFloor() const
 
 bool ElevatorController::isMinSmallerThanCurrent() const
 {
-	if (m_destinations1.empty())
+	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int minFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
+	int minFloor = *min_element(m_destinations.begin(), m_destinations.end());
 	return minFloor < m_currentFloor;
 }
 
 bool ElevatorController::isMinGreaterThanCurrent() const
 {
-	if (m_destinations1.empty())
+	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int minFloor = *min_element(m_destinations1.begin(), m_destinations1.end());
+	int minFloor = *min_element(m_destinations.begin(), m_destinations.end());
 	return minFloor > m_currentFloor;
 }
 
 bool ElevatorController::isMaxSmallerThanCurrent() const
 {
-	if (m_destinations1.empty())
+	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int maxFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
+	int maxFloor = *max_element(m_destinations.begin(), m_destinations.end());
 	return maxFloor < m_currentFloor;
 }
 
 bool ElevatorController::isMaxGreaterThanCurrent() const
 {
-	if (m_destinations1.empty())
+	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int maxFloor = *max_element(m_destinations1.begin(), m_destinations1.end());
+	int maxFloor = *max_element(m_destinations.begin(), m_destinations.end());
 	return maxFloor > m_currentFloor;
 }
 
@@ -440,25 +411,25 @@ void ElevatorController::printCurrentFloor() const
 void ElevatorController::printDestinations() const
 {
 	cout << "Current travel destinations: ";
-	printFloorList(m_destinations1);
+	printFloorList(m_destinations);
 }
 
 void ElevatorController::printNextDestinations() const
 {
 	cout << "Next travel destinations: ";
-	printFloorList(m_destinations2);
+	printFloorList(m_nextTravelDestinations);
 }
 
 void ElevatorController::printWaitingGoDown() const
 {
 	cout << "Floors with people waiting to go down: ";
-	printFloorList(m_waitingToGoDown);
+	printFloorList(m_floorsWaitingToGoDown);
 }
 
 void ElevatorController::printWaitingGoUp() const
 {
 	cout << "Floors with people waiting to go up: ";
-	printFloorList(m_waitingToGoUp);
+	printFloorList(m_floorsWaitingToGoUp);
 }
 
 void ElevatorController::printFloorList(const unordered_set<int>& floors) const
