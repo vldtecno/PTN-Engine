@@ -31,6 +31,51 @@ namespace ptne
 		m_implementation(new PTN_EngineImp())
 	{}
 
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<ConditionFunctorPtr>& additionalConditions,
+		const vector<string>& inhibitorPlaces)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			inhibitorPlaces,
+			additionalConditions);
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces,
+		const vector<ConditionFunctorPtr>& additionalConditions,
+		const vector<string>& inhibitorPlaces)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			{},
+			destinationPlaces,
+			{},
+			inhibitorPlaces,
+			additionalConditions);
+	}
+
+	void PTN_Engine::addPlace(
+		const std::string& name,
+		const size_t initialNumberOfTokens,
+		ActionFunctorPtr onEnterAction,
+		ActionFunctorPtr onExitAction,
+		const bool input)
+	{
+		m_implementation->createPlace(name,
+			initialNumberOfTokens,
+			onEnterAction,
+			onExitAction,
+			input);
+	}
 
 	void PTN_Engine::createTransition(
 		const vector<string>& activationPlaces,
