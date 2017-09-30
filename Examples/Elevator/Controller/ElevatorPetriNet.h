@@ -50,4 +50,23 @@ public:
 
 	void destinationButton() override;
 
+
+private:
+
+	void createInputPlaces();
+	void createCabinePlaces(std::shared_ptr<ElevatorController> ptrController);
+	void createArrivalPlaces(std::shared_ptr<ElevatorController> ptrController);
+	void createButtonPressPlaces(std::shared_ptr<ElevatorController> ptrController);
+	void createSimulationPlaces(std::shared_ptr<ElevatorController> ptrController);
+
+	void createCabineTransitions(std::shared_ptr<ElevatorController> ptrController);
+	void createSimulationTransitions(std::shared_ptr<ElevatorController> ptrController);
+	void createArrivingFloorTransitions(std::shared_ptr<ElevatorController> ptrController);
+	void createButtonPressingTransitions(std::shared_ptr<ElevatorController> ptrController);
+	void createCallingButtonTransitions(std::shared_ptr<ElevatorController> ptrController);
+
+	void incrementAndExecute(const std::string& inputPlace, const bool debug = false);
+
+
+
 };
