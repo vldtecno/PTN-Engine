@@ -178,21 +178,13 @@ void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController
 	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
 
-	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
-
-	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
-
+	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
 	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
 		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
 
-	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
-	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
 }
 
 void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorController> ptrController)
