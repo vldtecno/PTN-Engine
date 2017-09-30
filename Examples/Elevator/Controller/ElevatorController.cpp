@@ -122,8 +122,8 @@ void ElevatorController::addDestination1()
 		m_nextTravelDestinations.erase(m_toAddToDestination);
 	}
 
-	m_floorsWaitingToGoDown.erase(m_toAddToDestination);
-	m_floorsWaitingToGoUp.erase(m_toAddToDestination);	
+	//m_floorsWaitingToGoDown.erase(m_toAddToDestination);
+	//m_floorsWaitingToGoUp.erase(m_toAddToDestination);	
 
 	m_destinations.insert(m_toAddToDestination);
 
@@ -180,21 +180,19 @@ void ElevatorController::removeDestination()
 
 void ElevatorController::removeCurrentFromWaitingToGoDown()
 {
-	auto it = m_floorsWaitingToGoDown.find(m_currentFloor);
-	if (it != m_floorsWaitingToGoDown.end())
+	size_t i = m_floorsWaitingToGoDown.erase(m_currentFloor);
+	if (i > 0)
 	{
 		cout << "Removed " << m_currentFloor << " from waiting to go down" << endl;
-		m_floorsWaitingToGoDown.erase(it);
 	}
 }
 
 void ElevatorController::removeCurrentFromWaitingToGoUp()
 {
-	auto it = m_floorsWaitingToGoUp.find(m_currentFloor);
-	if (it != m_floorsWaitingToGoUp.end())
+	size_t i = m_floorsWaitingToGoUp.erase(m_currentFloor);
+	if (i > 0)
 	{
 		cout << "Removed " << m_currentFloor << " from waiting to go up" << endl;
-		m_floorsWaitingToGoUp.erase(it);
 	}
 }
 
@@ -236,7 +234,6 @@ void ElevatorController::mergeMinGoingUp()
 	m_nextTravelDestinations.insert(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
 	m_floorsWaitingToGoUp.clear();
 
-	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::mergeMaxGoingDown()
@@ -252,7 +249,6 @@ void ElevatorController::mergeMaxGoingDown()
 	m_nextTravelDestinations.insert(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
 	m_floorsWaitingToGoDown.clear();
 
-	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::mergePostponedToCurrent()
