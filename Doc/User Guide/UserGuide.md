@@ -2,7 +2,8 @@
 
 ## Getting Started
 
-This is a step by step guide of how to integrate the *PTN Engine* in your program.
+This is a step by step guide of how to integrate the *PTN Engine* in your 
+program.
 
 For further details you can read the code of the examples included in this
 distribution.
@@ -10,9 +11,9 @@ distribution.
 ### 1. Build the *PTN Engine*
 
 You can generate a build configuration for *PTN Engine* running the provided
-CMake scripts. These support GCC and MSVC. Other compilers are not yet supported
-, so if you want to use a different compiler you will have to change the scripts
-yourself.
+CMake scripts. These support GCC and Visual C++. Other compilers are not yet 
+supported, so if you want to use a different compiler you will have to change 
+or write the build scripts yourself.
 
 Building with the provided CMake scripts will provide you the necessary
 *PTN Engine* static and dynamic libraries.
@@ -152,8 +153,8 @@ createTransition(
 
 ### 6 - Create access to input places
 
-To control the PTN Engine net, you need to provide access to it via public methods
-in your new class.
+To control the PTN Engine net, you need to provide access to it via public 
+methods in your new class.
 
 
 ```c++

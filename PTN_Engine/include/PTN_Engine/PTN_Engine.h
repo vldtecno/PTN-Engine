@@ -36,7 +36,7 @@ namespace ptne
 	//! Base class that implements the Petri net logic.
 	/*!
 	 * Base class that implements the Petri net logic.
-	 * Using the pipmpl idiom.
+	 * Using the pimpl idiom.
 	 * \sa PTN_EngineImp
 	 */
 	class DLL_PUBLIC PTN_Engine
