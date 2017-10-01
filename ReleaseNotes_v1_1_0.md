@@ -3,6 +3,9 @@
 ## version 1.1.0 - 2017-10-01
 
 ### Features
+ - Implemented free choice. When more than one transition is active at the same 
+ time, the transition that will be fired first is randomly chosen. (Note also
+ that at the moment there is no parallelism available). 
  - Weighted arcs: arcs can now have weights different than 1. The weight can be 
  specified in the transition constructors.
  - Inhibitor arc. It is possible to define inhibitor arcs in the transition 
