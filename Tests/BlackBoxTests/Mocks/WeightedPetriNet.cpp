@@ -38,15 +38,15 @@ Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatc
 
 	createTransition(
 			{"InputWaitPackage"}, //activation
-			{1},
+			vector<size_t>{1},
 			{"WaitPackage"}, //destination
-			{1});
+			vector<size_t>{1});
 
 	createTransition(
 			{"WaitPackage"}, //activation
-			{3},
+			vector<size_t>{3},
 			{"ChannelA", "ChannelB"}, //destination
-			{4, 10});
+			vector<size_t>{4, 10});
 
 }
 
