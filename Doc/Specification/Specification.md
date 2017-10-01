@@ -7,12 +7,10 @@ users alone.**
 
 ## The **PTN Engine** Concept
 
-The *PTN Engine* is a C++ 11 library that implements (some of the types of)
-Petri nets, also known as place transition nets, and calls third party code
-according to its state.
+The *PTN Engine* is a C++ 11 library that implements the rules of Petri nets. 
 
-Its purpose is to allow C++ developers to easily implement a program whose
-behaviour is defined by a Petri net.
+Its purpose is to be integrated in other programs and to enable the 
+integrating program to have its logic defined by a Petri net.
 
 The engine can be integrated by deriving from its classes. It provides a PTN
 base class and Petri nets can be defined in the constructor of its children.
@@ -22,19 +20,36 @@ Third party code can be invoked as tokens enter and leave each place in the net,
 The *PTN Engine* aims to:
  * control the software that integrates it so that its business logic conforms
    to a specified Petri net;
- * make the business logic of client software more flexible;
  * be easy to integrate with third party code.
 
 Quality is a concern in the development of the *PTN Engine*. For this reason
-unit tests and documentation accompany its delivery. There is much to be
-improved concerning this topic, which hopefully will be addressed in future
-releases.
+unit tests and documentation accompany its delivery. There is much to be 
+improved concerning this topic, which hopefully will be performed in each new 
+release.
+
+### Implemented Petri net features
+
+The basics: place, transition, arc (implicit) and token.
+
+Implemented Petri net extensions:
+- inhibitor arc;
+- reset arc;
+- arc weights;
+
+### Control features
+These features are what allows the Petri net to communicate with the controller. 
+- external (to the net) boolean functions can be added to a transition. This is 
+a way to implement events influencing the firing of a transition.
+- external (to the net) methods can be executed when a token enters and when a 
+token leaves a place. In other words: control or simulation actions can be 
+triggered by tokens entering and leaving a place.
 
 ### Licenses and Related 3rd Party Software
 
 The *PTN Engine* is licensed under the Apache License, Version 2.0 .
 
-Its tests link statically and dynamically against Google Test.
+Its tests link statically and dynamically against 
+[Google Test](https://github.com/google/googletest).
 
 Build instructions are scripted to be used with CMake.
 
@@ -48,14 +63,14 @@ This version supports only a subset of Petri nets.
 
 It can nonetheless be used to implement finite-state machines and marked graphs.
 
-The CMake build scripts support the compilers GCC and MSVC.
+The CMake build scripts support the compilers GCC 4.9 and Visual C++ 2015.
 
 
 ## Alternatives
 If the *PTN Engine* does not meet your requirements, here are some alternative
 suggestions:
 
-Boost MSM: http://www.boost.org/doc/libs/1_64_0/libs/msm/doc/HTML/index.html
+[Boost MSM](http://www.boost.org/doc/libs/1_64_0/libs/msm/doc/HTML/index.html)
 
 Others alternatives using Petri nets can be looked for here:
 https://www.informatik.uni-hamburg.de/TGI/PetriNets/tools/quick.html
@@ -81,7 +96,7 @@ C++11 specific:
  - tuple
  - to_string
 
-The *PTN Engine* relies on Google Test (https://github.com/google/googletest)
+The *PTN Engine* relies on [Google Test](https://github.com/google/googletest)
 for unit testing.
 
 ### Structure
@@ -153,7 +168,7 @@ use of exceptions.
 No analysis or metrics at this point.
 TODO
 
-#### Space Complexity and Memory Footprint
+#### Spatial Complexity and Memory Footprint
 No analysis or metrics at this point.
 TODO
 
