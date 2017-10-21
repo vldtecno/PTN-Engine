@@ -1,3 +1,5 @@
+![PTN Engine](<../Logo/PTN%20Engine%20Logo.svg> "PTN Engine")
+
 # ***PTN Engine* User Guide**
 
 ## Getting Started
