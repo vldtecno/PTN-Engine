@@ -1,3 +1,5 @@
+![PTN Engine](<../Logo/PTN%20Engine%20Logo.svg> "PTN Engine")
+
 # ***PTN Engine* Specification**
 
 This document specifies the *PTN Engine* library version 1.1.0 .
