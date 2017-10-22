@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="50mm"
-   height="50mm"
-   viewBox="0 0 50 50"
+   width="47.088345mm"
+   height="29.025959mm"
+   viewBox="0 0 47.088345 29.025959"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
@@ -22,9 +22,9 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter4678"
-       x="-0.096000006"
+       x="-0.096000008"
        width="1.192"
-       y="-0.095999994"
+       y="-0.095999993"
        height="1.192">
       <feGaussianBlur
          inkscape:collect="always"
@@ -35,7 +35,7 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter4686"
-       x="-0.074077247"
+       x="-0.074077249"
        width="1.1481545"
        y="-0.31573182"
        height="1.6314636">
@@ -48,7 +48,7 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter4690"
-       x="-0.26008267"
+       x="-0.26008266"
        width="1.5201653"
        y="-0.058863688"
        height="1.1177274">
@@ -75,8 +75,8 @@
        style="color-interpolation-filters:sRGB"
        id="filter4702"
        x="-0.55404335"
-       width="2.1080867"
-       y="-0.06728681"
+       width="2.1080866"
+       y="-0.067286812"
        height="1.1345736">
       <feGaussianBlur
          inkscape:collect="always"
@@ -87,7 +87,7 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter4706"
-       x="-0.33599995"
+       x="-0.33599994"
        width="1.6719999"
        y="-0.091636367"
        height="1.1832727">
@@ -118,8 +118,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="171.19605"
-     inkscape:cy="182.12338"
+     inkscape:cx="79.837283"
+     inkscape:cy="140.77115"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -128,10 +128,10 @@
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     fit-margin-top="0.1"
-     fit-margin-left="0.1"
-     fit-margin-right="0.1"
-     fit-margin-bottom="0.1"
+     fit-margin-top="0.2"
+     fit-margin-left="0.2"
+     fit-margin-right="0.2"
+     fit-margin-bottom="0.2"
      inkscape:pagecheckerboard="true" />
   <metadata
      id="metadata5">
@@ -141,7 +141,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -149,7 +149,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-46.937312,-13.078541)">
+     transform="translate(-48.324592,-23.11147)">
     <g
        id="g4725"
        transform="translate(-64.946495,42.896759)">
