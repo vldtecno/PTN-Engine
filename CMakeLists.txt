@@ -50,11 +50,14 @@ option(BUILD_EXAMPLES "Builds the examples" OFF)
 add_subdirectory(PTN_Engine)
 
 if(BUILD_TESTS)
-add_subdirectory(Tests/WhiteBoxTests)
-add_subdirectory(Tests/BlackBoxTests)
+	find_path(GTEST_ROOT PATH ENV${GTEST_ROOT} NO_DEFAULT_PATH)
+	enable_testing()
+	find_package(GTest REQUIRED)	
+	add_subdirectory(Tests/WhiteBoxTests)
+	add_subdirectory(Tests/BlackBoxTests)
 endif(BUILD_TESTS)
 
 if(BUILD_EXAMPLES)
-add_subdirectory(Examples)
+	add_subdirectory(Examples)
 endif(BUILD_EXAMPLES)
 

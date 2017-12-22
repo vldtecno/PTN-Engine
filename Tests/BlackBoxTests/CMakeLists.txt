@@ -15,43 +15,27 @@
 # limitations under the License.
 
 cmake_minimum_required (VERSION 3.8)
-	
-find_path(GOOGLE_TEST_INCLUDE_DIR google_test)
-find_path(GOOGLE_TEST_BUILD_DIR google_test_build)
-
-enable_testing()
-set(PROJECT_TEST_NAME &{PROJECT_NAME_STR}_test)
 
 include_directories(
 	   ${INCLUDE_DIR}
 	   ${PROJECT_SOURCE_DIR}/Tests/BlackBoxTests 
-	   ${GOOGLE_TEST_INCLUDE_DIR}
+	   ${GTEST_INCLUDE_DIRS}
 	)	
 
 file( GLOB_RECURSE BlackBoxTest_SRC
 		"*.h"
 		"*.cpp"
 	)
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-	message(STATUS "GCC detected")	
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock/gtest)
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-if(MSVC)
-	message(STATUS "MSVC detected")
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googletest)
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock)
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock/gtest)
-endif(MSVC)
 	
 add_executable (BlackBoxTestDynamic ${BlackBoxTest_SRC})
-target_link_libraries(BlackBoxTestDynamic PUBLIC gtest gtest_main)
-target_link_libraries(BlackBoxTestDynamic PUBLIC PTN_EngineDynamic)
+target_link_libraries(BlackBoxTestDynamic PUBLIC 
+	${GTEST_BOTH_LIBRARIES}
+	PTN_EngineDynamic)
 		
 add_executable (BlackBoxTestStatic ${BlackBoxTest_SRC})
-target_link_libraries(BlackBoxTestStatic PUBLIC gtest gtest_main)
-target_link_libraries(BlackBoxTestStatic PUBLIC PTN_EngineStatic)
+target_link_libraries(BlackBoxTestStatic PUBLIC 
+	${GTEST_BOTH_LIBRARIES}
+	PTN_EngineStatic)
 
 
 

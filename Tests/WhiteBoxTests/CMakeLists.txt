@@ -16,46 +16,30 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-find_path(GOOGLE_TEST_INCLUDE_DIR google_test)
-find_path(GOOGLE_TEST_BUILD_DIR google_test_build)
-
 add_library(google_test SHARED IMPORTED)
-
-enable_testing()
-set(PROJECT_TEST_NAME &{PROJECT_NAME_STR}_test)
 
 include_directories(
 		${INCLUDE_DIR}
 		${PROJECT_SOURCE_DIR}/Tests/WhiteBoxTests 
 		${PROJECT_SOURCE_DIR}/PTN_Engine
-		${GOOGLE_TEST_INCLUDE_DIR}
+		${GTEST_INCLUDE_DIRS}
 	)
 
 file( GLOB_RECURSE Test_SRC
 		"*.h"
 		"*.cpp"
 	)
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-	message(STATUS "GCC detected")	
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock/gtest)
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-if(MSVC)
-	message(STATUS "MSVC detected")
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googletest)
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock)
-	link_directories(${GOOGLE_TEST_BUILD_DIR}/googlemock/gtest)
-endif(MSVC)
 	
 add_executable (WhiteBoxTestStatic ${Test_SRC})
 if(MSVC)
 	target_compile_definitions(WhiteBoxTestStatic PUBLIC GTEST_LINKED_AS_SHARED_LIBRARY)
 endif(MSVC)
-target_link_libraries(WhiteBoxTestStatic PUBLIC gtest gtest_main)
-target_link_libraries(WhiteBoxTestStatic PUBLIC PTN_EngineStatic)
-	
+
+target_link_libraries(WhiteBoxTestStatic PUBLIC 
+	${GTEST_BOTH_LIBRARIES}
+	PTN_EngineStatic)	
 
 add_executable (WhiteBoxTestDynamic ${Test_SRC})
-target_link_libraries(WhiteBoxTestDynamic PUBLIC gtest gtest_main)
-target_link_libraries(WhiteBoxTestDynamic PUBLIC PTN_EngineDynamicExpAll)    
+target_link_libraries(WhiteBoxTestDynamic PUBLIC 
+	${GTEST_BOTH_LIBRARIES}
+	PTN_EngineDynamicExpAll)    
