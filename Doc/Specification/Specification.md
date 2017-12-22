@@ -2,7 +2,7 @@
 
 # ***PTN Engine* Specification**
 
-This document specifies the *PTN Engine* library version 1.x.x .
+This document specifies the *PTN Engine* library version x.x.x .
 
 **Responsibility for the usage or integration of the *PTN Engine* belongs to its
 users alone.**
