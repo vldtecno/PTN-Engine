@@ -1,6 +1,6 @@
 # ***PTN Engine* Specification**
 
-This document specifies the *PTN Engine* library version 1.1.0 .
+This document specifies the *PTN Engine* library version 1.1.1 .
 
 **Responsibility for the usage or integration of the *PTN Engine* belongs to its
 users alone.**
