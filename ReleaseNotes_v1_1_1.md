@@ -3,6 +3,7 @@
 ## version 1.1.1 - 2017-12-22
 
 ### Documentation
+ - Added logo.
 
 ### Bug fixes
  - Corrected version numbers. 
