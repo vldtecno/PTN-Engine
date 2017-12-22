@@ -19,7 +19,7 @@ cmake_minimum_required (VERSION 3.8)
 # The version number.
 set (PTN_ENGINE_VERSION_MAJOR 1)
 set (PTN_ENGINE_VERSION_MINOR 1)
-set (PTN_ENGINE_VERSION_PATCH 1)
+set (PTN_ENGINE_VERSION_PATCH 2)
 
 project (PTN_Engine)
 
