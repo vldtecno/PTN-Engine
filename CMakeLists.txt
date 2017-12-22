@@ -1,4 +1,4 @@
-# This file is part of PTN Engine
+﻿# This file is part of PTN Engine
 # 
 # Copyright (c) 2017 Eduardo Valgôde
 # 
@@ -17,7 +17,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 # The version number.
-set (PTN_ENGINE_VERSION_MAJOR 1)
+set (PTN_ENGINE_VERSION_MAJOR 2)
 set (PTN_ENGINE_VERSION_MINOR 0)
 set (PTN_ENGINE_VERSION_PATCH 0)
 
