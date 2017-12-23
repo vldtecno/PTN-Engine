@@ -49,61 +49,7 @@ namespace ptne
 
 		//! Default constructor
 		PTN_Engine();
-
-		
-		////////////////////////////////////////
-		// To be deprecated in version 2.0 
-		////////////////////////////////////////
-
-		/*!
-		 * Create a new transition METHOD WILL BE DEPRECATED IN v2.0
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param activationWeights A vector with the weights of each activation place.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param destinationWeights A vector with the weights of each destination place.
-		 * \param additionalConditions A vector with functors that return bool.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<size_t>& activationWeights,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<size_t>& destinationWeights,
-			const std::vector<ConditionFunctorPtr>& additionalConditions,
-			const std::vector<std::string>& inhibitorPlaces);
-
-		/*!
-		 * Create a new transition METHOD WILL BE DEPRECATED IN v2.0
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param additionalConditions A vector with functors that return bool.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions,
-			const std::vector<std::string>& inhibitorPlaces);
-
-		/*!
-		 * Add place a place to the net. METHOD WILL BE DEPRECATED IN v2.0
-		 * \param name The name of the place.
-		 * \param initialNumberOfTokens The number of tokens to be initialized with.
-		 * \param onEnterAction The functor to be called once a token enters the place.
-		 * \param onExitAction The functor to be called once a token leaves the place.
-		 * \param input A flag determining if this place can have tokens added manually.
-		 */
-		void addPlace(
-			const std::string& name,
-			const size_t initialNumberOfTokens,
-			ActionFunctorPtr onEnterAction,
-			ActionFunctorPtr onExitAction,
-			const bool input = false);
-
-		////////////////////////////////////////
-
-
-
+	
 		/*!
 		 * Create a new transition
 		 * \param activationPlaces A vector with the names of the activation places.
