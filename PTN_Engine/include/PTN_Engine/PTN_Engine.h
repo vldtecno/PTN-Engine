@@ -28,7 +28,7 @@ namespace ptne
 {
 	class IConditionFunctor;
 	class IActionFunctor;
-	class PTN_EngineImp;
+	
 
 	using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
 	using ActionFunctorPtr = std::shared_ptr<IActionFunctor>;
@@ -228,6 +228,8 @@ namespace ptne
 		void printState(std::ostream& o) const;
 
 	private:
+
+		class PTN_EngineImp;
 
 		//! Pointer to implementation of the PTN_Engine.
 		std::unique_ptr<PTN_EngineImp> m_implementation;

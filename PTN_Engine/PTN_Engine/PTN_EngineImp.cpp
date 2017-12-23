@@ -37,14 +37,14 @@ namespace ptne
 		return s.size();
 	}
 
-	PTN_EngineImp::PTN_EngineImp():
+	PTN_Engine::PTN_EngineImp::PTN_EngineImp():
 		m_stop{false}
 	{}
 
-	PTN_EngineImp::~PTN_EngineImp()
+	PTN_Engine::PTN_EngineImp::~PTN_EngineImp()
 	{}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 			const vector<string>& activationPlaces,
 			const vector<size_t>& activationWeights,
 			const vector<string>& destinationPlaces,
@@ -70,7 +70,7 @@ namespace ptne
 						additionalConditions));
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 			const vector<string>& activationPlaces,
 			const vector<string>& destinationPlaces,			
 			const vector<string>& inhibitorPlaces,
@@ -85,7 +85,7 @@ namespace ptne
 			additionalConditions);
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<size_t>& activationWeights,
 		const vector<string>& destinationPlaces,
@@ -101,7 +101,7 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<size_t>& activationWeights,
 		const vector<string>& destinationPlaces,
@@ -117,7 +117,7 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<string>& destinationPlaces)
 	{
@@ -130,7 +130,7 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<string>& destinationPlaces,
 		const vector<string>& inhibitorPlaces)
@@ -144,7 +144,7 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	void PTN_EngineImp::createTransition(
+	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<string>& destinationPlaces,
 		const vector<ConditionFunctorPtr>& additionalConditions)
@@ -158,7 +158,7 @@ namespace ptne
 			vector<ConditionFunctorPtr>{});
 	}
 
-	vector<Transition*> PTN_EngineImp::collectActiveTransitionsRandomly()
+	vector<Transition*> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
 		vector<Transition*> activeTransitions;
 		for(Transition& transition : m_transitions)
@@ -173,7 +173,7 @@ namespace ptne
 	}
 
 
-	void PTN_EngineImp::createPlace(
+	void PTN_Engine::PTN_EngineImp::createPlace(
 			const string& name,
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
@@ -197,7 +197,7 @@ namespace ptne
 		}
 	}
 
-	void PTN_EngineImp::createPlace(
+	void PTN_Engine::PTN_EngineImp::createPlace(
 		const string& name,
 		const size_t initialNumberOfTokens,
 		const bool input)
@@ -205,7 +205,7 @@ namespace ptne
 		createPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
 	}
 
-	void PTN_EngineImp::createPlace(
+	void PTN_Engine::PTN_EngineImp::createPlace(
 		const string& name,
 		const size_t initialNumberOfTokens,
 		ActionFunctorPtr onEnterAction,
@@ -214,7 +214,7 @@ namespace ptne
 		createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
 	}
 
-	void PTN_EngineImp::execute(const bool log, ostream& o)
+	void PTN_Engine::PTN_EngineImp::execute(const bool log, ostream& o)
 	{
 		m_stop = false;
 		bool transitionFired;
@@ -244,12 +244,12 @@ namespace ptne
 		m_stop = false;
 	}
 
-	void PTN_EngineImp::execute()
+	void PTN_Engine::PTN_EngineImp::execute()
 	{
 		execute(false);
 	}
 
-	void PTN_EngineImp::clearInputPlaces()
+	void PTN_Engine::PTN_EngineImp::clearInputPlaces()
 	{
 		for( const WeakPtrPlace& place : m_inputPlaces)
 		{
@@ -258,7 +258,7 @@ namespace ptne
 		}
 	}
 
-	size_t PTN_EngineImp::getNumberOfTokens(const string& place) const
+	size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string& place) const
 	{
 		if(m_places.find(place) == m_places.end())
 		{
@@ -267,7 +267,7 @@ namespace ptne
 		return m_places.at(place)->getNumberOfTokens();
 	}
 
-	void PTN_EngineImp::incrementInputPlace(const string& place)
+	void PTN_Engine::PTN_EngineImp::incrementInputPlace(const string& place)
 	{
 		if(m_places.find(place) == m_places.end())
 		{
@@ -280,7 +280,7 @@ namespace ptne
 		m_places.at(place)->increaseNumberOfTokens(1);
 	}
 
-	vector<WeakPtrPlace> PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
+	vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
 	{
 		if(placesNames.size() != getNumberOfUniqueNames(placesNames))
 		{
@@ -299,23 +299,23 @@ namespace ptne
 		return placesVector;
 	}
 
-	PTN_EngineImp::InvalidNameException::InvalidNameException(const string& name):
+	PTN_Engine::PTN_EngineImp::InvalidNameException::InvalidNameException(const string& name):
 		PTN_Exception("Invalid name: " + name +".")
 	{}
 
-	PTN_EngineImp::RepeatedPlaceNamesException::RepeatedPlaceNamesException():
+	PTN_Engine::PTN_EngineImp::RepeatedPlaceNamesException::RepeatedPlaceNamesException():
 		PTN_Exception("Tried to create transition with repeated places.")
 	{}
 
-	PTN_EngineImp::NotInputPlaceException::NotInputPlaceException(const string& name):
+	PTN_Engine::PTN_EngineImp::NotInputPlaceException::NotInputPlaceException(const string& name):
 		PTN_Exception(name + " is not an input place.")
 	{}
 
-	PTN_EngineImp::RepeatedPlaceException::RepeatedPlaceException(const string& name):
+	PTN_Engine::PTN_EngineImp::RepeatedPlaceException::RepeatedPlaceException(const string& name):
 		PTN_Exception("Trying to add an already existing place: "+name+".")
 	{}
 
-	void PTN_EngineImp::printState(ostream& o ) const
+	void PTN_Engine::PTN_EngineImp::printState(ostream& o ) const
 	{
 		o << "Place; Tokens" << endl;
 		for (const auto& p : m_places)

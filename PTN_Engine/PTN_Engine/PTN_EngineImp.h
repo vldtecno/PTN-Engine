@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include <iostream>
 
 namespace ptne
@@ -42,7 +43,7 @@ namespace ptne
 	 * Used by the PTN_Engine class.
 	 * \sa PTN_Engine
 	 */
-	class PTN_EngineImp final
+	class PTN_Engine::PTN_EngineImp final
 	{
 	public:
 
