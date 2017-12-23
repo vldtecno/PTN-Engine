@@ -25,10 +25,11 @@ project (PTN_Engine)
 
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 
+set (CMAKE_CXX_STANDARD 14)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	#set(MULTITHREADED_BUILD 8 CACHE STRING "How many threads are used to build the project")
 	#set(CMAKE_MAKE_PROGRAM "${CMAKE_MAKE_PROGRAM} -j${MULTITHREADED_BUILD}")
-	set(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage -std=c++0x")
+	set(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 	set(GCC_COVERAGE_LINK_FLAGS "-lgcov -lpthread")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")	
