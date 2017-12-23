@@ -30,16 +30,18 @@ file( GLOB_RECURSE Test_SRC
 		"*.cpp"
 	)
 	
-add_executable (WhiteBoxTestStatic ${Test_SRC})
-if(MSVC)
-	target_compile_definitions(WhiteBoxTestStatic PUBLIC GTEST_LINKED_AS_SHARED_LIBRARY)
-endif(MSVC)
+add_executable (WhiteBoxTest ${Test_SRC})
+if(NOT BUILD_SHARED_LIBS AND MSVC)
+	target_compile_definitions(WhiteBoxTest PUBLIC GTEST_LINKED_AS_SHARED_LIBRARY)
+endif(NOT BUILD_SHARED_LIBS AND MSVC)
 
-target_link_libraries(WhiteBoxTestStatic PUBLIC 
+target_link_libraries(WhiteBoxTest PUBLIC 
 	${GTEST_BOTH_LIBRARIES}
-	PTN_EngineStatic)	
+	PTN_Engine)	
+	
+add_custom_command(TARGET WhiteBoxTest POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+	"${GTEST_ROOT}/$<CONFIGURATION>"
+	$<TARGET_FILE_DIR:WhiteBoxTest>)
 
-add_executable (WhiteBoxTestDynamic ${Test_SRC})
-target_link_libraries(WhiteBoxTestDynamic PUBLIC 
-	${GTEST_BOTH_LIBRARIES}
-	PTN_EngineDynamicExpAll)    
+   

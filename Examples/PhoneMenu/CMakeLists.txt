@@ -28,11 +28,9 @@ file( GLOB_RECURSE PhoneMenu_SRC
 		"*.cpp"
 	)
 
-add_executable (PhoneMenuDynamic ${PhoneMenu_SRC})
-target_link_libraries(PhoneMenuDynamic PUBLIC PTN_EngineDynamic)
-		
-add_executable (PhoneMenuStatic ${PhoneMenu_SRC})
-target_link_libraries(PhoneMenuStatic PUBLIC PTN_EngineStatic)
+add_executable (PhoneMenu ${PhoneMenu_SRC})
+target_link_libraries(PhoneMenu PUBLIC PTN_Engine)
+
 
 
 

@@ -27,15 +27,15 @@ file( GLOB_RECURSE BlackBoxTest_SRC
 		"*.cpp"
 	)
 	
-add_executable (BlackBoxTestDynamic ${BlackBoxTest_SRC})
-target_link_libraries(BlackBoxTestDynamic PUBLIC 
+add_executable (BlackBoxTest ${BlackBoxTest_SRC})
+target_link_libraries(BlackBoxTest PUBLIC 
 	${GTEST_BOTH_LIBRARIES}
-	PTN_EngineDynamic)
-		
-add_executable (BlackBoxTestStatic ${BlackBoxTest_SRC})
-target_link_libraries(BlackBoxTestStatic PUBLIC 
-	${GTEST_BOTH_LIBRARIES}
-	PTN_EngineStatic)
+	PTN_Engine)
+
+add_custom_command(TARGET BlackBoxTest POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	"${GTEST_ROOT}/$<CONFIGURATION>"
+	$<TARGET_FILE_DIR:BlackBoxTest>)
 
 
 

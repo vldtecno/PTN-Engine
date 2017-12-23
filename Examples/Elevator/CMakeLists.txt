@@ -28,11 +28,9 @@ file( GLOB_RECURSE Elevator_SRC
 		"*.cpp"
 	)
 
-add_executable (ElevatorDynamic ${Elevator_SRC})
-target_link_libraries(ElevatorDynamic PUBLIC PTN_EngineDynamic)
+add_executable (Elevator ${Elevator_SRC})
+target_link_libraries(Elevator PUBLIC PTN_Engine)
 		
-add_executable (ElevatorStatic ${Elevator_SRC})
-target_link_libraries(ElevatorStatic PUBLIC PTN_EngineStatic)
 
 
 

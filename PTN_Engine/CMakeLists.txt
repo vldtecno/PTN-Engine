@@ -28,53 +28,20 @@ file( GLOB_RECURSE
 		"*.cpp"
 	)
 
-
-#Static
-
-add_library (PTN_EngineStatic STATIC 
+add_library (PTN_Engine 
 	${PTN_Engine_SRC}
 	)
 
-target_compile_definitions(PTN_EngineStatic PUBLIC
+target_compile_definitions(PTN_Engine PUBLIC
 	_EXPORTING
    )
 	
-target_include_directories (PTN_EngineStatic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(BUILD_TESTS AND MSVC)
+	set_target_properties(PTN_Engine PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+endif(BUILD_TESTS AND MSVC)
+	
+target_include_directories (PTN_Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 	 
-set_target_properties(PTN_EngineStatic PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(PTN_Engine PROPERTIES LINKER_LANGUAGE CXX)
 
 
-
-#Dynamic
-
-add_library (PTN_EngineDynamic SHARED ${PTN_Engine_SRC})
-
-
-target_compile_definitions(PTN_EngineDynamic PUBLIC COMPILE_DEFINITIONS 
-	_EXPORTING
-   )
-		
-target_include_directories (PTN_EngineDynamic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-set_target_properties(PTN_EngineDynamic PROPERTIES LINKER_LANGUAGE CXX)
-
-
-
-#Dynamic - export all symbols for white box testing
-if(BUILD_TESTS)
-
-	add_library (PTN_EngineDynamicExpAll SHARED ${PTN_Engine_SRC})
-
-	target_compile_definitions(PTN_EngineDynamicExpAll PUBLIC COMPILE_DEFINITIONS 
-		_EXPORTING
-	   )
-		
-	target_include_directories (PTN_EngineDynamicExpAll PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-	set_target_properties(PTN_EngineDynamicExpAll PROPERTIES LINKER_LANGUAGE CXX)
-
-
-	if(MSVC)
-		set_target_properties(PTN_EngineDynamicExpAll PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
-	endif(MSVC)
-endif(BUILD_TESTS)

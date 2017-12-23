@@ -23,6 +23,7 @@ set (PTN_ENGINE_VERSION_PATCH x)
 
 project (PTN_Engine)
 
+option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	#set(MULTITHREADED_BUILD 8 CACHE STRING "How many threads are used to build the project")
