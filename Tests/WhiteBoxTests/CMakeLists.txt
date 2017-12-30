@@ -1,4 +1,4 @@
-# This file is part of PTN Engine
+﻿# This file is part of PTN Engine
 # 
 # Copyright (c) 2017 Eduardo Valgôde
 # 
@@ -41,7 +41,7 @@ target_link_libraries(WhiteBoxTest PUBLIC
 	
 add_custom_command(TARGET WhiteBoxTest POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-	"${GTEST_ROOT}/$<CONFIGURATION>"
+	"${GTEST_ROOT}/bin"
 	$<TARGET_FILE_DIR:WhiteBoxTest>)
 
    
