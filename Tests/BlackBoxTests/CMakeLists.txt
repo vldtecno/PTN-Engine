@@ -31,6 +31,11 @@ add_executable (BlackBoxTest ${BlackBoxTest_SRC})
 target_link_libraries(BlackBoxTest PUBLIC 
 	${GTEST_BOTH_LIBRARIES}
 	PTN_Engine)
+	
+if(NOT BUILD_SHARED_LIBS)
+	set_target_properties(BlackBoxTest PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
+endif()
+set_target_properties(BlackBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
 add_custom_command(TARGET BlackBoxTest POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -38,5 +43,9 @@ add_custom_command(TARGET BlackBoxTest POST_BUILD
 	$<TARGET_FILE_DIR:BlackBoxTest>)
 
 
-
+# Install rules
+if(INSTALL_TESTS)
+  install(TARGETS BlackBoxTest
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 

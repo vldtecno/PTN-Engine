@@ -30,7 +30,17 @@ file( GLOB_RECURSE Elevator_SRC
 
 add_executable (Elevator ${Elevator_SRC})
 target_link_libraries(Elevator PUBLIC PTN_Engine)
-		
+
+if(NOT BUILD_SHARED_LIBS)
+	set_target_properties(Elevator PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
+endif()
+set_target_properties(Elevator PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+
+# Install rules
+if(INSTALL_EXAMPLES)
+  install(TARGETS Elevator
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 
 
 
