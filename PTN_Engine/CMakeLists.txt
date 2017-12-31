@@ -44,4 +44,24 @@ target_include_directories (PTN_Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 	 
 set_target_properties(PTN_Engine PROPERTIES LINKER_LANGUAGE CXX)
 
+########################################################################
+#
+# Install rules
+if(INSTALL_PTN_ENGINE)
+  install(TARGETS PTN_Engine
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/PTN_Engine/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+  # configure and install pkgconfig files
+  configure_file(
+    cmake/PTN_Engine.pc.in
+    "${CMAKE_BINARY_DIR}/PTN_Engine.pc"
+    @ONLY)
+  install(FILES "${CMAKE_BINARY_DIR}/PTN_Engine.pc" 
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+endif()
+
 

@@ -34,7 +34,7 @@ target_link_libraries(BlackBoxTest PUBLIC
 
 add_custom_command(TARGET BlackBoxTest POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
-	"${GTEST_ROOT}/$<CONFIGURATION>"
+	"${GTEST_ROOT}/bin"
 	$<TARGET_FILE_DIR:BlackBoxTest>)
 
 

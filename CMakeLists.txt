@@ -25,6 +25,11 @@ project (PTN_Engine)
 
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 
+
+set(CMAKE_DEBUG_POSTFIX d)
+set(CMAKE_STATIC_LIBRARY_PREFIX lib)
+
+
 set (CMAKE_CXX_STANDARD 14)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	#set(MULTITHREADED_BUILD 8 CACHE STRING "How many threads are used to build the project")
@@ -62,4 +67,11 @@ endif(BUILD_TESTS)
 if(BUILD_EXAMPLES)
 	add_subdirectory(Examples)
 endif(BUILD_EXAMPLES)
+
+option(INSTALL_PTN_ENGINE "Enable installation of PTN Engine. (Projects embedding PTN Engine may want to turn this OFF.)" ON )
+
+include(CMakeDependentOption)
+include(GNUInstallDirs)
+
+
 
