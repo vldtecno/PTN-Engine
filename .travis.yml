@@ -36,8 +36,8 @@ install:
     fi
   - cmake --version
   
-  - apt-get -qq update
-  - apt-get install -y libgtest-dev valgrind
+  #- sudo apt-get -qq update
+  #- sudo apt-get install -y libgtest-dev valgrind
   - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
   - tar xf release-1.8.0.tar.gz
   - cd googletest-release-1.8.0
