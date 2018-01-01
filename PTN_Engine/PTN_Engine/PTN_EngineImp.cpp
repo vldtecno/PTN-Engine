@@ -52,7 +52,7 @@ namespace ptne
 			const vector<string>& inhibitorPlaces,
 			const vector<ConditionFunctorPtr>& additionalConditions)
 	{
-		unique_lock<shared_mutex> guard(m_mutex);
+		unique_lock<mutex> guard(m_mutex);
 		vector<WeakPtrPlace> activationPlacesVector =
 				getPlacesFromNames(activationPlaces);
 
@@ -181,7 +181,7 @@ namespace ptne
 			ActionFunctorPtr onExitAction,
 			const bool input)
 	{
-		unique_lock<shared_mutex> guard(m_mutex);
+		unique_lock<mutex> guard(m_mutex);
 		if(m_places.find(name)!= m_places.end())
 		{
 			throw RepeatedPlaceException(name);
@@ -218,7 +218,7 @@ namespace ptne
 
 	void PTN_Engine::PTN_EngineImp::execute(const bool log, ostream& o)
 	{
-		unique_lock<shared_mutex> guard(m_mutex);
+		unique_lock<mutex> guard(m_mutex);
 		m_stop = false;
 		bool transitionFired;
 
@@ -263,7 +263,7 @@ namespace ptne
 
 	size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string& place) const
 	{
-		unique_lock<shared_mutex> guard(m_mutex);
+		unique_lock<mutex> guard(m_mutex);
 		if(m_places.find(place) == m_places.end())
 		{
 			throw InvalidNameException(place);
@@ -273,7 +273,7 @@ namespace ptne
 
 	void PTN_Engine::PTN_EngineImp::incrementInputPlace(const string& place)
 	{
-		unique_lock<shared_mutex> guard(m_mutex);
+		unique_lock<mutex> guard(m_mutex);
 
 		if(m_places.find(place) == m_places.end())
 		{

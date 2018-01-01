@@ -24,7 +24,7 @@
 #include "PTN_Engine/PTN_Exception.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include <iostream>
-#include <shared_mutex>
+#include <mutex>
 
 namespace ptne
 {
@@ -275,8 +275,10 @@ namespace ptne
 		/*! 
 		 * Shared mutex to synchronize API calls, allowing simultaneous 
 		 * reads (readers-writer lock).
+		 * Replace the normal mutex for a shared mutex once GCC supports
+		 * it.
 		 */
-		mutable std::shared_mutex m_mutex;
+		mutable std::mutex m_mutex;
 
 		/*!
 		 * Clear the token counter from all input places.
