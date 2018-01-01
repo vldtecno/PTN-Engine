@@ -17,6 +17,7 @@
  */
 
 #include "Fixtures/FixturePetriNet.h"
+#include "Mocks/Simple/SimpleController.h"
 
 using namespace std;
 
@@ -170,3 +171,20 @@ void FixturePetriNet::testInhibitedState(const size_t expectedTokens[s_numberOfI
 	}
 
 }
+
+
+void FixturePetriNet::testThreadSafety()
+{
+	std::shared_ptr<SimpleController> simpleController = make_shared<SimpleController>();
+	simpleController->initialize();
+
+	const size_t numberOfThreads = 8;
+	simpleController->doSomethingConcurrently(numberOfThreads);
+	EXPECT_EQ(numberOfThreads, simpleController->getNumberOfDifferentThreads());
+
+	//TODO get a better way to test
+	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
+	
+
+}
+

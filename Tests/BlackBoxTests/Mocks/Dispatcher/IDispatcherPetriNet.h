@@ -18,30 +18,18 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher.h"
-#include "Mocks/IDispatcherPetriNet.h"
-#include "PTN_Engine/PTN_Engine.h"
+#include "Mocks/Dispatcher/Dispatcher.h"
 
-//! Implements PTN Engine net with a Petri net that uses the inhibitor arc.
-/*!
- * The behaviour is defined in the constructor.
- */
-class Dispatcher::InhibitedPetriNet:
-		public IDispatcherPetriNet,
-		private ptne::PTN_Engine
+//!Base class for a PTN Engine net that controls the dispatcher.
+class Dispatcher::IDispatcherPetriNet
 {
-	//For testing purposes.
 	friend class FixturePetriNet;
 
 public:
 
-	/*!
-	 * Constructor.
-	 * \param ptrDispatcher Shared pointer to the dispatcher.
-	 */
-	InhibitedPetriNet(std::shared_ptr<Dispatcher> ptrDispatcher);
+	virtual ~IDispatcherPetriNet(){}
 
-	//! Trigger the dispatch process.
-	void dispatch() override;
+	//! Trigger a dispatch process.
+	virtual void dispatch() = 0;
 
 };

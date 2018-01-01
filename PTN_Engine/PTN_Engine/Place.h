@@ -63,18 +63,6 @@ namespace ptne
 		void exitPlace(const size_t tokens = 1);
 
 		/*!
-		 * Increase number of tokens in the place.
-		 * \param tokens Number of tokens to be added. Must be at least 1.
-		 */
-		void increaseNumberOfTokens(const size_t tokens=1);
-
-		/*!
-		 * Decrease number of tokens in the place.
-		 * \param tokens Number of tokens to be removed. Must be at least 1.
-		 */
-		void decreaseNumberOfTokens(const size_t tokens=1);
-
-		/*!
 		 * Set the number of tokens in the place.
 		 * \param tokens Number of tokens to be set.
 		 */
@@ -114,6 +102,18 @@ namespace ptne
 		};
 
 	private:
+
+		/*!
+		* Increase number of tokens in the place.
+		* \param tokens Number of tokens to be added. Must be at least 1.
+		*/
+		void increaseNumberOfTokens(const size_t tokens = 1);
+
+		/*!
+		* Decrease number of tokens in the place.
+		* \param tokens Number of tokens to be removed. Must be at least 1.
+		*/
+		void decreaseNumberOfTokens(const size_t tokens = 1);
 
 		//! Number of tokens in the place.
 		size_t m_numberOfTokens;
