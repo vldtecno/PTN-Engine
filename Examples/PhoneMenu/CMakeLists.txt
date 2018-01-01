@@ -31,7 +31,17 @@ file( GLOB_RECURSE PhoneMenu_SRC
 add_executable (PhoneMenu ${PhoneMenu_SRC})
 target_link_libraries(PhoneMenu PUBLIC PTN_Engine)
 
+if(NOT BUILD_SHARED_LIBS)
+	set_target_properties(PhoneMenu PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
+endif()
+set_target_properties(PhoneMenu PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
+
+# Install rules
+if(INSTALL_EXAMPLES)
+  install(TARGETS PhoneMenu
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
 
 
 

@@ -1,0 +1,9 @@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: PTN_Engine
+Description: PTN Engine
+Version: @PROJECT_VERSION@
+URL: https://github.com/vldtecno/PTN-Engine
+Libs: -L${libdir} -lPTN_Engine @CMAKE_THREAD_LIBS_INIT@
+Cflags: -I${includedir} @CMAKE_THREAD_LIBS_INIT@

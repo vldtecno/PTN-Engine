@@ -25,6 +25,11 @@ project (PTN_Engine)
 
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 
+set(CMAKE_DEBUG_POSTFIX _d)
+set(CMAKE_STATIC_LIBRARY_PREFIX lib)
+set(EXECUTABLE_STATIC_POSTFIX _s)
+
+
 set (CMAKE_CXX_STANDARD 14)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	#set(MULTITHREADED_BUILD 8 CACHE STRING "How many threads are used to build the project")
@@ -52,6 +57,7 @@ option(BUILD_EXAMPLES "Builds the examples" OFF)
 add_subdirectory(PTN_Engine)
 
 if(BUILD_TESTS)
+	option(INSTALL_TESTS "Install tests" OFF)
 	find_path(GTEST_ROOT PATH ENV${GTEST_ROOT} NO_DEFAULT_PATH)
 	enable_testing()
 	find_package(GTest REQUIRED)	
@@ -60,6 +66,14 @@ if(BUILD_TESTS)
 endif(BUILD_TESTS)
 
 if(BUILD_EXAMPLES)
+	option(INSTALL_EXAMPLES "Install examples" OFF)
 	add_subdirectory(Examples)
 endif(BUILD_EXAMPLES)
+
+option(INSTALL_PTN_ENGINE "Enable installation of PTN Engine. (Projects embedding PTN Engine may want to turn this OFF.)" ON )
+
+include(CMakeDependentOption)
+include(GNUInstallDirs)
+
+
 
