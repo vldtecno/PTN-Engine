@@ -32,12 +32,12 @@ namespace
 	};
 
 	/*!
-		* Locks a std::weak_ptr checking for expiration. It throws a
-		* ExpiredSharedPtrException if the pointer is expired.
-		*
-		* \param toLock Weak pointer to be locked.
-		* \returns Shared pointer from locking toLock.
-		*/
+	 * Locks a std::weak_ptr checking for expiration. It throws a
+	 * ExpiredSharedPtrException if the pointer is expired.
+	 *
+	 * \param toLock Weak pointer to be locked.
+	 * \returns Shared pointer from locking toLock.
+	 */
 	template <typename T>
 	std::shared_ptr<T> lockWeakPtr(std::weak_ptr<T> toLock)
 	{
@@ -52,14 +52,14 @@ namespace
 	}
 
 	/*!
-	* Locks a std::weak_ptr checking for expiration and for nullptr.
-	* It throws a ExpiredSharedPtrException if the pointer is expired.
-	* It throws a NullLockedPtrException if the shapred pointer contains
-	* nullptr.
-	*
-	* \param toLock Weak pointer to be locked.
-	* \returns Shared pointer from locking toLock (not nullptr).
-	*/
+	 * Locks a std::weak_ptr checking for expiration and for nullptr.
+	 * It throws a ExpiredSharedPtrException if the pointer is expired.
+	 * It throws a NullLockedPtrException if the shapred pointer contains
+	 * nullptr.
+	 *
+	 * \param toLock Weak pointer to be locked.
+	 * \returns Shared pointer from locking toLock (not nullptr).
+	 */
 	template <typename T>
 	std::shared_ptr<T> lockWeakPtrNotNull(std::weak_ptr<T> toLock)
 	{
