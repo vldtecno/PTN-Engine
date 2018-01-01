@@ -19,7 +19,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "Mocks/Dispatcher.h"
+#include "Mocks/Dispatcher/Dispatcher.h"
 
 //! Fixture for testing a complete PTN net.
 /*!
@@ -68,6 +68,12 @@ public:
 	 * \param expectedTokens Expected number of tokens in each place.
 	 */
 	void testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces]);
+
+	/*!
+	 * 
+	 * 
+	 */
+	void testThreadSafety();
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;

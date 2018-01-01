@@ -18,18 +18,30 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher.h"
+#include "Mocks/Dispatcher/Dispatcher.h"
+#include "Mocks/Dispatcher/IDispatcherPetriNet.h"
+#include "PTN_Engine/PTN_Engine.h"
 
-//!Base class for a PTN Engine net that controls the dispatcher.
-class Dispatcher::IDispatcherPetriNet
+//! Implements PTN Engine net defining a free choice behaviour.
+/*!
+ * The behaviour is defined in the constructor.
+ */
+class Dispatcher::FreeChoicePetriNet:
+		public IDispatcherPetriNet,
+		private ptne::PTN_Engine
 {
+	//For testing purposes.
 	friend class FixturePetriNet;
 
 public:
 
-	virtual ~IDispatcherPetriNet(){}
+	/*!
+	 * Constructor.
+	 * \param ptrDispatcher Shared pointer to the dispatcher.
+	 */
+	FreeChoicePetriNet(std::shared_ptr<Dispatcher> ptrDispatcher);
 
-	//! Trigger a dispatch process.
-	virtual void dispatch() = 0;
+	//! Trigger the dispatch process.
+	void dispatch() override;
 
 };

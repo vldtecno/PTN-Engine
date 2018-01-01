@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher.h"
-#include "Mocks/IDispatcherPetriNet.h"
+#include "Mocks/Dispatcher/Dispatcher.h"
+#include "Mocks/Dispatcher/IDispatcherPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 
 //! Implements PTN Engine net defining a round robin behaviour.

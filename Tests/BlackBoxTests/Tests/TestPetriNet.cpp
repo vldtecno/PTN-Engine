@@ -133,3 +133,9 @@ TEST_F(FixturePetriNet, Inhibited_1)
 
 }
 
+TEST_F(FixturePetriNet, ThreadSafety)
+{
+	testThreadSafety();
+}
+
+

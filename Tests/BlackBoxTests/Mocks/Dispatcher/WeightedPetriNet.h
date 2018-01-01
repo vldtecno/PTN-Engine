@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher.h"
-#include "Mocks/IDispatcherPetriNet.h"
+#include "Mocks/Dispatcher/Dispatcher.h"
+#include "Mocks/Dispatcher/IDispatcherPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 
-//! Implements PTN Engine net defining a free choice behaviour.
+//! Implements PTN Engine net with a Petri net with different weights.
 /*!
  * The behaviour is defined in the constructor.
  */
-class Dispatcher::FreeChoicePetriNet:
+class Dispatcher::WeightedPetriNet:
 		public IDispatcherPetriNet,
 		private ptne::PTN_Engine
 {
@@ -39,7 +39,7 @@ public:
 	 * Constructor.
 	 * \param ptrDispatcher Shared pointer to the dispatcher.
 	 */
-	FreeChoicePetriNet(std::shared_ptr<Dispatcher> ptrDispatcher);
+	WeightedPetriNet(std::shared_ptr<Dispatcher> ptrDispatcher);
 
 	//! Trigger the dispatch process.
 	void dispatch() override;
