@@ -18,6 +18,13 @@
 
 #pragma once
 
+#ifdef _MSC_FULL_VER
+ // Disable warning about exporting PTN_Exception inheriting from 
+ // std::runtime_error, which might have been compiled differently
+ // by the client linking to PTN Engine.
+#pragma warning( disable : 4275 )  
+#endif
+
 #include "PTN_Engine/Utilities/Explicit.h"
 #include <stdexcept>
 
