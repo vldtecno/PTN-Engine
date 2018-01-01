@@ -283,7 +283,7 @@ namespace ptne
 		{
 			throw NotInputPlaceException(place);
 		}
-		m_places.at(place)->increaseNumberOfTokens(1);
+		m_places.at(place)->enterPlace(1);
 	}
 
 	vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
