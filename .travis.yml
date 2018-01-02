@@ -36,8 +36,7 @@ install:
     fi
   - cmake --version
   
-  #- sudo apt-get -qq update
-  #- sudo apt-get install -y libgtest-dev valgrind
+  #install googletest
   - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
   - tar xf release-1.8.0.tar.gz
   - cd googletest-release-1.8.0
@@ -45,9 +44,6 @@ install:
   - cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=./install .
   - make install
   - export GTEST_ROOT=`pwd`/install/
-# - sudo cp -a include/gtest /usr/include
-# - sudo cp -a libgtest_main.so libgtest.so /usr/lib/
-# - which valgrind
  
 compiler:
   - gcc
