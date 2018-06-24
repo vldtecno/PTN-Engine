@@ -72,6 +72,23 @@ namespace ptne
 	}
 
 	void PTN_Engine::PTN_EngineImp::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<string>& inhibitorPlaces,
+		const vector<string>& additionalConditions)
+	{
+		createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			getConditionFunctors(additionalConditions));
+	}
+
+	void PTN_Engine::PTN_EngineImp::createTransition(
 			const vector<string>& activationPlaces,
 			const vector<string>& destinationPlaces,			
 			const vector<string>& inhibitorPlaces,
@@ -84,6 +101,21 @@ namespace ptne
 			vector<size_t>{},
 			inhibitorPlaces,
 			additionalConditions);
+	}
+
+	void PTN_Engine::PTN_EngineImp::createTransition(
+			const vector<string>& activationPlaces,
+			const vector<string>& destinationPlaces,
+			const vector<string>& inhibitorPlaces,
+			const vector<string>& additionalConditions)
+	{
+		createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			getConditionFunctors(additionalConditions));
 	}
 
 	void PTN_Engine::PTN_EngineImp::createTransition(
@@ -175,11 +207,11 @@ namespace ptne
 
 
 	void PTN_Engine::PTN_EngineImp::createPlace(
-			const string& name,
-			const size_t initialNumberOfTokens,
-			ActionFunctorPtr onEnterAction,
-			ActionFunctorPtr onExitAction,
-			const bool input)
+		const string& name,
+		const size_t initialNumberOfTokens,
+		ActionFunctorPtr onEnterAction,
+		ActionFunctorPtr onExitAction,
+		const bool input)
 	{
 		unique_lock<mutex> guard(m_mutex);
 		if(m_places.find(name)!= m_places.end())
@@ -188,15 +220,27 @@ namespace ptne
 		}
 
 		SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens,
-				onEnterAction,
-				onExitAction,
-				input);
+			onEnterAction,
+			onExitAction,
+			input);
 
 		m_places[name] = place;
 		if(place->isInputPlace())
 		{
 			m_inputPlaces.push_back(place);
 		}
+	}
+
+	void PTN_Engine::PTN_EngineImp::createPlaceStr(
+		const string& name,
+		const size_t initialNumberOfTokens,
+		const string& onEnterAction,
+		const string& onExitAction,
+		const bool input)
+	{
+		ActionFunctorPtr onEnter = getActionFunctor(onEnterAction);
+		ActionFunctorPtr onExit = getActionFunctor(onExitAction);
+		createPlace(name, initialNumberOfTokens, onEnter, onExit, input);
 	}
 
 	void PTN_Engine::PTN_EngineImp::createPlace(
@@ -214,6 +258,44 @@ namespace ptne
 		const bool input)
 	{
 		createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
+	}
+
+	void PTN_Engine::PTN_EngineImp::registerAction(
+		const string& name,
+		ActionFunctorPtr action)
+	{
+		unique_lock<mutex> guard(m_mutex);
+		if(name == "")
+		{
+			throw InvalidFunctionNameException(name);
+		}
+
+		if(m_actions.find(name)!= m_actions.end())
+		{
+			throw RepeatedActionException(name);
+		}
+
+		//verificar acções repetidas
+		m_actions[name] = action;
+	}
+
+	void PTN_Engine::PTN_EngineImp::registerCondition(
+		const string& name,
+		ConditionFunctorPtr condition)
+	{
+		unique_lock<mutex> guard(m_mutex);
+		if(name == "")
+		{
+			throw InvalidFunctionNameException(name);
+		}
+
+		if(m_conditions.find(name)!= m_conditions.end())
+		{
+			throw RepeatedConditionException(name);
+		}
+
+		//verificar se há repetidos?
+		m_conditions[name] = condition;
 	}
 
 	void PTN_Engine::PTN_EngineImp::execute(const bool log, ostream& o)
@@ -259,6 +341,39 @@ namespace ptne
 			SharedPtrPlace spPlace = lockWeakPtrNotNull(place);
 			spPlace->setNumberOfTokens(0);
 		}
+	}
+
+	ActionFunctorPtr PTN_Engine::PTN_EngineImp::getActionFunctor(const string& name) const
+	{
+		if(name == "")
+		{
+			return nullptr;
+		}
+
+		if(m_actions.find(name) == m_actions.end())
+		{
+			throw InvalidFunctionNameException(name);
+		}
+		return m_actions.at(name);
+	}
+
+	vector<ConditionFunctorPtr> PTN_Engine::PTN_EngineImp::getConditionFunctors(const vector<string>& names) const
+	{
+		vector<ConditionFunctorPtr> conditions;
+		for(const string& name : names)
+		{
+			if(name == "")
+			{
+				continue;
+			}
+
+			if(m_actions.find(name) == m_actions.end())
+			{
+				throw InvalidFunctionNameException(name);
+			}
+			conditions.push_back(m_conditions.at(name));
+		}
+		return conditions;
 	}
 
 	size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string& place) const
@@ -319,6 +434,18 @@ namespace ptne
 
 	PTN_Engine::PTN_EngineImp::RepeatedPlaceException::RepeatedPlaceException(const string& name):
 		PTN_Exception("Trying to add an already existing place: "+name+".")
+	{}
+
+	PTN_Engine::PTN_EngineImp::RepeatedActionException::RepeatedActionException(const string& name):
+		PTN_Exception("Trying to add an already existing action: "+name+".")
+	{}
+
+	PTN_Engine::PTN_EngineImp::RepeatedConditionException::RepeatedConditionException(const string& name):
+		PTN_Exception("Trying to add an already existing condition: "+name+".")
+	{}
+
+	PTN_Engine::PTN_EngineImp::InvalidFunctionNameException::InvalidFunctionNameException(const string& name):
+		PTN_Exception("The function is not yet registered: "+name+".")
 	{}
 
 	void PTN_Engine::PTN_EngineImp::printState(ostream& o ) const

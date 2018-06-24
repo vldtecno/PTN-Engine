@@ -77,6 +77,24 @@ namespace ptne
 		 * \param activationWeights A vector with the weights of each activation place.
 		 * \param destinationPlaces A vector with the names of the destination places.
 		 * \param destinationWeights A vector with the weights of each destination place.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+		 * \param additionalConditions A vector with names to additional conditions.
+		 */
+		void createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<size_t>& activationWeights,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<size_t>& destinationWeights,
+			const std::vector<std::string>& inhibitorPlaces,
+			const std::vector<std::string>& additionalConditions
+		);
+
+		/*!
+		 * Create a new transition
+		 * \param activationPlaces A vector with the names of the activation places.
+		 * \param activationWeights A vector with the weights of each activation place.
+		 * \param destinationPlaces A vector with the names of the destination places.
+		 * \param destinationWeights A vector with the weights of each destination place.
 		 */
 		void createTransition(
 			const std::vector<std::string>& activationPlaces,
@@ -160,17 +178,17 @@ namespace ptne
 			const std::vector<ConditionFunctorPtr>& additionalConditions);
 
 		/*!
-		 * Run until it no more transitions can be fired or stop is flagged.
-		 * \param log Flag logging the state of the net on or off.
-		 * \param o Log output stream.
+		 * Create a new transition
+		 * \param activationPlaces A vector with the names of the activation places.
+		 * \param destinationPlaces A vector with the names of the destination places.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+		 * \param additionalConditions A vector with names to additional conditions.
 		 */
-		void execute(const bool log, std::ostream& o = std::cout);
-
-		/*!
-		 * Run until it no more transitions can be fired or stop is flagged.
-		 * No state logging performed.
-		 */
-		void execute();
+		void createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<std::string>& inhibitorPlaces,
+			const std::vector<std::string>& additionalConditions);
 
 		/*!
 		 * Create a new place in the net.
@@ -191,6 +209,21 @@ namespace ptne
 		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
+		 * \param onEnterAction Name of the function to be called once a token enters the place.
+		 * \param onExitAction Name of the function functor to be called once a token leaves the place.
+		 * \param input A flag determining if this place can have tokens added manually.
+		 */
+		void createPlaceStr(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			const std::string& onEnterAction,
+			const std::string& onExitAction,
+			const bool input = false);
+
+		/*!
+		 * Create a new place in the net.
+		 * \param name The name of the place.
+		 * \param initialNumberOfTokens The number of tokens to be initialized with.
 		 * \param input A flag determining if this place can have tokens added manually.
 		 */
 		void createPlace(
@@ -210,6 +243,37 @@ namespace ptne
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
 			const bool input = false);
+
+		/*!
+		 * Register an action to be called by the Petri net.
+		 * \param name The name of the place.
+		 * \param action The functor to be called once a token enters the place.
+		 */
+		void registerAction(
+			const std::string& name,
+			ActionFunctorPtr action);
+
+		/*!
+		 * Register a condition
+		 * \param name The name of the condition
+		 * \param conditions A function pointer to a condition.
+		 */
+		void registerCondition(
+			const std::string& name,
+			ConditionFunctorPtr condition);
+
+		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * \param log Flag logging the state of the net on or off.
+		 * \param o Log output stream.
+		 */
+		void execute(const bool log, std::ostream& o = std::cout);
+
+		/*!
+		 * Run until it no more transitions can be fired or stop is flagged.
+		 * No state logging performed.
+		 */
+		void execute();
 
 		/*!
 		 * Return the number of tokens in a given place.
@@ -270,6 +334,36 @@ namespace ptne
 			RepeatedPlaceException(const std::string& name);
 		};
 
+		/*!
+		 * Exception to be thrown if the user tries to add a Condition
+		 * to the net that with the name of an already existing one.
+		 */
+		class RepeatedActionException: public PTN_Exception
+		{
+		public:
+			RepeatedActionException(const std::string& name);
+		};
+
+		/*!
+		 * Exception to be thrown if the user tries to add an Action
+		 * to the net that with the name of an already existing one.
+		 */
+		class RepeatedConditionException: public PTN_Exception
+		{
+		public:
+			RepeatedConditionException(const std::string& name);
+		};
+
+		/*!
+		 * Exception to be thrown if the user tries to use an invalid
+		 * function name
+		 */
+		class InvalidFunctionNameException: public PTN_Exception
+		{
+		public:
+			InvalidFunctionNameException(const std::string& name);
+		};
+
 	private:
 
 		/*! 
@@ -284,6 +378,21 @@ namespace ptne
 		 * Clear the token counter from all input places.
 		 */
 		void clearInputPlaces();
+
+		/*!
+		 * Get the registered action function pointer identified by name.
+		 * \param name The function name or identifier
+		 * \return The functions pointer of the registered function
+		 */
+		ActionFunctorPtr getActionFunctor(const std::string& name) const;
+
+		/*!
+		 * Get the registered condition function pointers identified by
+		 * their names.
+		 * \param names Vector of names
+		 * \return Vector of conditions
+		 */
+		std::vector<ConditionFunctorPtr> getConditionFunctors(const std::vector<std::string>& names) const;
 
 		/*!
 		 * Collects and randomizes the order of all active transitions.
@@ -310,6 +419,12 @@ namespace ptne
 		 * access operations are expected.
 		 */
 		std::map<std::string, SharedPtrPlace> m_places;
+
+		//! Actions that can be called by the Petri net.
+		std::map<std::string, ActionFunctorPtr> m_actions;
+
+		//! Conditions that can be used by the Petri net.
+		std::map<std::string, ConditionFunctorPtr> m_conditions;
 
 		//! Translates a vector of names of places to a vector of weak pointers to those places.
 		/*!

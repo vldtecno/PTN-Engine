@@ -52,6 +52,23 @@ namespace ptne
 		const vector<string>& activationPlaces,
 		const vector<size_t>& activationWeights,
 		const vector<string>& destinationPlaces,
+		const vector<size_t>& destinationWeights,
+		const vector<string>& inhibitorPlaces,
+		const vector<string>& additionalConditions)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			activationWeights,
+			destinationPlaces,
+			destinationWeights,
+			inhibitorPlaces,
+			additionalConditions);
+	}
+
+	void PTN_Engine::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<size_t>& activationWeights,
+		const vector<string>& destinationPlaces,
 		const vector<size_t>& destinationWeights)
 	{
 		m_implementation->createTransition(
@@ -135,7 +152,7 @@ namespace ptne
 			vector<string>{},
 			additionalConditions);
 	}
-	
+
 	void PTN_Engine::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<string>& destinationPlaces,
@@ -152,12 +169,25 @@ namespace ptne
 	}
 
 	void PTN_Engine::createPlace(const string& name,
-			const size_t initialNumberOfTokens,
-						ActionFunctorPtr onEnterAction,
-						ActionFunctorPtr onExitAction,
-						const bool input)
+		const size_t initialNumberOfTokens,
+		ActionFunctorPtr onEnterAction,
+		ActionFunctorPtr onExitAction,
+		const bool input)
 	{
 		m_implementation->createPlace(name,
+			initialNumberOfTokens,
+			onEnterAction,
+			onExitAction,
+			input);
+	}
+
+	void PTN_Engine::createPlace(const string& name,
+		const size_t initialNumberOfTokens,
+		const string& onEnterAction,
+		const string& onExitAction,
+		const bool input)
+	{
+		m_implementation->createPlaceStr(name,
 			initialNumberOfTokens,
 			onEnterAction,
 			onExitAction,
@@ -185,6 +215,32 @@ namespace ptne
 			onEnterAction,
 			nullptr,
 			input);
+	}
+
+	void PTN_Engine::createPlace(const string& name,
+		const size_t initialNumberOfTokens,
+		const string& onEnterAction,
+		const bool input)
+	{
+		m_implementation->createPlaceStr(name,
+				initialNumberOfTokens,
+				onEnterAction,
+				"",
+				input);
+	}
+
+	void PTN_Engine::registerAction(
+		const string& name,
+		ActionFunctorPtr action)
+	{
+		m_implementation->registerAction(name, action);
+	}
+
+	void PTN_Engine::registerCondition(
+		const string& name,
+		ConditionFunctorPtr condition)
+	{
+		m_implementation->registerCondition(name, condition);
 	}
 
 	void PTN_Engine::execute(const bool log, ostream& o)

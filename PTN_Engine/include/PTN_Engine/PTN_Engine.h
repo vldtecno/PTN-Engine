@@ -74,6 +74,24 @@ namespace ptne
 		 * \param activationWeights A vector with the weights of each activation place.
 		 * \param destinationPlaces A vector with the names of the destination places.
 		 * \param destinationWeights A vector with the weights of each destination place.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+		 * \param additionalConditions A vector with names to additional conditions.
+		 */
+		void createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<size_t>& activationWeights,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<size_t>& destinationWeights,
+			const std::vector<std::string>& inhibitorPlaces,
+			const std::vector<std::string>& additionalConditions
+		);
+
+		/*!
+		 * Create a new transition
+		 * \param activationPlaces A vector with the names of the activation places.
+		 * \param activationWeights A vector with the weights of each activation place.
+		 * \param destinationPlaces A vector with the names of the destination places.
+		 * \param destinationWeights A vector with the weights of each destination place.
 		 */
 		void createTransition(
 			const std::vector<std::string>& activationPlaces,
@@ -175,6 +193,21 @@ namespace ptne
 		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
+		 * \param onEnterAction Name of the function to be called once a token enters the place.
+		 * \param onExitAction Name of the function functor to be called once a token leaves the place.
+		 * \param input A flag determining if this place can have tokens added manually.
+		 */
+		void createPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			const std::string& onEnterAction,
+			const std::string& onExitAction,
+			const bool input = false);
+
+		/*!
+		 * Create a new place in the net.
+		 * \param name The name of the place.
+		 * \param initialNumberOfTokens The number of tokens to be initialized with.
 		 * \param input A flag determining if this place can have tokens added manually.
 		 */
 		void createPlace(
@@ -194,6 +227,37 @@ namespace ptne
 			const size_t initialNumberOfTokens,
 			ActionFunctorPtr onEnterAction,
 			const bool input = false);
+
+		/*!
+		 * Create a new place in the net.
+		 * \param name The name of the place.
+		 * \param initialNumberOfTokens The number of tokens to be initialized with.
+		 * \param onEnterAction Name of the function to be called once a token enters the place.
+		 * \param input A flag determining if this place can have tokens added manually.
+		 */
+		void createPlace(
+			const std::string& name,
+			const size_t initialNumberOfTokens,
+			const std::string& onEnterAction,
+			const bool input = false);
+
+		/*!
+		 * Register an action to be called by the Petri net.
+		 * \param name The name of the place.
+		 * \param action The functor to be called once a token enters the place.
+		 */
+		void registerAction(
+			const std::string& name,
+			ActionFunctorPtr action);
+
+		/*!
+		 * Register a condition
+		 * \param name The name of the condition
+		 * \param conditions A function pointer to a condition.
+		 */
+		void registerCondition(
+			const std::string& name,
+			ConditionFunctorPtr condition);
 
 		/*!
 		 * Run until it no more transitions can be fired or stop is flagged.
