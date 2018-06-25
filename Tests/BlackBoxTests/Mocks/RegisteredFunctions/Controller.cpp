@@ -1,7 +1,7 @@
 /*
 * This file is part of PTN Engine
 *
-* Copyright (c) 2018 Eduardo Valg�de
+* Copyright (c) 2018 Eduardo Valgôde
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,32 +16,32 @@
 * limitations under the License.
 */
 
-#include "Mocks/Simple/SimplePetriNet.h"
+#include "Mocks/RegisteredFunctions/Controller.h"
 #include <thread>
 
 using namespace std;
 
-SimpleController::SimpleController():
+Controller::Controller():
 	m_petriNet(nullptr)
 {
 }
 
-void SimpleController::initialize()
+void Controller::initialize()
 {
-	m_petriNet = make_unique<SimpleController::SimplePetriNet>(shared_from_this());
+	m_petriNet = make_unique<Controller::RegisteredFunctionsPN>(shared_from_this());
 }
 
-void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
+void Controller::doSomethingConcurrently(const size_t numberOfThreads)
 {
 	m_collectedThreadIds.clear();
 	auto f = [&]()->void
-	{	
+	{
 		this_thread::sleep_for(chrono::milliseconds(5));
 		for (int i = 0; i < 10; ++i)
 		{
 			m_petriNet->addExecuteP1();
 		}
-	};	
+	};
 
 	vector<future<void>> tasks;
 	for (size_t i = 0; i < numberOfThreads; ++i)
@@ -56,13 +56,12 @@ void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 	}
 }
 
-size_t SimpleController::getNumberOfDifferentThreads() const
+size_t Controller::getNumberOfDifferentThreads() const
 {
 	return m_collectedThreadIds.size();
 }
 
-void SimpleController::collectThreadId()
+void Controller::collectThreadId()
 {
 	m_collectedThreadIds.insert(this_thread::get_id());
 }
-

@@ -1,7 +1,7 @@
 /*
 * This file is part of PTN Engine
 *
-* Copyright (c) 2018 Eduardo Valg�de
+* Copyright (c) 2018 Eduardo Valgôde
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,26 +25,28 @@
 
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
+#include "PTN_Engine/PTN_Engine.h"
 
-//! A very simple controller with a very simple petri net.
-class SimpleController: public std::enable_shared_from_this<SimpleController>
+class Controller: public std::enable_shared_from_this<Controller>
 {
-	class SimplePetriNet;
-	friend class SimplePetriNet;
+	class RegisteredFunctionsPN;
+
 	friend class FixturePetriNet;
+	friend class RegisteredFunctionsPN;
+
 public:
 
-	SimpleController();
+	Controller();
 
-	SimpleController(const SimpleController&) = delete;
+	Controller(const Controller&) = delete;
 
-	SimpleController& operator=(const SimpleController&) = delete;
+	Controller& operator=(const Controller&) = delete;
 
-	~SimpleController() = default;
+	~Controller() = default;
 
 	void initialize();
 
-	void doSomethingConcurrently(const size_t numberOfThreads);	
+	void doSomethingConcurrently(const size_t numberOfThreads);
 
 	size_t getNumberOfDifferentThreads() const;
 
@@ -52,16 +54,16 @@ private:
 
 	void collectThreadId();
 
-	std::unique_ptr<SimplePetriNet> m_petriNet;
+	std::unique_ptr<RegisteredFunctionsPN> m_petriNet;
 
 	std::set<std::thread::id> m_collectedThreadIds;
 
 };
 
-template class ptne::Action<SimpleController>;
-using ControllerAction = ptne::Action<SimpleController>;
+template class ptne::Action<Controller>;
+using ControllerAction2 = ptne::Action<Controller>;
 
-template class ptne::ActivationCondition<SimpleController>;
-using ControllerFireCondition = ptne::ActivationCondition<SimpleController>;
+template class ptne::ActivationCondition<Controller>;
+using ControllerFireCondition2 = ptne::ActivationCondition<Controller>;
 
-#include "Mocks/Simple/SimplePetriNet.h"
+#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"

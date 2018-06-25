@@ -138,4 +138,7 @@ TEST_F(FixturePetriNet, ThreadSafety)
 	testThreadSafety();
 }
 
-
+TEST_F(FixturePetriNet, RegisteredMethods)
+{
+	testRegisteredMethods();
+}

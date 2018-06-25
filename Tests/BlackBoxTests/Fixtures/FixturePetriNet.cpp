@@ -18,6 +18,7 @@
 
 #include "Fixtures/FixturePetriNet.h"
 #include "Mocks/Simple/SimpleController.h"
+#include "Mocks/RegisteredFunctions/Controller.h"
 
 using namespace std;
 
@@ -184,7 +185,18 @@ void FixturePetriNet::testThreadSafety()
 
 	//TODO get a better way to test
 	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
-	
+}
 
+void FixturePetriNet::testRegisteredMethods()
+{
+	std::shared_ptr<SimpleController> simpleController = make_shared<SimpleController>();
+	simpleController->initialize();
+
+	const size_t numberOfThreads = 8;
+	simpleController->doSomethingConcurrently(numberOfThreads);
+	EXPECT_EQ(numberOfThreads, simpleController->getNumberOfDifferentThreads());
+
+	//TODO get a better way to test
+	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
 }
 

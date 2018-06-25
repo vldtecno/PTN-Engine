@@ -75,6 +75,12 @@ public:
 	 */
 	void testThreadSafety();
 
+	/*!
+	 *
+	 *
+	 */
+	void testRegisteredMethods();
+
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;
 
