@@ -24,8 +24,6 @@
 //! Fixture for testing a complete PTN net.
 /*!
  *
- *
- *
  */
 class F2: public ::testing::Test
 {
@@ -35,10 +33,14 @@ public:
 	F2();
 
 	/*!
-	 *
-	 *
+	 * Test a Petri net whose methods are registered first.
 	 */
 	void testRegisteredMethods();
+
+	/*!
+	 * Test detection of already registered methods.
+	 */
+	void testRepeatedRegisteredMethods();
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;

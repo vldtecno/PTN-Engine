@@ -17,6 +17,7 @@
 */
 
 #include "Mocks/RegisteredFunctions/Controller.h"
+#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include <thread>
 
 using namespace std;
@@ -28,40 +29,46 @@ Controller::Controller():
 
 void Controller::initialize()
 {
-	m_petriNet = make_unique<Controller::RegisteredFunctionsPN>(shared_from_this());
-}
-
-void Controller::doSomethingConcurrently(const size_t numberOfThreads)
-{
-	m_collectedThreadIds.clear();
-	auto f = [&]()->void
+	if(!m_petriNet)
 	{
-		this_thread::sleep_for(chrono::milliseconds(5));
-		for (int i = 0; i < 10; ++i)
-		{
-			m_petriNet->addExecuteP1();
-		}
-	};
-
-	vector<future<void>> tasks;
-	for (size_t i = 0; i < numberOfThreads; ++i)
-	{
-		auto fut = async(launch::async, f);
-		tasks.push_back(move(fut));
+		m_petriNet = make_unique<RegisteredFunctionsPN>(shared_from_this());
 	}
-
-	for (auto& task : tasks)
-	{
-		task.wait();
-	}
+	m_petriNet->registerCallbacks();
+	m_petriNet->createPetriNetStructure();
 }
 
-size_t Controller::getNumberOfDifferentThreads() const
+void Controller::startExecution()
 {
-	return m_collectedThreadIds.size();
+	m_petriNet->addExecuteP0();
 }
 
-void Controller::collectThreadId()
+string Controller::getSomeString() const
 {
-	m_collectedThreadIds.insert(this_thread::get_id());
+	return m_someString;
 }
+
+void Controller::actionPlace1()
+{
+	m_someString = "actionPlace1";
+}
+
+void Controller::actionPlace2()
+{
+	m_someString = "actionPlace2";
+}
+
+bool Controller::externalCondition1() const
+{
+	return true;
+}
+
+bool Controller::externalCondition2() const
+{
+	return true;
+}
+
+bool Controller::externalCondition3() const
+{
+	return false;
+}
+

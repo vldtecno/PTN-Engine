@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "Fixtures/FixturePetriNet.h"
-#include "Fixtures/F2/f2.h"
+#include "Fixtures/F2/F2.h"
 
 TEST_F(FixturePetriNet, RoundRobin_1)
 {
@@ -142,4 +142,9 @@ TEST_F(FixturePetriNet, ThreadSafety)
 TEST_F(F2, RegisteredMethods)
 {
 	testRegisteredMethods();
+}
+
+TEST_F(F2, AlreadyRegisteredMethods)
+{
+	testRepeatedRegisteredMethods();
 }

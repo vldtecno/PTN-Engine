@@ -19,18 +19,16 @@
 #pragma once
 
 #include <memory>
-#include <ostream>
-#include <set>
-#include <future>
+#include <string>
 
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
 #include "PTN_Engine/PTN_Engine.h"
 
+class RegisteredFunctionsPN;
+
 class Controller: public std::enable_shared_from_this<Controller>
 {
-	class RegisteredFunctionsPN;
-
 	friend class F2;
 	friend class RegisteredFunctionsPN;
 
@@ -46,24 +44,31 @@ public:
 
 	void initialize();
 
-	void doSomethingConcurrently(const size_t numberOfThreads);
+	void startExecution();
 
-	size_t getNumberOfDifferentThreads() const;
+	std::string getSomeString() const;
 
 private:
 
-	void collectThreadId();
-
 	std::unique_ptr<RegisteredFunctionsPN> m_petriNet;
 
-	std::set<std::thread::id> m_collectedThreadIds;
+	void actionPlace1();
+
+	void actionPlace2();
+
+	bool externalCondition1() const;
+
+	bool externalCondition2() const;
+
+	bool externalCondition3() const;
+
+	std::string m_someString;
 
 };
 
 template class ptne::Action<Controller>;
-using ControllerAction2 = ptne::Action<Controller>;
+using ControllerAction = ptne::Action<Controller>;
 
 template class ptne::ActivationCondition<Controller>;
-using ControllerFireCondition2 = ptne::ActivationCondition<Controller>;
+using ControllerFireCondition = ptne::ActivationCondition<Controller>;
 
-#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"

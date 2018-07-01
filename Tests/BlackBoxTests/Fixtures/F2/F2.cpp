@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-#include "Fixtures/F2/f2.h"
+#include "Fixtures/F2/F2.h"
 #include "Mocks/RegisteredFunctions/Controller.h"
+#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 
 using namespace std;
 
@@ -32,11 +33,21 @@ void F2::testRegisteredMethods()
 	std::shared_ptr<Controller> controller = make_shared<Controller>();
 	controller->initialize();
 
-	const size_t numberOfThreads = 8;
-	controller->doSomethingConcurrently(numberOfThreads);
-	EXPECT_EQ(numberOfThreads, controller->getNumberOfDifferentThreads());
+	controller->startExecution();
 
 	//TODO get a better way to test
+	EXPECT_EQ(1, controller->m_petriNet->getNumberOfTokens("P1"));
 	EXPECT_EQ(0, controller->m_petriNet->getNumberOfTokens("P2"));
+
+	EXPECT_EQ("actionPlace1", controller->getSomeString());
+}
+
+void F2::testRepeatedRegisteredMethods()
+{
+	std::shared_ptr<Controller> controller = make_shared<Controller>();
+	controller->initialize();
+
+	ASSERT_THROW(
+	controller->initialize(), ptne::PTN_Exception);
 }
 

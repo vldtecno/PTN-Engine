@@ -104,21 +104,6 @@ namespace ptne
 	}
 
 	void PTN_Engine::PTN_EngineImp::createTransition(
-			const vector<string>& activationPlaces,
-			const vector<string>& destinationPlaces,
-			const vector<string>& inhibitorPlaces,
-			const vector<string>& additionalConditions)
-	{
-		createTransition(
-			activationPlaces,
-			vector<size_t>{},
-			destinationPlaces,
-			vector<size_t>{},
-			inhibitorPlaces,
-			getConditionFunctors(additionalConditions));
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
 		const vector<string>& activationPlaces,
 		const vector<size_t>& activationWeights,
 		const vector<string>& destinationPlaces,
@@ -190,6 +175,22 @@ namespace ptne
 			vector<string>{},
 			vector<ConditionFunctorPtr>{});
 	}
+
+	void PTN_Engine::PTN_EngineImp::createTransition(
+		const vector<string>& activationPlaces,
+		const vector<string>& destinationPlaces,
+		const vector<string>& inhibitorPlaces,
+		const vector<string>& additionalConditions)
+	{
+		createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			getConditionFunctors(additionalConditions));
+	}
+
 
 	vector<Transition*> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
@@ -367,7 +368,7 @@ namespace ptne
 				continue;
 			}
 
-			if(m_actions.find(name) == m_actions.end())
+			if(m_conditions.find(name) == m_conditions.end())
 			{
 				throw InvalidFunctionNameException(name);
 			}

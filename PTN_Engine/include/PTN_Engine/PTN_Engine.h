@@ -138,7 +138,6 @@ namespace ptne
 			const std::vector<std::string>& activationPlaces,
 			const std::vector<std::string>& destinationPlaces);
 
-
 		/*!
 		 * Create a new transition
 		 * \param activationPlaces A vector with the names of the activation places.
@@ -173,6 +172,19 @@ namespace ptne
 			const std::vector<std::string>& destinationPlaces,
 			const std::vector<std::string>& inhibitorPlaces,
 			const std::vector<ConditionFunctorPtr>& additionalConditions);
+
+		/*!
+		 * Create a new transition
+		 * \param activationPlaces A vector with the names of the activation places.
+		 * \param destinationPlaces A vector with the names of the destination places.
+		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+		 * \param additionalConditions A vector with names to additional conditions.
+		 */
+		void createTransition(
+			const std::vector<std::string>& activationPlaces,
+			const std::vector<std::string>& destinationPlaces,
+			const std::vector<std::string>& inhibitorPlaces,
+			const std::vector<std::string>& additionalConditions);
 
 		/*!
 		 * Create a new place in the net.

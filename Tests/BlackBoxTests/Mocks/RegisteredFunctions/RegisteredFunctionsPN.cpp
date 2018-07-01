@@ -21,23 +21,34 @@
 
 using namespace std;
 
-Controller::RegisteredFunctionsPN::RegisteredFunctionsPN(shared_ptr<Controller> controller):
-	::ptne::PTN_Engine()
+RegisteredFunctionsPN::RegisteredFunctionsPN(shared_ptr<Controller> controller):
+	ptne::PTN_Engine(),
+	m_controller(controller)
 {
-	registerAction("collectThreadId", make_shared<ControllerAction2>(controller, &Controller::collectThreadId));
-	//registerCondition("someCondition", make_shared<ControllerCondition>(controller, &SimpleController::someCondition));
-
-	createPlace("P1", 0, "collectThreadId", true);
-	createPlace("P2", 0);
-
-	//createTransition({ "P1" }, { "P2" }, "someCondition");
-	createTransition({ "P1" }, { "P2" });
-	createTransition({ "P2" }, { });
-
 }
 
-void Controller::RegisteredFunctionsPN::addExecuteP1()
+void RegisteredFunctionsPN::registerCallbacks()
 {
-	incrementInputPlace("P1");
+	auto controller = lockWeakPtr(m_controller);
+	registerAction("actionPlace1", make_shared<ControllerAction>(controller, &Controller::actionPlace1));
+	registerAction("actionPlace2", make_shared<ControllerAction>(controller, &Controller::actionPlace2));
+	registerCondition("externalCondition1", make_shared<ControllerFireCondition>(controller, &Controller::externalCondition1));
+	registerCondition("externalCondition2", make_shared<ControllerFireCondition>(controller, &Controller::externalCondition2));
+	registerCondition("externalCondition3", make_shared<ControllerFireCondition>(controller, &Controller::externalCondition3));
+}
+
+void RegisteredFunctionsPN::createPetriNetStructure()
+{
+	createPlace("P0", 0, true);
+	createPlace("P1", 0, "actionPlace1", false);
+	createPlace("P2", 0, "actionPlace2", false);
+
+	createTransition({ "P0" }, { "P1" }, {}, vector<string>{"externalCondition1", "externalCondition2"});
+	createTransition({ "P0" }, { "P2" }, {}, vector<string>{"externalCondition3"});
+}
+
+void RegisteredFunctionsPN::addExecuteP0()
+{
+	incrementInputPlace("P0");
 	execute();
 }

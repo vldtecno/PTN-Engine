@@ -20,7 +20,7 @@
 
 #include "PTN_Engine/PTN_Engine.h"
 
-class Controller::RegisteredFunctionsPN: public ptne::PTN_Engine
+class RegisteredFunctionsPN: public ptne::PTN_Engine
 {
 	friend class F2;
 
@@ -28,6 +28,12 @@ public:
 
 	RegisteredFunctionsPN(std::shared_ptr<Controller> controller);
 
-	void addExecuteP1();
+	void registerCallbacks();
+
+	void createPetriNetStructure();
+
+	void addExecuteP0();
+
+	std::weak_ptr<Controller> m_controller;
 
 };

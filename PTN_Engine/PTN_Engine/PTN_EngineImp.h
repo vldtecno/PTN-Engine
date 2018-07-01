@@ -141,7 +141,6 @@ namespace ptne
 			const std::vector<std::string>& activationPlaces,
 			const std::vector<std::string>& destinationPlaces);
 
-
 		/*!
 		 * Create a new transition
 		 * \param activationPlaces A vector with the names of the activation places.

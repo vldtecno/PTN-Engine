@@ -168,6 +168,21 @@ namespace ptne
 			additionalConditions);
 	}
 
+	void PTN_Engine::createTransition(
+		const std::vector<std::string>& activationPlaces,
+		const std::vector<std::string>& destinationPlaces,
+		const std::vector<std::string>& inhibitorPlaces,
+		const std::vector<std::string>& additionalConditions)
+	{
+		m_implementation->createTransition(
+			activationPlaces,
+			vector<size_t>{},
+			destinationPlaces,
+			vector<size_t>{},
+			inhibitorPlaces,
+			additionalConditions);
+	}
+
 	void PTN_Engine::createPlace(const string& name,
 		const size_t initialNumberOfTokens,
 		ActionFunctorPtr onEnterAction,
