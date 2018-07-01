@@ -31,7 +31,7 @@ class Controller: public std::enable_shared_from_this<Controller>
 {
 	class RegisteredFunctionsPN;
 
-	friend class FixturePetriNet;
+	friend class F2;
 	friend class RegisteredFunctionsPN;
 
 public:

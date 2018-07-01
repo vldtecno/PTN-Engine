@@ -22,7 +22,7 @@
 
 class Controller::RegisteredFunctionsPN: public ptne::PTN_Engine
 {
-	friend class FixturePetriNet;
+	friend class F2;
 
 public:
 
