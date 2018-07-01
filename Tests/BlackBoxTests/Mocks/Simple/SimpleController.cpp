@@ -1,7 +1,7 @@
 /*
 * This file is part of PTN Engine
 *
-* Copyright (c) 2018 Eduardo Valgôde
+* Copyright (c) 2018 Eduardo Valgï¿½de
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 
-#include "Mocks/Simple/SimpleController.h"
+#include "Mocks/Simple/SimplePetriNet.h"
 #include <thread>
 
 using namespace std;

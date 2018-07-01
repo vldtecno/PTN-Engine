@@ -1,7 +1,7 @@
 /*
 * This file is part of PTN Engine
 *
-* Copyright (c) 2018 Eduardo Valgôde
+* Copyright (c) 2018 Eduardo Valgï¿½de
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -18,12 +18,13 @@
 
 #pragma once
 
-#include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
 #include <memory>
 #include <ostream>
 #include <set>
 #include <future>
+
+#include "PTN_Engine/ActivationCondition.h"
+#include "PTN_Engine/Action.h"
 
 //! A very simple controller with a very simple petri net.
 class SimpleController: public std::enable_shared_from_this<SimpleController>

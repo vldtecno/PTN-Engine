@@ -184,7 +184,6 @@ void FixturePetriNet::testThreadSafety()
 
 	//TODO get a better way to test
 	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
-	
-
 }
+
 
