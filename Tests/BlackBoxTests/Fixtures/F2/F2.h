@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2018 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
