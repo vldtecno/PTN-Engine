@@ -81,9 +81,9 @@ namespace ptne
 	{
 		createTransition(
 			activationPlaces,
-			vector<size_t>{},
+			activationWeights,
 			destinationPlaces,
-			vector<size_t>{},
+			destinationWeights,
 			inhibitorPlaces,
 			getConditionFunctors(additionalConditions));
 	}
@@ -132,7 +132,7 @@ namespace ptne
 			destinationPlaces,
 			destinationWeights,	
 			vector<string>{},
-			vector<ConditionFunctorPtr>{});
+			additionalConditions);
 	}
 
 	void PTN_Engine::PTN_EngineImp::createTransition(
@@ -173,7 +173,7 @@ namespace ptne
 			destinationPlaces,
 			vector<size_t>{},
 			vector<string>{},
-			vector<ConditionFunctorPtr>{});
+			additionalConditions);
 	}
 
 	void PTN_Engine::PTN_EngineImp::createTransition(
@@ -309,15 +309,15 @@ namespace ptne
 		{
 			if (log)
 			{
-				printState(cout);
+				printState(o);
 			}
 
 			//Safe to use raw pointers here. Nothing justifies deleting a
 			// transition from m_transitions, so there should never be an
 			// invalid pointer. At the moment this is only single threaded, 
 			// so synchronization problems are not an issue.
-			vector<Transition*> activeTransitions(move(
-				collectActiveTransitionsRandomly()));
+			vector<Transition*> activeTransitions(
+				collectActiveTransitionsRandomly());
 
 			transitionFired = false;
 			for (Transition* transition : activeTransitions)

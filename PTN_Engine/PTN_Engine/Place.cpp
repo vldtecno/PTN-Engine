@@ -29,9 +29,9 @@ namespace ptne
 			ActionFunctorPtr onEnterEventHandler,
 			ActionFunctorPtr onExitEventHandler,
 			const bool input):
-		m_numberOfTokens{initialNumberOfTokens},
 		m_onEnterAction{onEnterEventHandler},
 		m_onExitAction{onExitEventHandler},
+		m_numberOfTokens{initialNumberOfTokens},
 		m_isInputPlace{input}
 	{}
 
