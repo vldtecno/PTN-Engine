@@ -20,22 +20,12 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IConditionFunctor.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
-#include <set>
+#include "PTN_Engine/Utilities/DetectRepeated.h"
 
 
 namespace ptne
 {
 	using namespace std;
-
-	static size_t getNumberOfUniquePlaces(const vector<Transition::WeakPtrPlace>& places)
-	{
-		set<Transition::WeakPtrPlace, owner_less<Transition::WeakPtrPlace>> s;
-		for(Transition::WeakPtrPlace place : places)
-		{
-			s.insert(place);
-		}
-		return s.size();
-	}
 
 	Transition::Transition(
 		const vector<WeakPtrPlace>& activationPlaces,
@@ -57,15 +47,9 @@ namespace ptne
 			throw DestinationWeightDimensionException();
 		}
 
-		if(activationPlaces.size() != getNumberOfUniquePlaces(activationPlaces))
-		{
-			throw ActivationPlaceRepetitionException();
-		}
+		utility::detectRepeated<Place, ActivationPlaceRepetitionException>(activationPlaces);
 
-		if(destinationPlaces.size() != getNumberOfUniquePlaces(destinationPlaces))
-		{
-			throw DestinationPlaceRepetitionException();
-		}
+		utility::detectRepeated<Place, DestinationPlaceRepetitionException>(destinationPlaces);
 
 		if (activationWeights.size() != 0)
 		{
@@ -138,7 +122,7 @@ namespace ptne
 	{
 		for(const WeakPtrPlace& inhibitorPlace: m_inhibitorPlaces)
 		{
-			SharedPtrPlace spInhibitorPlace = lockWeakPtrNotNull(inhibitorPlace);
+			SharedPtrPlace spInhibitorPlace = lockWeakPtr(inhibitorPlace);
 
 			if(spInhibitorPlace->getNumberOfTokens() > 0)
 			{
@@ -156,7 +140,7 @@ namespace ptne
 			const WeakPtrPlace& activationPlace = get<0>(tupleActivationPlace);
 			const size_t activationWeight = get<1>(tupleActivationPlace);
 
-			SharedPtrPlace spPlace = lockWeakPtrNotNull(activationPlace);
+			SharedPtrPlace spPlace = lockWeakPtr(activationPlace);
 
 			if(spPlace->getNumberOfTokens() < activationWeight)
 			{

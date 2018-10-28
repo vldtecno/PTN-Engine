@@ -27,7 +27,6 @@ Controller::Controller():
 	m_pPetriNet{nullptr},
 	m_messageSelected(0)
 {
-
 }
 
 Controller::~Controller()
@@ -64,46 +63,44 @@ void Controller::initialize()
 		return;
 	}
 
-	m_pPetriNet = move(
-		PtrPetriNet(new MenuStateMachine(shared_from_this()))
-		);
+	m_pPetriNet = PtrPetriNet(new MenuStateMachine(shared_from_this()));
 }
 
 void Controller::showMainMenu()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
 	mainMenu->showMenu();
 }
 
 void Controller::selectCallsOption()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
 	mainMenu->select(0);
 }
 
 void Controller::selectMessagesOption()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtrNotNull(m_mainMenu);
+	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
 	mainMenu->select(1);
 }
 
 void Controller::showCallsMenu()
 {
-	shared_ptr<CallList> callLog = lockWeakPtrNotNull(m_callLog);
-	shared_ptr<CallLogView> callLogView = lockWeakPtrNotNull(m_callLogView);
+	shared_ptr<CallList> callLog = lockWeakPtr(m_callLog);
+	shared_ptr<CallLogView> callLogView = lockWeakPtr(m_callLogView);
 	callLogView->viewCallLog(*callLog);
 }
 
 void Controller::showMessageMenu()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
-	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtrNotNull(m_messagesMenu);
+	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
+	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtr(m_messagesMenu);
 	messagesMenu->showMessagesList(*messageList, m_messageSelected);
 }
 
 void Controller::selectNextMessage()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
+	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
 	++m_messageSelected;
 	if(m_messageSelected == messageList->size())
 	{
@@ -113,8 +110,8 @@ void Controller::selectNextMessage()
 
 void Controller::showMessage()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtrNotNull(m_messageList);
-	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtrNotNull(m_messagesMenu);
+	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
+	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtr(m_messagesMenu);
 	messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
 }
 
@@ -142,8 +139,3 @@ void Controller::setCallLog(shared_ptr<CallList> callLog)
 {
 	m_callLog = callLog;
 }
-
-
-
-
-

@@ -20,22 +20,11 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
-#include <algorithm>
-#include <set>
+#include "PTN_Engine/Utilities/DetectRepeated.h"
 
 namespace ptne
 {
 	using namespace std;
-
-	static size_t getNumberOfUniqueNames(const vector<string>& names)
-	{
-		set<string> s;
-		for(string name : names)
-		{
-			s.insert(name);
-		}
-		return s.size();
-	}
 
 	PTN_Engine::PTN_EngineImp::PTN_EngineImp():
 		m_stop{false}
@@ -191,7 +180,6 @@ namespace ptne
 			getConditionFunctors(additionalConditions));
 	}
 
-
 	vector<Transition*> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
 		vector<Transition*> activeTransitions;
@@ -205,7 +193,6 @@ namespace ptne
 		random_shuffle(activeTransitions.begin(), activeTransitions.end());
 		return activeTransitions;
 	}
-
 
 	void PTN_Engine::PTN_EngineImp::createPlace(
 		const string& name,
@@ -266,7 +253,7 @@ namespace ptne
 		ActionFunctorPtr action)
 	{
 		unique_lock<mutex> guard(m_mutex);
-		if(name == "")
+		if(name.empty())
 		{
 			throw InvalidFunctionNameException(name);
 		}
@@ -285,7 +272,7 @@ namespace ptne
 		ConditionFunctorPtr condition)
 	{
 		unique_lock<mutex> guard(m_mutex);
-		if(name == "")
+		if(name.empty())
 		{
 			throw InvalidFunctionNameException(name);
 		}
@@ -312,6 +299,7 @@ namespace ptne
 				printState(o);
 			}
 
+			//TODO: Create an iterator for active transitions
 			//Safe to use raw pointers here. Nothing justifies deleting a
 			// transition from m_transitions, so there should never be an
 			// invalid pointer. At the moment this is only single threaded, 
@@ -339,14 +327,14 @@ namespace ptne
 	{
 		for( const WeakPtrPlace& place : m_inputPlaces)
 		{
-			SharedPtrPlace spPlace = lockWeakPtrNotNull(place);
+			SharedPtrPlace spPlace = lockWeakPtr(place);
 			spPlace->setNumberOfTokens(0);
 		}
 	}
 
 	ActionFunctorPtr PTN_Engine::PTN_EngineImp::getActionFunctor(const string& name) const
 	{
-		if(name == "")
+		if(name.empty())
 		{
 			return nullptr;
 		}
@@ -361,11 +349,11 @@ namespace ptne
 	vector<ConditionFunctorPtr> PTN_Engine::PTN_EngineImp::getConditionFunctors(const vector<string>& names) const
 	{
 		vector<ConditionFunctorPtr> conditions;
-		for(const string& name : names)
+		for_each(names.cbegin(), names.cend(), [&](const string& name)
 		{
-			if(name == "")
+			if(name.empty())
 			{
-				continue;
+				return;
 			}
 
 			if(m_conditions.find(name) == m_conditions.end())
@@ -373,7 +361,7 @@ namespace ptne
 				throw InvalidFunctionNameException(name);
 			}
 			conditions.push_back(m_conditions.at(name));
-		}
+		});
 		return conditions;
 	}
 
@@ -404,10 +392,7 @@ namespace ptne
 
 	vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<string>& placesNames) const
 	{
-		if(placesNames.size() != getNumberOfUniqueNames(placesNames))
-		{
-			throw RepeatedPlaceNamesException();
-		}
+		utility::detectRepeatedNames<string, RepeatedPlaceNamesException>(placesNames);
 
 		vector<WeakPtrPlace> placesVector;
 		for(const auto& placeName : placesNames)
@@ -458,5 +443,4 @@ namespace ptne
 		}
 		o << endl << endl;
 	}
-
 }
