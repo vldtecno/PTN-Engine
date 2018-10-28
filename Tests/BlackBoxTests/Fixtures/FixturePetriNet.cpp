@@ -105,7 +105,7 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 		/
 		(tokens[3]+tokens[5]);
 
-	EXPECT_TRUE(metric < 0.04);
+	EXPECT_TRUE(metric < 0.041f);
 
 }
 

@@ -45,9 +45,7 @@ void ElevatorController::initialize()
 		return;
 	}
 
-	m_pPetriNet = move(
-		PtrPetriNet(new ElevatorPetriNet(shared_from_this()))
-		);
+	m_pPetriNet = PtrPetriNet(new ElevatorPetriNet(shared_from_this()));
 }
 
 void ElevatorController::openDoors()

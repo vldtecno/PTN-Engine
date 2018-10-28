@@ -73,6 +73,9 @@ private:
 
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 
+	//! The state machine of the controller.
+	PtrPetriNet m_pPetriNet;
+
 	//! Floor where the elevator currently is.
 	int m_currentFloor;
 
@@ -108,9 +111,6 @@ private:
 	void printWaitingGoUp() const;
 	void printFloorList(const std::unordered_set<int>& floors) const;
 	void printSchedule() const;
-
-	//! The state machine of the controller.
-	PtrPetriNet m_pPetriNet;
 	
 	////////////////////
 	//Methods used by the petri net

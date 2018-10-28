@@ -37,7 +37,7 @@ public:
 	 * \param messageList List of messages.
 	 * \param selectedMessage Selected message from the list.
 	 */
-	void showMessagesList(const MessageList& messageList, const int selectedMessage);
+	void showMessagesList(const MessageList& messageList, const size_t selectedMessage);
 
 	/*!
 	 * Print the selected message on screen.

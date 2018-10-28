@@ -22,7 +22,7 @@
 
 using namespace std;
 
-void MessagesMenuView::showMessagesList(const MessageList& messageList, const int selectedMessage)
+void MessagesMenuView::showMessagesList(const MessageList& messageList, const size_t selectedMessage)
 {
 	for(size_t i = 0 ; i < messageList.size(); ++i)
 	{

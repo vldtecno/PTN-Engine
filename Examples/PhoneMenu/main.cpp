@@ -75,7 +75,7 @@ void programLoop(shared_ptr<Controller> controller)
 	} while(!exit);
 }
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
 	//Set up data
 	shared_ptr<Controller::MessageList> messageList = make_shared<Controller::MessageList>();

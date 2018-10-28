@@ -199,7 +199,7 @@ void programLoop(shared_ptr<ElevatorController> controller)
 	} while (!exit);
 }
 
-int main(int argc, char** argv)
+int main(int , char** )
 {
 	//Set up controller
 	shared_ptr<ElevatorController> controller = make_shared<ElevatorController>();
