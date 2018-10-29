@@ -22,7 +22,7 @@ include_directories(
 		${INCLUDE_DIR}
 		${PROJECT_SOURCE_DIR}/Tests/WhiteBoxTests 
 		${PROJECT_SOURCE_DIR}/PTN_Engine
-		${GTEST_INCLUDE_DIRS}
+		${GTEST_INCLUDE_DIR}
 	)
 
 file( GLOB_RECURSE Test_SRC
@@ -42,12 +42,7 @@ target_link_libraries(WhiteBoxTest PUBLIC
 if(NOT BUILD_SHARED_LIBS)
 	set_target_properties(WhiteBoxTest PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
 endif()	
-set_target_properties(WhiteBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})	
-	
-add_custom_command(TARGET WhiteBoxTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-	"${GTEST_ROOT}/bin"
-	$<TARGET_FILE_DIR:WhiteBoxTest>)
+set_target_properties(WhiteBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
  # Install rules
 if(INSTALL_TESTS)
