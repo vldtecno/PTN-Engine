@@ -19,7 +19,7 @@
 #pragma once
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include "PTN_Engine/PTN_Exception.h"
 #include "PTN_Engine/PTN_Engine.h"
@@ -90,106 +90,6 @@ namespace ptne
 		);
 
 		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param activationWeights A vector with the weights of each activation place.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param destinationWeights A vector with the weights of each destination place.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<size_t>& activationWeights,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<size_t>& destinationWeights);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param activationWeights A vector with the weights of each activation place.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param destinationWeights A vector with the weights of each destination place.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<size_t>& activationWeights,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<size_t>& destinationWeights,
-			const std::vector<std::string>& inhibitorPlaces);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param activationWeights A vector with the weights of each activation place.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param destinationWeights A vector with the weights of each destination place.
-		 * \param additionalConditions A vector with functors that return bool.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<size_t>& activationWeights,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<size_t>& destinationWeights,
-			const std::vector<ConditionFunctorPtr>& additionalConditions);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<std::string>& inhibitorPlaces);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param additionalConditions A vector with functors that return bool.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 * \param additionalConditions A vector with functors that return bool.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<std::string>& inhibitorPlaces,
-			const std::vector<ConditionFunctorPtr>& additionalConditions);
-
-		/*!
-		 * Create a new transition
-		 * \param activationPlaces A vector with the names of the activation places.
-		 * \param destinationPlaces A vector with the names of the destination places.
-		 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-		 * \param additionalConditions A vector with names to additional conditions.
-		 */
-		void createTransition(
-			const std::vector<std::string>& activationPlaces,
-			const std::vector<std::string>& destinationPlaces,
-			const std::vector<std::string>& inhibitorPlaces,
-			const std::vector<std::string>& additionalConditions);
-
-		/*!
 		 * Create a new place in the net.
 		 * \param name The name of the place.
 		 * \param initialNumberOfTokens The number of tokens to be initialized with.
@@ -217,30 +117,6 @@ namespace ptne
 			const size_t initialNumberOfTokens,
 			const std::string& onEnterAction,
 			const std::string& onExitAction,
-			const bool input = false);
-
-		/*!
-		 * Create a new place in the net.
-		 * \param name The name of the place.
-		 * \param initialNumberOfTokens The number of tokens to be initialized with.
-		 * \param input A flag determining if this place can have tokens added manually.
-		 */
-		void createPlace(
-			const std::string& name,
-			const size_t initialNumberOfTokens,
-			const bool input = false);
-
-		/*!
-		 * Create a new place in the net.
-		 * \param name The name of the place.
-		 * \param initialNumberOfTokens The number of tokens to be initialized with.
-		 * \param onEnterAction The functor to be called once a token enters the place.
-		 * \param input A flag determining if this place can have tokens added manually.
-		 */
-		void createPlace(
-			const std::string& name,
-			const size_t initialNumberOfTokens,
-			ActionFunctorPtr onEnterAction,
 			const bool input = false);
 
 		/*!
@@ -417,13 +293,13 @@ namespace ptne
 		 * removals during the lifetime of the net. Otherwise many
 		 * access operations are expected.
 		 */
-		std::map<std::string, SharedPtrPlace> m_places;
+		std::unordered_map<std::string, SharedPtrPlace> m_places;
 
 		//! Actions that can be called by the Petri net.
-		std::map<std::string, ActionFunctorPtr> m_actions;
+		std::unordered_map<std::string, ActionFunctorPtr> m_actions;
 
 		//! Conditions that can be used by the Petri net.
-		std::map<std::string, ConditionFunctorPtr> m_conditions;
+		std::unordered_map<std::string, ConditionFunctorPtr> m_conditions;
 
 		//! Translates a vector of names of places to a vector of weak pointers to those places.
 		/*!

@@ -72,7 +72,7 @@ namespace ptne
 		const vector<size_t>& destinationWeights)
 	{
 		m_implementation->createTransition(
-			activationPlaces, 
+			activationPlaces,
 			activationWeights,
 			destinationPlaces,
 			destinationWeights,
@@ -238,10 +238,10 @@ namespace ptne
 		const bool input)
 	{
 		m_implementation->createPlaceStr(name,
-				initialNumberOfTokens,
-				onEnterAction,
-				"",
-				input);
+			 initialNumberOfTokens,
+			 onEnterAction,
+			 "",
+			 input);
 	}
 
 	void PTN_Engine::registerAction(

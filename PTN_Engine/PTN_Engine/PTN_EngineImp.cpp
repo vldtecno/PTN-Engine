@@ -77,109 +77,6 @@ namespace ptne
 			getConditionFunctors(additionalConditions));
 	}
 
-	void PTN_Engine::PTN_EngineImp::createTransition(
-			const vector<string>& activationPlaces,
-			const vector<string>& destinationPlaces,			
-			const vector<string>& inhibitorPlaces,
-			const vector<ConditionFunctorPtr>& additionalConditions)
-	{
-		createTransition(
-			activationPlaces, 
-			vector<size_t>{},
-			destinationPlaces,
-			vector<size_t>{},
-			inhibitorPlaces,
-			additionalConditions);
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<size_t>& activationWeights,
-		const vector<string>& destinationPlaces,
-		const vector<size_t>& destinationWeights,
-		const vector<string>& inhibitorPlaces)
-	{
-		createTransition(
-			activationPlaces, 
-			activationWeights, 
-			destinationPlaces, 
-			destinationWeights, 
-			inhibitorPlaces, 
-			vector<ConditionFunctorPtr>{});
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<size_t>& activationWeights,
-		const vector<string>& destinationPlaces,
-		const vector<size_t>& destinationWeights,
-		const vector<ConditionFunctorPtr>& additionalConditions)
-	{
-		createTransition(
-			activationPlaces,
-			activationWeights,
-			destinationPlaces,
-			destinationWeights,	
-			vector<string>{},
-			additionalConditions);
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<string>& destinationPlaces)
-	{
-		createTransition(
-			activationPlaces,
-			vector<size_t>{},
-			destinationPlaces, 
-			vector<size_t>{},
-			vector<string>{},
-			vector<ConditionFunctorPtr>{});
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<string>& destinationPlaces,
-		const vector<string>& inhibitorPlaces)
-	{
-		createTransition(
-			activationPlaces,
-			vector<size_t>{},
-			destinationPlaces,
-			vector<size_t>{},
-			inhibitorPlaces, 
-			vector<ConditionFunctorPtr>{});
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<string>& destinationPlaces,
-		const vector<ConditionFunctorPtr>& additionalConditions)
-	{
-		createTransition(
-			activationPlaces,
-			vector<size_t>{},
-			destinationPlaces,
-			vector<size_t>{},
-			vector<string>{},
-			additionalConditions);
-	}
-
-	void PTN_Engine::PTN_EngineImp::createTransition(
-		const vector<string>& activationPlaces,
-		const vector<string>& destinationPlaces,
-		const vector<string>& inhibitorPlaces,
-		const vector<string>& additionalConditions)
-	{
-		createTransition(
-			activationPlaces,
-			vector<size_t>{},
-			destinationPlaces,
-			vector<size_t>{},
-			inhibitorPlaces,
-			getConditionFunctors(additionalConditions));
-	}
-
 	vector<Transition*> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
 	{
 		vector<Transition*> activeTransitions;
@@ -229,23 +126,6 @@ namespace ptne
 		ActionFunctorPtr onEnter = getActionFunctor(onEnterAction);
 		ActionFunctorPtr onExit = getActionFunctor(onExitAction);
 		createPlace(name, initialNumberOfTokens, onEnter, onExit, input);
-	}
-
-	void PTN_Engine::PTN_EngineImp::createPlace(
-		const string& name,
-		const size_t initialNumberOfTokens,
-		const bool input)
-	{
-		createPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
-	}
-
-	void PTN_Engine::PTN_EngineImp::createPlace(
-		const string& name,
-		const size_t initialNumberOfTokens,
-		ActionFunctorPtr onEnterAction,
-		const bool input)
-	{
-		createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
 	}
 
 	void PTN_Engine::PTN_EngineImp::registerAction(
