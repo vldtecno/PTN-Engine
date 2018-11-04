@@ -16,36 +16,37 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-add_library(google_test SHARED IMPORTED)
-
 include_directories(
 		${INCLUDE_DIR}
 		${PROJECT_SOURCE_DIR}/Tests/WhiteBoxTests 
 		${PROJECT_SOURCE_DIR}/PTN_Engine
-		${GTEST_INCLUDE_DIR}
+		${gtest_SOURCE_DIR}/include
 	)
 
 file( GLOB_RECURSE Test_SRC
 		"*.h"
 		"*.cpp"
 	)
-	
+
 add_executable (WhiteBoxTest ${Test_SRC})
 if(NOT BUILD_SHARED_LIBS AND MSVC)
 	target_compile_definitions(WhiteBoxTest PUBLIC GTEST_LINKED_AS_SHARED_LIBRARY)
 endif(NOT BUILD_SHARED_LIBS AND MSVC)
 
 target_link_libraries(WhiteBoxTest PUBLIC 
-	${GTEST_BOTH_LIBRARIES}
+	gtest 
+	gtest_main
+	gmock
+	gmock_main
 	PTN_Engine)	
-	
+
 if(NOT BUILD_SHARED_LIBS)
 	set_target_properties(WhiteBoxTest PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
 endif()	
 set_target_properties(WhiteBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
- # Install rules
+# Install rules
 if(INSTALL_TESTS)
-  install(TARGETS WhiteBoxTest
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	install(TARGETS WhiteBoxTest
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()  

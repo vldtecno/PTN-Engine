@@ -17,21 +17,24 @@
 cmake_minimum_required (VERSION 3.8)
 
 include_directories(
-	   ${INCLUDE_DIR}
-	   ${PROJECT_SOURCE_DIR}/Tests/BlackBoxTests 
-	   ${GTEST_INCLUDE_DIR}
-	)	
+		${INCLUDE_DIR}
+		${PROJECT_SOURCE_DIR}/Tests/BlackBoxTests
+		${gtest_SOURCE_DIR}/include
+	)
 
 file( GLOB_RECURSE BlackBoxTest_SRC
 		"*.h"
 		"*.cpp"
 	)
-	
+
 add_executable (BlackBoxTest ${BlackBoxTest_SRC})
 target_link_libraries(BlackBoxTest PUBLIC 
-	${GTEST_BOTH_LIBRARIES}
+	gtest
+	gtest_main
+	gmock
+	gmock_main
 	PTN_Engine)
-	
+
 if(NOT BUILD_SHARED_LIBS)
 	set_target_properties(BlackBoxTest PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
 endif()
@@ -39,7 +42,6 @@ set_target_properties(BlackBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFI
 
 # Install rules
 if(INSTALL_TESTS)
-  install(TARGETS BlackBoxTest
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	install(TARGETS BlackBoxTest
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
-
