@@ -18,18 +18,17 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
 #include "Mocks/Dispatcher/Dispatcher.h"
+#include "gtest/gtest.h"
 
 //! Fixture for testing a complete PTN net.
 /*!
  * To test a complete PTN Engine net from the users point of view.
  * It only uses the public interface.
  */
-class FixturePetriNet: public ::testing::Test
+class FixturePetriNet : public ::testing::Test
 {
 public:
-
 	//! Total number of places in the net.
 	const static size_t s_numberOfRoundRobinPlaces = 7;
 
@@ -70,12 +69,11 @@ public:
 	void testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces]);
 
 	/*!
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	void testThreadSafety();
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;
-
 };

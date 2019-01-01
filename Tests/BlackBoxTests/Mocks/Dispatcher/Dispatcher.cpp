@@ -23,21 +23,20 @@
 using namespace std;
 
 
-Dispatcher::Dispatcher():
-	m_pPetriNet{nullptr},
-	m_resetCounter{false},
-	m_isWaitingPackage{true},
-	m_isUsingChannelA{false},
-	m_isUsingChannelB{false},
-	m_isChannelASelected{true},
-	m_isChannelBSelected{false}
+Dispatcher::Dispatcher()
+: m_pPetriNet{ nullptr }
+, m_resetCounter{ false }
+, m_isWaitingPackage{ true }
+, m_isUsingChannelA{ false }
+, m_isUsingChannelB{ false }
+, m_isChannelASelected{ true }
+, m_isChannelBSelected{ false }
 {
-
 }
 
 void Dispatcher::initialize()
 {
-	if(m_pPetriNet)
+	if (m_pPetriNet)
 	{
 		return;
 	}
@@ -46,7 +45,8 @@ void Dispatcher::initialize()
 }
 
 Dispatcher::~Dispatcher()
-{}
+{
+}
 
 void Dispatcher::actionWaitPackage()
 {
@@ -110,7 +110,7 @@ void Dispatcher::setResetCounter(const bool resetCounter)
 
 void Dispatcher::dispatch()
 {
-	if(m_pPetriNet)
+	if (m_pPetriNet)
 	{
 		m_pPetriNet->dispatch();
 	}
@@ -118,30 +118,20 @@ void Dispatcher::dispatch()
 
 void Dispatcher::setRoundRobinMode()
 {
-	m_pPetriNet = move(
-		PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this()))
-	);
+	m_pPetriNet = move(PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this())));
 }
 
 void Dispatcher::setFreeChoiceMode()
 {
-	m_pPetriNet = move(
-		PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this()))
-	);
+	m_pPetriNet = move(PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this())));
 }
 
 void Dispatcher::setWeightedPN()
 {
-	m_pPetriNet = move(
-		PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this()))
-	);
+	m_pPetriNet = move(PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this())));
 }
 
 void Dispatcher::setInhibitedPN()
 {
-	m_pPetriNet = move(
-		PtrInhibitedPetriNet(new InhibitedPetriNet(shared_from_this()))
-	);
+	m_pPetriNet = move(PtrInhibitedPetriNet(new InhibitedPetriNet(shared_from_this())));
 }
-
-

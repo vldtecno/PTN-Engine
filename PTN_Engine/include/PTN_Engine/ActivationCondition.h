@@ -18,60 +18,57 @@
 
 #pragma once
 
-#include "PTN_Engine/Utilities/Explicit.h"
-#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include "PTN_Engine/IConditionFunctor.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/Utilities/Explicit.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <memory>
 
 namespace ptne
 {
-	//! Facilitates creating functors of additional conditions to be used by the net.
+//! Facilitates creating functors of additional conditions to be used by the net.
+/*!
+ * Facilitates creating functors of additional conditions to be used by the net.
+ * On evaluating if a transition can be fired an additional condition can be used.
+ * This condition is defined by the controller.
+ * \sa ptne::IConditionFunctor
+ */
+template <class C>
+class DLL_PUBLIC ActivationCondition final : public IConditionFunctor
+{
+public:
+	//! Member function pointer type.
+	using FireConditionMFPTR = bool (C::*)() const;
+
 	/*!
-	 * Facilitates creating functors of additional conditions to be used by the net.
-	 * On evaluating if a transition can be fired an additional condition can be used.
-	 * This condition is defined by the controller.
-	 * \sa ptne::IConditionFunctor
+	 * Constructor of the ActivationCondition functor.
+	 * \param controller Shared pointer to controller object.
+	 * \param memberFunctionPointer Member function to be invoked by the net.
 	 */
-	template <class C>
-	class DLL_PUBLIC ActivationCondition final:
-		public IConditionFunctor
+	ActivationCondition(std::shared_ptr<C> controller, FireConditionMFPTR memberFunctionPointer)
+	: m_parent{ controller }
+	, m_memberFunctionPointer{ memberFunctionPointer }
 	{
-	public:
+	}
 
-		//! Member function pointer type.
-		using FireConditionMFPTR = bool (C::*)() const;
-
-		/*!
-		 * Constructor of the ActivationCondition functor.
-		 * \param controller Shared pointer to controller object.
-		 * \param memberFunctionPointer Member function to be invoked by the net.
-		 */
-		ActivationCondition(std::shared_ptr<C> controller, FireConditionMFPTR memberFunctionPointer):
-			m_parent{controller},
-			m_memberFunctionPointer{memberFunctionPointer}
+	/*!
+	 * Function called by the net, which in its turn calls the
+	 * controller's member function.
+	 */
+	bool operator()() const override
+	{
+		if (std::shared_ptr<C> sptrController = lockWeakPtr(m_parent))
 		{
+			C &controller = *(sptrController);
+			return (controller.*(m_memberFunctionPointer))();
 		}
+		throw PTN_Exception("Unexpected invalid pointer");
+	}
 
-		/*!
-		 * Function called by the net, which in its turn calls the
-		 * controller's member function.
-		 */
-		bool operator()() const override
-		{
-			if(std::shared_ptr<C> sptrController = lockWeakPtr(m_parent))
-			{
-				C& controller = *(sptrController);
-				return (controller.*(m_memberFunctionPointer))();
-			}
-			throw PTN_Exception("Unexpected invalid pointer");
-		}
+	//! Weak pointer to controller.
+	std::weak_ptr<C> m_parent;
 
-		//! Weak pointer to controller.
-		std::weak_ptr<C> m_parent;
-
-		//! Function pointer to member function of the controller.
-		FireConditionMFPTR m_memberFunctionPointer;
-
-	};
-}
+	//! Function pointer to member function of the controller.
+	FireConditionMFPTR m_memberFunctionPointer;
+};
+} // namespace ptne

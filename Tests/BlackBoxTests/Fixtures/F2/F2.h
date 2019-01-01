@@ -18,17 +18,16 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
 #include "Mocks/Dispatcher/Dispatcher.h"
+#include "gtest/gtest.h"
 
 //! Fixture for testing a complete PTN net.
 /*!
  *
  */
-class F2: public ::testing::Test
+class F2 : public ::testing::Test
 {
 public:
-
 	//! Constructor.
 	F2();
 
@@ -44,5 +43,4 @@ public:
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;
-
 };

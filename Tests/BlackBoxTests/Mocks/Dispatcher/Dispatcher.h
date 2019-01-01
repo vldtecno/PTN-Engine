@@ -6,9 +6,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,22 +19,20 @@
 
 #pragma once
 
-#include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
+#include "PTN_Engine/ActivationCondition.h"
 
 
 //! Mock/fake controller class
 /*!
- * This is the controller of a package dispatcher that
- * has two channels available: A and B.
+ * This is the controller of a package dispatcher that has two channels available: A and B.
  * When a package arrives it can either use one or the other.
- * Required to inherit from std::enable_shared_from_this, in order
- * to provide the PTN Engine with a shared pointer to the controller.
+ * Required to inherit from std::enable_shared_from_this, in order to provide the PTN Engine with a shared pointer
+ * to the controller.
  */
-class Dispatcher: public std::enable_shared_from_this<Dispatcher>
+class Dispatcher : public std::enable_shared_from_this<Dispatcher>
 {
 private:
-
 	//! Interface for Petri nets controlling the logic of this dispatcher
 	class IDispatcherPetriNet;
 
@@ -101,7 +99,6 @@ private:
 	bool m_resetCounter;
 
 public:
-
 	Dispatcher();
 
 	~Dispatcher();
@@ -148,7 +145,6 @@ public:
 
 	//! Select inhibited Petri net.
 	void setInhibitedPN();
-
 };
 
 template class ptne::Action<Dispatcher>;
@@ -157,7 +153,7 @@ using DispatcherAction = ptne::Action<Dispatcher>;
 template class ptne::ActivationCondition<Dispatcher>;
 using DispatcherFireCondition = ptne::ActivationCondition<Dispatcher>;
 
-#include "Mocks/Dispatcher/RoundRobinPetriNet.h"
 #include "Mocks/Dispatcher/FreeChoicePetriNet.h"
-#include "Mocks/Dispatcher/WeightedPetriNet.h"
 #include "Mocks/Dispatcher/InhibitedPetriNet.h"
+#include "Mocks/Dispatcher/RoundRobinPetriNet.h"
+#include "Mocks/Dispatcher/WeightedPetriNet.h"

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/Action.h"
+#include "PTN_Engine/ActivationCondition.h"
 
 //! Sample controller.
 /*!
@@ -28,7 +28,6 @@
 class Controller final
 {
 public:
-
 	//! Constructor.
 	Controller();
 
@@ -51,7 +50,6 @@ public:
 	void setFireCondition(const bool);
 
 private:
-
 	//! Counter of times entered.
 	size_t m_enterCounter;
 
@@ -60,7 +58,6 @@ private:
 
 	//! Activation condition.
 	bool m_canFire;
-
 };
 
 template class ptne::Action<Controller>;
@@ -68,6 +65,3 @@ using ControllerAction = ptne::Action<Controller>;
 
 template class ptne::ActivationCondition<Controller>;
 using ControllerFireCondition = ptne::ActivationCondition<Controller>;
-
-
-

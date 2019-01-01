@@ -23,31 +23,26 @@
 using namespace ptne;
 using namespace std;
 
-Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatcher):
-	PTN_Engine{}
+Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
+: PTN_Engine{}
 {
 
-	//Places
+	// Places
 	createPlace("InputWaitPackage", 0, true);
-	createPlace("WaitPackage",0);
+	createPlace("WaitPackage", 0);
 	createPlace("ChannelA", 0);
 	createPlace("ChannelB", 0);
 
 
-	//Transitions
+	// Transitions
 
-	createTransition(
-			{"InputWaitPackage"}, //activation
-			vector<size_t>{1},
-			{"WaitPackage"}, //destination
-			vector<size_t>{1});
+	createTransition({ "InputWaitPackage" }, // activation
+					 vector<size_t>{ 1 }, { "WaitPackage" }, // destination
+					 vector<size_t>{ 1 });
 
-	createTransition(
-			{"WaitPackage"}, //activation
-			vector<size_t>{3},
-			{"ChannelA", "ChannelB"}, //destination
-			vector<size_t>{4, 10});
-
+	createTransition({ "WaitPackage" }, // activation
+					 vector<size_t>{ 3 }, { "ChannelA", "ChannelB" }, // destination
+					 vector<size_t>{ 4, 10 });
 }
 
 void Dispatcher::WeightedPetriNet::dispatch()

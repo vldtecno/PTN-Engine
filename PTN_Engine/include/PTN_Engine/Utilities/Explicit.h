@@ -6,24 +6,25 @@
 
 #pragma once
 
-
+// clang-format off
 #if defined(WIN32)
-	#ifdef _EXPORTING
-		#define DLL_PUBLIC __declspec(dllexport)
-	#else
-		#define DLL_PUBLIC __declspec(dllimport)
-	#endif
-	#define DLL_HIDDEN
+    #ifdef _EXPORTING
+        #define DLL_PUBLIC __declspec(dllexport)
+    #else
+            #define DLL_PUBLIC __declspec(dllimport)
+    #endif
+    #define DLL_HIDDEN
 #elif defined(__GNUC__)
-	//GCC
-	#ifdef _EXPORTING
-		#define DLL_PUBLIC __attribute__((visibility("default")))
-		#define DLL_HIDDEN __attribute__((visibility("hidden")))
-	#else
-		#define DLL_PUBLIC
-		#define DLL_HIDDEN
-	#endif
+    // GCC
+    #ifdef _EXPORTING
+        #define DLL_PUBLIC __attribute__((visibility("default")))
+        #define DLL_HIDDEN __attribute__((visibility("hidden")))
+    #else
+        #define DLL_PUBLIC
+        #define DLL_HIDDEN
+    #endif
 #else
-	#define DLL_PUBLIC
-	#define DLL_HIDDEN
+    #define DLL_PUBLIC
+    #define DLL_HIDDEN
 #endif
+// clang-format on

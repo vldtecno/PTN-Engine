@@ -23,96 +23,100 @@
 
 namespace ptne
 {
-	using namespace std;
+using namespace std;
 
-	Place::Place(const size_t initialNumberOfTokens,
-			ActionFunctorPtr onEnterEventHandler,
-			ActionFunctorPtr onExitEventHandler,
-			const bool input):
-		m_onEnterAction{onEnterEventHandler},
-		m_onExitAction{onExitEventHandler},
-		m_numberOfTokens{initialNumberOfTokens},
-		m_isInputPlace{input}
-	{}
-
-	Place::~Place()
-	{}
-
-	void Place::enterPlace(const size_t tokens)
-	{
-		increaseNumberOfTokens(tokens);
-		if(m_onEnterAction != nullptr)
-		{
-			(*m_onEnterAction)();
-		}
-	}
-
-	void Place::exitPlace(const size_t tokens)
-	{
-		decreaseNumberOfTokens(tokens);
-		if(m_onExitAction != nullptr)
-		{
-			(*m_onExitAction)();
-		}
-	}
-
-	void Place::increaseNumberOfTokens(const size_t tokens)
-	{
-		if(tokens == 0)
-		{
-			throw NullTokensException();
-		}
-
-		if(tokens > UINT_MAX - m_numberOfTokens)
-		{
-			throw OverflowException(tokens);
-		}
-
-		m_numberOfTokens += tokens;
-	}
-
-	void Place::decreaseNumberOfTokens(const size_t tokens)
-	{
-		if(m_numberOfTokens < tokens )
-		{
-			throw NotEnoughTokensException();
-		}
-		if(tokens == 0) //reset
-		{
-			m_numberOfTokens = 0;
-		}
-		else
-		{
-			m_numberOfTokens -= tokens;
-		}
-	}
-
-	void Place::setNumberOfTokens(const size_t tokens)
-	{
-		m_numberOfTokens = tokens;
-	}
-
-	size_t Place::getNumberOfTokens() const
-	{
-		return m_numberOfTokens;
-	}
-
-	bool Place::isInputPlace() const
-	{
-		return m_isInputPlace;
-	}
-
-	Place::NullTokensException::NullTokensException():
-		PTN_Exception("Number of tokens must greater than 0")
-	{}
-
-	Place::OverflowException::OverflowException(const size_t tooBig):
-		PTN_Exception(
-			"Cannot add "+to_string(tooBig)+" tokens to place without overflowing.")
-	{}
-
-	Place::NotEnoughTokensException::NotEnoughTokensException():
-		PTN_Exception("Not enough tokens in the place.")
-	{}
-
+Place::Place(const size_t initialNumberOfTokens,
+             ActionFunctorPtr onEnterEventHandler,
+             ActionFunctorPtr onExitEventHandler,
+             const bool input)
+: m_onEnterAction{ onEnterEventHandler }
+, m_onExitAction{ onExitEventHandler }
+, m_numberOfTokens{ initialNumberOfTokens }
+, m_isInputPlace{ input }
+{
 }
+
+Place::~Place()
+{
+}
+
+void Place::enterPlace(const size_t tokens)
+{
+	increaseNumberOfTokens(tokens);
+	if (m_onEnterAction != nullptr)
+	{
+		(*m_onEnterAction)();
+	}
+}
+
+void Place::exitPlace(const size_t tokens)
+{
+	decreaseNumberOfTokens(tokens);
+	if (m_onExitAction != nullptr)
+	{
+		(*m_onExitAction)();
+	}
+}
+
+void Place::increaseNumberOfTokens(const size_t tokens)
+{
+	if (tokens == 0)
+	{
+		throw NullTokensException();
+	}
+
+	if (tokens > UINT_MAX - m_numberOfTokens)
+	{
+		throw OverflowException(tokens);
+	}
+
+	m_numberOfTokens += tokens;
+}
+
+void Place::decreaseNumberOfTokens(const size_t tokens)
+{
+	if (m_numberOfTokens < tokens)
+	{
+		throw NotEnoughTokensException();
+	}
+	if (tokens == 0) // reset
+	{
+		m_numberOfTokens = 0;
+	}
+	else
+	{
+		m_numberOfTokens -= tokens;
+	}
+}
+
+void Place::setNumberOfTokens(const size_t tokens)
+{
+	m_numberOfTokens = tokens;
+}
+
+size_t Place::getNumberOfTokens() const
+{
+	return m_numberOfTokens;
+}
+
+bool Place::isInputPlace() const
+{
+	return m_isInputPlace;
+}
+
+Place::NullTokensException::NullTokensException()
+: PTN_Exception("Number of tokens must greater than 0")
+{
+}
+
+Place::OverflowException::OverflowException(const size_t tooBig)
+: PTN_Exception("Cannot add " + to_string(tooBig) + " tokens to place without overflowing.")
+{
+}
+
+Place::NotEnoughTokensException::NotEnoughTokensException()
+: PTN_Exception("Not enough tokens in the place.")
+{
+}
+
+} // namespace ptne

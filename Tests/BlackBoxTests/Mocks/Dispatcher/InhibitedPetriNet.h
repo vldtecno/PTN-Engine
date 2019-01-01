@@ -26,15 +26,12 @@
 /*!
  * The behaviour is defined in the constructor.
  */
-class Dispatcher::InhibitedPetriNet:
-		public IDispatcherPetriNet,
-		private ptne::PTN_Engine
+class Dispatcher::InhibitedPetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 {
-	//For testing purposes.
+	// For testing purposes.
 	friend class FixturePetriNet;
 
 public:
-
 	/*!
 	 * Constructor.
 	 * \param ptrDispatcher Shared pointer to the dispatcher.
@@ -43,5 +40,4 @@ public:
 
 	//! Trigger the dispatch process.
 	void dispatch() override;
-
 };

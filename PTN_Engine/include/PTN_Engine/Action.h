@@ -17,57 +17,52 @@
  */
 #pragma once
 
+#include "PTN_Engine/IActionFunctor.h"
 #include "PTN_Engine/Utilities/Explicit.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
-#include "PTN_Engine/IActionFunctor.h"
 #include <memory>
 
 namespace ptne
 {
-	//! Facilitates creating functors to be executed on enter and on exit.
+//! Facilitates creating functors to be executed on enter and on exit.
+/*!
+ * Facilitates creating functors to be executed on enter and on exit of tokens in places.
+ * \sa ptne::IActionFunctor
+ */
+template <class C>
+class DLL_PUBLIC Action final : public IActionFunctor
+{
+public:
+	//! Member function pointer type.
+	using ActionMFPTR = void (C::*)();
+
 	/*!
-	 * Facilitates creating functors to be executed on enter and on exit of
-	 * tokens in places.
-	 * \sa ptne::IActionFunctor
+	 * Constructor of the Action functor.
+	 * \param controller Shared pointer to controller object.
+	 * \param memberFunctionPointer Member function to be invoked by the net.
 	 */
-	template <class C>
-	class DLL_PUBLIC Action final:
-		public IActionFunctor
+	Action(std::shared_ptr<C> controller, ActionMFPTR memberFunctionPointer)
+	: m_parent{ controller }
+	, m_memberFunctionPointer{ memberFunctionPointer }
 	{
-	public:
+	}
 
-		//! Member function pointer type.
-		using ActionMFPTR = void (C::*)();
-
-		/*!
-		 * Constructor of the Action functor.
-		 * \param controller Shared pointer to controller object.
-		 * \param memberFunctionPointer Member function to be invoked by the net.
-		 */
-		Action(std::shared_ptr<C> controller, ActionMFPTR memberFunctionPointer):
-			m_parent{controller},
-			m_memberFunctionPointer{memberFunctionPointer}
+	/*!
+	 * Function called by the net, which in its turn calls the controller's member function.
+	 */
+	void operator()() override
+	{
+		if (std::shared_ptr<C> sptrController = lockWeakPtr(m_parent))
 		{
+			C &controller = *(sptrController);
+			(controller.*(m_memberFunctionPointer))();
 		}
+	}
 
-		/*!
-		 * Function called by the net, which in its turn calls the
-		 * controller's member function.
-		 */
-		void operator()() override
-		{
-			if(std::shared_ptr<C> sptrController = lockWeakPtr(m_parent))
-			{
-				C& controller = *(sptrController);
-				(controller.*(m_memberFunctionPointer))();
-			}
-		}
+	//! Weak pointer to controller.
+	std::weak_ptr<C> m_parent;
 
-		//! Weak pointer to controller.
-		std::weak_ptr<C> m_parent;
-
-		//! Function pointer to member function of the controller.
-		ActionMFPTR m_memberFunctionPointer;
-
-	};
-}
+	//! Function pointer to member function of the controller.
+	ActionMFPTR m_memberFunctionPointer;
+};
+} // namespace ptne

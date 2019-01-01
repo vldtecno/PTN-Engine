@@ -23,47 +23,42 @@
 using namespace ptne;
 using namespace std;
 
-Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispatcher):
-	PTN_Engine{}
+Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
+: PTN_Engine{}
 {
 
-	//Places
+	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("P1",1);
-	createPlace("P2",1);
-	createPlace("P3",1);
-	createPlace("P4",0);
-	createPlace("P5",0);
+	createPlace("P1", 1);
+	createPlace("P2", 1);
+	createPlace("P3", 1);
+	createPlace("P4", 0);
+	createPlace("P5", 0);
 
-	//Transitions
-
-
-	createTransition(
-			{"InputWaitPackage", "P1", "P3"}, //activation
-			{"P4"} //destination
-			);
+	// Transitions
 
 
-	createTransition(
-			{"P2"}, //activation
-			{"P5"}, //destination
-			{"P3"} //inhibitor arc
-			);
+	createTransition({ "InputWaitPackage", "P1", "P3" }, // activation
+					 { "P4" } // destination
+	);
 
 
-	createTransition(
-			{"InputWaitPackage", "P4"}, //activation
-			{"P1", "P3"} //destination
-			);
+	createTransition({ "P2" }, // activation
+					 { "P5" }, // destination
+					 { "P3" } // inhibitor arc
+	);
 
 
-	createTransition(
-			{"P5"}, //activation
-			{"P2"}, //destination
-			{"P4"} //inhibitor arc
-			);
+	createTransition({ "InputWaitPackage", "P4" }, // activation
+					 { "P1", "P3" } // destination
+	);
 
+
+	createTransition({ "P5" }, // activation
+					 { "P2" }, // destination
+					 { "P4" } // inhibitor arc
+	);
 }
 
 void Dispatcher::InhibitedPetriNet::dispatch()

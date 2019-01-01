@@ -18,17 +18,16 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
+#include "Mocks/Controller.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Transition.h"
+#include "gtest/gtest.h"
 #include <memory>
-#include "Mocks/Controller.h"
 
 //! Fixture to test transitions.
-class FixtureTestTransition: public ::testing::Test
+class FixtureTestTransition : public ::testing::Test
 {
 public:
-
 	//! Constructor.
 	FixtureTestTransition();
 
@@ -46,11 +45,11 @@ public:
 	 * \param expectedFireResult If it is expected that the condition fires.
 	 */
 	void createTransition(const std::vector<size_t> inputTokens,
-			const std::vector<size_t> outputTokens,
-			const std::vector<size_t> expectedInputTokens,
-			const std::vector<size_t> expectedOutputTokens,
-			VectorOfConditions conditions,
-			const bool expectedFireResult);
+						  const std::vector<size_t> outputTokens,
+						  const std::vector<size_t> expectedInputTokens,
+						  const std::vector<size_t> expectedOutputTokens,
+						  VectorOfConditions conditions,
+						  const bool expectedFireResult);
 
 
 	/*!
@@ -64,15 +63,14 @@ public:
 	 * \param conditions Additional conditions from the controller.
 	 * \param expectedFireResult If it is expected that the condition fires.
 	 */
-	void createTransitionWithWeights(
-			const std::vector<size_t> inputTokens,
-			const std::vector<size_t> inputWeights,
-			const std::vector<size_t> outputTokens,
-			const std::vector<size_t> outputWeights,
-			const std::vector<size_t> expectedInputTokens,
-			const std::vector<size_t> expectedOutputTokens,
-			VectorOfConditions conditions,
-			const bool expectedFireResult);
+	void createTransitionWithWeights(const std::vector<size_t> inputTokens,
+									 const std::vector<size_t> inputWeights,
+									 const std::vector<size_t> outputTokens,
+									 const std::vector<size_t> outputWeights,
+									 const std::vector<size_t> expectedInputTokens,
+									 const std::vector<size_t> expectedOutputTokens,
+									 VectorOfConditions conditions,
+									 const bool expectedFireResult);
 
 	/*!
 	 * Utility function. Creates vector of shared pointers to places from a vector of
@@ -88,13 +86,10 @@ public:
 	 * \param Vector of shared pointers to places.
 	 * \return Vector of weak pointers to vector of shared pointers.
 	 */
-	std::vector<std::weak_ptr<ptne::Place>> createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> places);
+	std::vector<std::weak_ptr<ptne::Place>>
+	createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> places);
 
 protected:
-
 	//!
 	std::shared_ptr<Controller> m_controller;
-
-
-
 };

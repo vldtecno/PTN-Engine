@@ -20,16 +20,16 @@
 
 #include "Mocks/Dispatcher/Dispatcher.h"
 
-//!Base class for a PTN Engine net that controls the dispatcher.
+//! Base class for a PTN Engine net that controls the dispatcher.
 class Dispatcher::IDispatcherPetriNet
 {
 	friend class FixturePetriNet;
 
 public:
-
-	virtual ~IDispatcherPetriNet(){}
+	virtual ~IDispatcherPetriNet()
+	{
+	}
 
 	//! Trigger a dispatch process.
 	virtual void dispatch() = 0;
-
 };

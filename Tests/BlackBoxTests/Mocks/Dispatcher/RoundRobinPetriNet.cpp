@@ -23,69 +23,58 @@
 using namespace ptne;
 using namespace std;
 
-Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDispatcher):
-	PTN_Engine{}
+Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
+: PTN_Engine{}
 {
 
 
-	//Places
+	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage",1,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
+	createPlace("WaitPackage", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	createPlace("ChannelA", 0,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
+	createPlace("ChannelA", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
-	createPlace("ChannelB", 0,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
+	createPlace("ChannelB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelB),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelB));
 
-	createPlace("SelectA", 1,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectA),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelA));
+	createPlace("SelectA", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionSelectA),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveSelectChannelA));
 
-	createPlace("SelectB", 0,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionSelectB),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveSelectChannelB));
+	createPlace("SelectB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionSelectB),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveSelectChannelB));
 
 	createPlace("PackageCounter", 0);
 
 
-	//Transitions
+	// Transitions
 
-	//Use A
-	createTransition(
-			{"InputWaitPackage", "WaitPackage", "SelectA"}, //activation
-			{ "ChannelA", "PackageCounter"} //destination
-			);
+	// Use A
+	createTransition({ "InputWaitPackage", "WaitPackage", "SelectA" }, // activation
+					 { "ChannelA", "PackageCounter" } // destination
+	);
 
-	//Use B
-	createTransition(
-			{"InputWaitPackage", "WaitPackage", "SelectB"}, //activation
-			{"ChannelB", "PackageCounter"}//destination
-			);
+	// Use B
+	createTransition({ "InputWaitPackage", "WaitPackage", "SelectB" }, // activation
+					 { "ChannelB", "PackageCounter" } // destination
+	);
 
-	//Switch to A
-	createTransition({"ChannelA"}, //activation
-			{"SelectB", "WaitPackage"} //destination
-			);
+	// Switch to A
+	createTransition({ "ChannelA" }, // activation
+					 { "SelectB", "WaitPackage" } // destination
+	);
 
-	//Switch to B
-	createTransition(
-			{"ChannelB"}, //activation
-			{"SelectA", "WaitPackage"} //destination
-			);
+	// Switch to B
+	createTransition({ "ChannelB" }, // activation
+					 { "SelectA", "WaitPackage" } // destination
+	);
 
-	//Reset Counter
-	createTransition(
-			{"PackageCounter"}, //activation
-			{}, //destination
-			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
-			);
-
+	// Reset Counter
+	createTransition({ "PackageCounter" }, // activation
+					 {}, // destination
+					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
 }
 
 void Dispatcher::RoundRobinPetriNet::dispatch()

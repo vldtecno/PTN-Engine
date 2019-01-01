@@ -22,20 +22,19 @@
 
 namespace ptne
 {
-	//! Interface class for functors called by the net.
-	/*!
-	 * Interface for the functors to be called evaluating if
-	 * a transition can be fired or not.
-	 */
-	class DLL_PUBLIC IConditionFunctor
+//! Interface class for functors called by the net.
+/*!
+ * Interface for the functors to be called evaluating if a transition can be fired or not.
+ */
+class DLL_PUBLIC IConditionFunctor
+{
+public:
+	virtual ~IConditionFunctor()
 	{
-	public:
+	}
 
-		virtual ~IConditionFunctor(){}
+	//! Will be called evaluating if a transition is active.
+	virtual bool operator()() const = 0;
+};
 
-		//! Will be called evaluating if a transition is active.
-		virtual bool operator()() const = 0;
-
-	};
-
-}
+} // namespace ptne

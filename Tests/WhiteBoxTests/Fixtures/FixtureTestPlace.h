@@ -25,10 +25,9 @@
 
 
 //! Fixture to test places.
-class FixtureTestPlace: public ::testing::Test
+class FixtureTestPlace : public ::testing::Test
 {
 public:
-
 	//! Constructor.
 	FixtureTestPlace();
 
@@ -54,11 +53,9 @@ public:
 	void inputPlace();
 
 protected:
-
 	//! Mock/fake controller
 	std::shared_ptr<Controller> m_controller;
 
 	//! A PTN Engine place.
 	ptne::Place m_place;
-
 };

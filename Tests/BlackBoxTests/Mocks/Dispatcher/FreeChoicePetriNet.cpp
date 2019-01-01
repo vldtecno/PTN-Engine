@@ -23,80 +23,66 @@
 using namespace ptne;
 using namespace std;
 
-Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDispatcher):
-	PTN_Engine{}
+Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDispatcher)
+: PTN_Engine{}
 {
 
-	//Places
+	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage",1,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
+	createPlace("WaitPackage", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
 
-	createPlace("ChannelA", 0,
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
-			make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
+	createPlace("ChannelA", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
 
 	createPlace("CounterA", 0);
 
-	createPlace("ChannelB", 0,
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::actionChannelB),
-			make_shared<DispatcherAction>(ptrDispatcher,&Dispatcher::onLeaveChannelB));
+	createPlace("ChannelB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelB),
+				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelB));
 
 	createPlace("CounterB", 0);
 
 	createPlace("PackageCounter", 0);
 
 
-	//Transitions
+	// Transitions
 
-	//Use A
-	createTransition(
-			{"InputWaitPackage", "WaitPackage"}, //activation
-			{ "ChannelA", "PackageCounter"} //destination
-			);
+	// Use A
+	createTransition({ "InputWaitPackage", "WaitPackage" }, // activation
+					 { "ChannelA", "PackageCounter" } // destination
+	);
 
-	//Use B
-	createTransition(
-			{"InputWaitPackage", "WaitPackage"}, //activation
-			{"ChannelB", "PackageCounter"} //destination
-			);
+	// Use B
+	createTransition({ "InputWaitPackage", "WaitPackage" }, // activation
+					 { "ChannelB", "PackageCounter" } // destination
+	);
 
-	//From A back to waiting a package
-	createTransition(
-			{"ChannelA"}, //activation
-			{"WaitPackage", "CounterA"} //destination
-			);
+	// From A back to waiting a package
+	createTransition({ "ChannelA" }, // activation
+					 { "WaitPackage", "CounterA" } // destination
+	);
 
-	//From B back to waiting a package
-	createTransition(
-			{"ChannelB"}, //activation
-			{"WaitPackage", "CounterB"} //destination
-			);
+	// From B back to waiting a package
+	createTransition({ "ChannelB" }, // activation
+					 { "WaitPackage", "CounterB" } // destination
+	);
 
-	//Reset Counters
-	createTransition(
-			{"PackageCounter"}, //activation
-			{}, //destination
-			//additional conditions
-			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
-			);
+	// Reset Counters
+	createTransition({ "PackageCounter" }, // activation
+					 {}, // destination
+					 // additional conditions
+					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
 
-	createTransition(
-			{"CounterA"}, //activation
-			{}, //destination
-			//additional conditions
-			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
-			);
+	createTransition({ "CounterA" }, // activation
+					 {}, // destination
+					 // additional conditions
+					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
 
-	createTransition(
-			{"CounterB"}, //activation
-			{}, //destination
-			//additional conditions
-			{make_shared<DispatcherFireCondition>(ptrDispatcher,&Dispatcher::resetCounter)}
-			);
-
+	createTransition({ "CounterB" }, // activation
+					 {}, // destination
+					 // additional conditions
+					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
 }
 
 void Dispatcher::FreeChoicePetriNet::dispatch()

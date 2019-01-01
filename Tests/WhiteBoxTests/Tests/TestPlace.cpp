@@ -41,7 +41,7 @@ TEST_F(FixtureTestPlace, ExitPlaceDefault)
 
 TEST_F(FixtureTestPlace, EnterPlace)
 {
-	//TODO testar max int
+	// TODO testar max int
 	enterPlace(1);
 	enterPlace(2);
 	enterPlace(3);
@@ -49,7 +49,7 @@ TEST_F(FixtureTestPlace, EnterPlace)
 
 TEST_F(FixtureTestPlace, ExitPlace)
 {
-	//TODO testar max int
+	// TODO testar max int
 	enterPlace(4);
 	exitPlace(1);
 	exitPlace(2);
@@ -60,10 +60,7 @@ TEST_F(FixtureTestPlace, Overflow)
 {
 	enterPlace(UINT_MAX);
 
-	ASSERT_THROW(
-	m_place.enterPlace(1),
-	ptne::Place::OverflowException
-	);
+	ASSERT_THROW(m_place.enterPlace(1), ptne::Place::OverflowException);
 }
 
 TEST_F(FixtureTestPlace, NullTokens)
@@ -75,11 +72,5 @@ TEST_F(FixtureTestPlace, NullTokens)
 
 TEST_F(FixtureTestPlace, NotEnoughTokens)
 {
-	ASSERT_THROW(
-	m_place.exitPlace(1),
-	ptne::Place::NotEnoughTokensException
-	);
+	ASSERT_THROW(m_place.exitPlace(1), ptne::Place::NotEnoughTokensException);
 }
-
-
-

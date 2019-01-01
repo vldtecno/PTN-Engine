@@ -22,8 +22,8 @@
 
 using namespace std;
 
-F2::F2():
-	m_dispatcher(make_shared<Dispatcher>())
+F2::F2()
+: m_dispatcher(make_shared<Dispatcher>())
 {
 	m_dispatcher->initialize();
 }
@@ -35,7 +35,7 @@ void F2::testRegisteredMethods()
 
 	controller->startExecution();
 
-	//TODO get a better way to test
+	// TODO get a better way to test
 	EXPECT_EQ(1, controller->m_petriNet->getNumberOfTokens("P1"));
 	EXPECT_EQ(0, controller->m_petriNet->getNumberOfTokens("P2"));
 
@@ -47,7 +47,5 @@ void F2::testRepeatedRegisteredMethods()
 	std::shared_ptr<Controller> controller = make_shared<Controller>();
 	controller->initialize();
 
-	ASSERT_THROW(
-	controller->initialize(), ptne::PTN_Exception);
+	ASSERT_THROW(controller->initialize(), ptne::PTN_Exception);
 }
-

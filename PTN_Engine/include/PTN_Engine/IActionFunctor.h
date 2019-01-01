@@ -22,20 +22,19 @@
 
 namespace ptne
 {
-	//! Interface class for functors called by the net.
-	/*!
-	 * Interface for the functors to be called on enter and on exit
-	 * of tokens in places of the net.
-	 */
-	class DLL_PUBLIC IActionFunctor
+//! Interface class for functors called by the net.
+/*!
+ * Interface for the functors to be called on enter and on exit of tokens in places of the net.
+ */
+class DLL_PUBLIC IActionFunctor
+{
+public:
+	virtual ~IActionFunctor()
 	{
-	public:
+	}
 
-		virtual ~IActionFunctor(){}
+	//! Will be called on enter or on exit of tokens in a given place.
+	virtual void operator()() = 0;
+};
 
-		//! Will be called on enter or on exit of tokens in a given place.
-		virtual void operator()() = 0;
-
-	};
-
-}
+} // namespace ptne

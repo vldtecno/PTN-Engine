@@ -20,14 +20,12 @@
 
 using namespace ptne;
 
-FixtureTestPlace::FixtureTestPlace():
-	m_controller{std::make_shared<Controller>(Controller{})},
-	m_place{
-		size_t(0),
-		std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
-		std::make_shared<ControllerAction>(m_controller, &Controller::onExit)
-		}
-{}
+FixtureTestPlace::FixtureTestPlace()
+: m_controller{ std::make_shared<Controller>(Controller{}) }
+, m_place{ size_t(0), std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
+		   std::make_shared<ControllerAction>(m_controller, &Controller::onExit) }
+{
+}
 
 void FixtureTestPlace::enterPlace()
 {
@@ -36,8 +34,8 @@ void FixtureTestPlace::enterPlace()
 
 	m_place.enterPlace();
 
-	EXPECT_EQ(numberOfTokens+1, m_place.getNumberOfTokens());
-	EXPECT_EQ(enterCounter+1, m_controller->getEnterCounter());
+	EXPECT_EQ(numberOfTokens + 1, m_place.getNumberOfTokens());
+	EXPECT_EQ(enterCounter + 1, m_controller->getEnterCounter());
 }
 
 void FixtureTestPlace::exitPlace()
@@ -48,10 +46,10 @@ void FixtureTestPlace::exitPlace()
 
 	size_t expectedNumberOfTokens = numberOfTokens;
 	size_t expectedExitCounter = exitCounter;
-	if(shouldFire)
+	if (shouldFire)
 	{
-		expectedNumberOfTokens = expectedNumberOfTokens-1;
-		expectedExitCounter = exitCounter+1;
+		expectedNumberOfTokens = expectedNumberOfTokens - 1;
+		expectedExitCounter = exitCounter + 1;
 
 		m_place.exitPlace();
 	}
@@ -62,8 +60,6 @@ void FixtureTestPlace::exitPlace()
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
 	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
-
-
 }
 
 void FixtureTestPlace::enterPlace(const size_t tokens)
@@ -73,8 +69,8 @@ void FixtureTestPlace::enterPlace(const size_t tokens)
 
 	m_place.enterPlace(tokens);
 
-	EXPECT_EQ(numberOfTokens+tokens, m_place.getNumberOfTokens());
-	EXPECT_EQ(enterCounter+1, m_controller->getEnterCounter());
+	EXPECT_EQ(numberOfTokens + tokens, m_place.getNumberOfTokens());
+	EXPECT_EQ(enterCounter + 1, m_controller->getEnterCounter());
 }
 
 void FixtureTestPlace::exitPlace(const size_t tokens)
@@ -85,10 +81,10 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 
 	size_t expectedNumberOfTokens = numberOfTokens;
 	size_t expectedExitCounter = exitCounter;
-	if(shouldFire)
+	if (shouldFire)
 	{
-		expectedNumberOfTokens = expectedNumberOfTokens-tokens;
-		expectedExitCounter = exitCounter+1;
+		expectedNumberOfTokens = expectedNumberOfTokens - tokens;
+		expectedExitCounter = exitCounter + 1;
 
 		m_place.exitPlace(tokens);
 	}
@@ -103,12 +99,7 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 
 void FixtureTestPlace::inputPlace()
 {
-	ptne::Place inputPlace(
-			size_t(0),
-			std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
-			std::make_shared<ControllerAction>(m_controller, &Controller::onExit)
-			);
+	ptne::Place inputPlace(size_t(0), std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
+						   std::make_shared<ControllerAction>(m_controller, &Controller::onExit));
 	EXPECT_EQ(false, inputPlace.isInputPlace());
 }
-
-

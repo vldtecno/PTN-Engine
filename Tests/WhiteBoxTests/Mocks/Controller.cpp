@@ -18,12 +18,11 @@
 
 #include "Mocks/Controller.h"
 
-Controller::Controller():
-	m_enterCounter{0},
-	m_exitCounter{0},
-	m_canFire{true}
+Controller::Controller()
+: m_enterCounter{ 0 }
+, m_exitCounter{ 0 }
+, m_canFire{ true }
 {
-
 }
 
 void Controller::onEnter()
@@ -55,4 +54,3 @@ void Controller::setFireCondition(const bool canFire)
 {
 	m_canFire = canFire;
 }
-

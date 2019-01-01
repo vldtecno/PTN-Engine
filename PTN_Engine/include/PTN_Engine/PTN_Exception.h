@@ -19,10 +19,10 @@
 #pragma once
 
 #ifdef _MSC_FULL_VER
- // Disable warning about exporting PTN_Exception inheriting from 
- // std::runtime_error, which might have been compiled differently
- // by the client linking to PTN Engine.
-#pragma warning( disable : 4275 )  
+// Disable warning about exporting PTN_Exception inheriting from
+// std::runtime_error, which might have been compiled differently
+// by the client linking to PTN Engine.
+#pragma warning(disable : 4275)
 #endif
 
 #include "PTN_Engine/Utilities/Explicit.h"
@@ -30,14 +30,13 @@
 
 namespace ptne
 {
-	//! Exception base type used in the PTN Engine.
-	class DLL_PUBLIC PTN_Exception: public std::runtime_error
+//! Exception base type used in the PTN Engine.
+class DLL_PUBLIC PTN_Exception : public std::runtime_error
+{
+public:
+	explicit PTN_Exception(const std::string &msg)
+	: std::runtime_error(msg)
 	{
-	public:
-
-		explicit PTN_Exception(const std::string& msg):
-			std::runtime_error(msg)
-		{}
-
-	};
-}
+	}
+};
+} // namespace ptne
