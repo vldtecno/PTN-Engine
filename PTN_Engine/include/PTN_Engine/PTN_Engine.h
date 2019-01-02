@@ -22,12 +22,15 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace ptne
 {
 class IConditionFunctor;
 class IActionFunctor;
+class IExporter;
+class IImporter;
 
 
 using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
@@ -43,10 +46,6 @@ class DLL_PUBLIC PTN_Engine
 {
 public:
 	virtual ~PTN_Engine();
-
-protected:
-	//! Default constructor
-	PTN_Engine();
 
 	/*!
 	 * Create a new transition
@@ -277,6 +276,23 @@ protected:
 	 * \param o Output stream.
 	 */
 	void printState(std::ostream &o) const;
+
+	/*!
+	 * \brief Exports the Petri net using the provided exporter.
+	 * \param exporter Object capable of exporting all important information about the Petri net's structure to
+	 * some other format.
+	 */
+	void export_(IExporter &exporter) const;
+
+	/*!
+	 * \brief Imports the Petri net using the provided importer.
+	 * \param importer Object containing all necessary information to create a new Petri net.
+	 */
+	void import(const IImporter &importer);
+
+protected:
+	//! Default constructor
+	PTN_Engine();
 
 private:
 	class PTN_EngineImp;

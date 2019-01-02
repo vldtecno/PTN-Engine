@@ -19,6 +19,6 @@ cmake_minimum_required (VERSION 3.8)
 
 add_subdirectory(PhoneMenu)
 add_subdirectory(Elevator)
-
-
-
+if(BUILD_IMPORT_EXPORT)
+	add_subdirectory(PhoneMenuXML)
+endif(BUILD_IMPORT_EXPORT)

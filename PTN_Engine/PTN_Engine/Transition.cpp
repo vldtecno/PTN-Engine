@@ -118,6 +118,26 @@ bool Transition::isActive() const
 	return true;
 }
 
+vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getActivationPlaces() const
+{
+	return m_activationPlaces;
+}
+
+vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getDestinationPlaces() const
+{
+	return m_destinationPlaces;
+}
+
+vector<ConditionFunctorPtr> Transition::getAdditionalActivationConditions() const
+{
+	return m_additionalActivationConditions;
+}
+
+std::vector<Transition::WeakPtrPlace> Transition::getInhibitorPlaces() const
+{
+	return m_inhibitorPlaces;
+}
+
 bool Transition::checkInhibitorPlaces() const
 {
 	for (const WeakPtrPlace &inhibitorPlace : m_inhibitorPlaces)

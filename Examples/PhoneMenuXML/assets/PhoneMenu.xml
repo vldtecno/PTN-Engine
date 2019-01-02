@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<PTN-Engine version="2.0" format="1" name="PhoneMenu">
+	<Places>
+		<Place name="InputA" isInput="true" />
+		<Place name="InputB" isInput="true" />
+		<Place name="InputC" isInput="true" />
+		<Place name="CallsMenuSelected" tokens="1" onEnterAction="showMainMenu" />	
+		<Place name="MessagesMenuSelected" onEnterAction="showMainMenu" />
+		<Place name="SelectMessagesOption" onEnterAction="selectMessagesOption" />
+		<Place name="SelectCallsOption" onEnterAction="selectCallsOption" />
+		<Place name="CallsLog" onEnterAction="showCallsMenu" />
+		<Place name="MessagesMenu" onEnterAction="showMessageMenu" />
+		<Place name="NextMessage" onEnterAction="selectNextMessage" />
+		<Place name="ShowMessage" onEnterAction="showMessage" />
+	</Places>
+	
+	<Transitions>		
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputA" />
+				<ActivationPlace name="CallsMenuSelected" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="SelectMessagesOption" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="SelectMessagesOption"  />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="MessagesMenuSelected" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputA" />
+				<ActivationPlace name="MessagesMenuSelected" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="SelectCallsOption" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="SelectCallsOption" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="CallsMenuSelected" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputB" />
+				<ActivationPlace name="CallsMenuSelected" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="CallsLog" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputC" />
+				<ActivationPlace name="CallsLog" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="CallsMenuSelected" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputB" />
+				<ActivationPlace name="MessagesMenuSelected" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="MessagesMenu" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputC" />
+				<ActivationPlace name="MessagesMenu" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="MessagesMenuSelected" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputA" />
+				<ActivationPlace name="MessagesMenu" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="NextMessage" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="NextMessage" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="MessagesMenu" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputB" />
+				<ActivationPlace name="MessagesMenu" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="ShowMessage" />
+			</DestinationPlaces>			
+		</Transition>
+		<Transition>
+			<ActivationPlaces>
+				<ActivationPlace name="InputC" />
+				<ActivationPlace name="ShowMessage" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="MessagesMenu" />
+			</DestinationPlaces>			
+		</Transition>
+		
+	</Transitions>
+
+</PTN-Engine>
+

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<PTN-Engine version="2.0" format="1" name="Something">
+	<Places>
+		<Place name="P01" />
+		<Place name="P02" tokens="" />
+		<Place name="P11" onExitAction="" />
+		<Place name="P12" onEnterAction="" />
+		<Place name="P13" isInput="" />
+		<Place name="P14" tokens="" onExitAction="" />
+		<Place name="P15" tokens="" onEnterAction="" />
+		<Place name="P16" tokens="" isInput="" />
+		<Place name="P17" tokens="" onEnterAction="" />
+		<Place name="P18" tokens="" onExitAction="" />		
+		<Place name="P19" onExitAction="" onEnterAction="" />
+		<Place name="P20" onExitAction="" isInput="" />
+		<Place name="P21" onEnterAction="" isInput="" />
+		<Place name="P22" tokens="" onExitAction="" onEnterAction="" />
+		<Place name="P23" tokens="" onExitAction="" isInput="" />		
+		<Place name="P24" tokens="" onEnterAction="" isInput="" />
+		<Place name="P25" onExitAction="" onEnterAction="" isInput="" />
+		<Place name="P26" tokens="" isInput="" onEnterAction="" onExitAction="" />
+
+		<Place name="P27" tokens="0" isInput="" onEnterAction="" onExitAction="" />
+		<Place name="P28" tokens="1" isInput="" onEnterAction="" onExitAction="" />
+		<Place name="P29" tokens="2" isInput="true" onEnterAction="" onExitAction="" />
+		<Place name="P30" tokens="0" isInput="false" onEnterAction="" onExitAction="" />
+		<Place name="P31" tokens="0" isInput="false" onEnterAction="action1" onExitAction="" />
+		<Place name="P32" tokens="0" isInput="false" onEnterAction="" onExitAction="action2" />
+		<Place name="P33" tokens="0" isInput="false" onEnterAction="action1" onExitAction="action2" />	
+	</Places>
+	
+	<Transitions>		
+		<Transition name="t1">
+			<ActivationConditions>
+				<ActivationCondition name="condition1" />
+				<ActivationCondition name="condititon2" />
+			</ActivationConditions>
+			<InhibitorPlaces>
+				<InhibitorPlace name="P1"/>
+			</InhibitorPlaces>
+			<ActivationPlaces>
+				<ActivationPlace name="P2" weight="1" />
+				<ActivationPlace name="P3" weight="2"/>
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="P4" weight="1"/>
+				<DestinationPlace name="P5" weight="2"/>
+			</DestinationPlaces>			
+		</Transition>
+
+		<Transition name="t2">
+			<ActivationConditions>
+				<ActivationCondition name="condititon2" />
+			</ActivationConditions>
+			<InhibitorPlaces>
+				<InhibitorPlace name="P1"/>
+			</InhibitorPlaces>
+			<ActivationPlaces>
+				<ActivationPlace name="P4" weight="1" />
+			</ActivationPlaces>
+			<DestinationPlaces>
+				<DestinationPlace name="P4" weight="1"/>
+				<DestinationPlace name="P5" weight="2"/>
+			</DestinationPlaces>			
+		</Transition>		
+	</Transitions>
+
+</PTN-Engine>
+

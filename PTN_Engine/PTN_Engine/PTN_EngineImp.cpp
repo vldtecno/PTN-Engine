@@ -17,10 +17,13 @@
  */
 
 #include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
+#include "PTN_Engine/IExporter.h"
+#include "PTN_Engine/IImporter.h"
 #include "PTN_Engine/PTN_Engine/Transition.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
+#include <algorithm>
 
 namespace ptne
 {
@@ -260,6 +263,85 @@ vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<
 		placesVector.push_back(m_places.at(placeName));
 	}
 	return placesVector;
+}
+
+void PTN_Engine::PTN_EngineImp::export_(IExporter &exporter) const
+{
+	exportPlaces(exporter);
+	exportTransitions(exporter);
+}
+
+void PTN_Engine::PTN_EngineImp::exportPlaces(IExporter &exporter) const
+{
+	for (const auto &place : m_places)
+	{
+		string onEnter;
+		auto itFound = find_if(m_actions.cbegin(), m_actions.cend(),
+							   [&](const auto &it) { return it.second == place.second->m_onEnterAction; });
+		if (itFound != m_actions.cend())
+		{
+			onEnter = itFound->first; // on enter
+		}
+
+		string onExit;
+		itFound = find_if(m_actions.cbegin(), m_actions.cend(),
+						  [&](const auto &it) { return it.second == place.second->m_onExitAction; });
+		if (itFound != m_actions.cend())
+		{
+			onExit = itFound->first; // on enter
+		}
+
+		exporter.exportPlace(place.first, std::to_string(place.second->getNumberOfTokens()),
+							 place.second->isInputPlace() ? "true" : "false", onEnter, onExit);
+	}
+}
+
+void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
+{
+	for (const auto &transition : m_transitions)
+	{
+		vector<tuple<string, size_t>> activationPlacesExport;
+		for (const auto &activationPlace : transition.getActivationPlaces())
+		{
+			tuple<string, size_t> activationPlaceExport;
+			get<0>(activationPlaceExport) = findName(get<0>(activationPlace).lock(), m_places);
+			get<1>(activationPlaceExport) = get<1>(activationPlace);
+			activationPlacesExport.emplace_back(activationPlaceExport);
+		}
+
+		vector<tuple<string, size_t>> destinationPlacesExport;
+		for (const auto &destinationPlace : transition.getDestinationPlaces())
+		{
+			tuple<string, size_t> destinationPlaceExport;
+			get<0>(destinationPlaceExport) = findName(get<0>(destinationPlace).lock(), m_places);
+			get<1>(destinationPlaceExport) = get<1>(destinationPlace);
+			destinationPlacesExport.emplace_back(destinationPlaceExport);
+		}
+
+		vector<string> activationConditionsNames;
+		for (const auto &activationCondition : transition.getAdditionalActivationConditions())
+		{
+			activationConditionsNames.emplace_back(findName(activationCondition, m_conditions));
+		}
+
+		vector<string> inhibitorPlacesNames;
+		for (const auto &inhibitorPlace : transition.getInhibitorPlaces())
+		{
+			inhibitorPlacesNames.emplace_back(findName(inhibitorPlace.lock(), m_places));
+		}
+
+		exporter.exportTransition(activationPlacesExport, destinationPlacesExport, activationConditionsNames,
+								  inhibitorPlacesNames);
+	}
+}
+
+void PTN_Engine::PTN_EngineImp::import(PTN_Engine &ptnEngine, const IImporter &importer)
+{
+	// TODO: Not exception safe, maybe this should go to a constructor instead.
+	m_places.clear();
+	m_transitions.clear();
+	importer.createPlaces(ptnEngine);
+	importer.createTransitions(ptnEngine);
 }
 
 PTN_Engine::PTN_EngineImp::InvalidNameException::InvalidNameException(const string &name)

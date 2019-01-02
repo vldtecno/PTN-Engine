@@ -52,8 +52,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/PTN_Engine/include)
 
+option(BUILD_IMPORT_EXPORT "Builds importer and exporters")
 option(BUILD_TESTS "Builds the unit tests" OFF)
 option(BUILD_EXAMPLES "Builds the examples" OFF)
+
 
 #Projects
 add_subdirectory(PTN_Engine)
@@ -65,7 +67,8 @@ if(BUILD_TESTS)
 	###
 	# from https://crascit.com/2015/07/25/cmake-gtest/
 	# Download and unpack googletest at configure time
-	configure_file(cmake/CMakeLists.txt.in googletest-download/CMakeLists.txt)
+	configure_file(cmake/gtest.CMakeLists.txt.in googletest-download/CMakeLists.txt)
+
 	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
 		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/googletest-download" )
 	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
@@ -93,6 +96,33 @@ if(BUILD_TESTS)
 	add_subdirectory(Tests/WhiteBoxTests)
 	add_subdirectory(Tests/BlackBoxTests)
 endif(BUILD_TESTS)
+
+if(BUILD_IMPORT_EXPORT)
+	### pugixml
+
+	configure_file(cmake/pugixml.CMakeLists.txt.in pugixml-download/CMakeLists.txt)
+
+	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pugixml-download" )
+	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pugixml-download" )
+	
+	#define PUGIXML_WCHAR_MODE
+#	add_definitions(-DPUGIXML_WCHAR_MODE)
+
+#	set(pugixml_force_shared_crt ON CACHE BOOL "" FORCE)
+
+
+	add_subdirectory("${CMAKE_BINARY_DIR}/pugixml-src"
+		"${CMAKE_BINARY_DIR}/pugixml-build")
+
+
+	include_directories("${pugixml_SOURCE_DIR}/include"
+		"${pugixml_SOURCE_DIR}/include")
+
+	######
+	add_subdirectory(ImportExport)
+endif(BUILD_IMPORT_EXPORT)
 
 if(BUILD_EXAMPLES)
 	option(INSTALL_EXAMPLES "Install examples" OFF)

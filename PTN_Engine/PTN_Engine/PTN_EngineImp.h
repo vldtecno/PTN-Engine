@@ -32,6 +32,8 @@ class Place;
 class Transition;
 class IConditionFunctor;
 class IActionFunctor;
+class IExporter;
+class IImporter;
 
 using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
 using ActionFunctorPtr = std::shared_ptr<IActionFunctor>;
@@ -157,6 +159,10 @@ public:
 	 */
 	void printState(std::ostream &o) const;
 
+	void export_(IExporter &exporter) const;
+
+	void import(PTN_Engine &ptnEngine, const IImporter &importer);
+
 	/*!
 	 * Exception to be thrown when trying to use a place with a wrong name.
 	 */
@@ -255,6 +261,34 @@ private:
 	 * \return Vector of unique pointers to active transitions.
 	 */
 	std::vector<Transition *> collectActiveTransitionsRandomly();
+
+	/*!
+	 *
+	 */
+	template <class PtrType, class ContainerType>
+	std::string findName(const PtrType &ptr, const ContainerType &container) const
+	{
+		std::string name;
+		auto itFound =
+		find_if(container.cbegin(), container.cend(), [&](const auto &it) { return it.second == ptr; });
+		if (itFound != container.cend())
+		{
+			name = itFound->first;
+		}
+		return name;
+	}
+
+	/*!
+	 * \brief exportPlaces
+	 * \param exporter
+	 */
+	void exportPlaces(IExporter &exporter) const;
+
+	/*!
+	 * \brief exportTransitions
+	 * \param exporter
+	 */
+	void exportTransitions(IExporter &exporter) const;
 
 	//! Vector with the transitions.
 	/*!

@@ -17,6 +17,8 @@
  */
 
 #include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/IExporter.h"
+#include "PTN_Engine/IImporter.h"
 #include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
 
@@ -196,6 +198,16 @@ void PTN_Engine::incrementInputPlace(const string &place)
 void PTN_Engine::printState(ostream &o) const
 {
     m_implementation->printState(o);
+}
+
+void PTN_Engine::export_(IExporter &exporter) const
+{
+    m_implementation->export_(exporter);
+}
+
+void PTN_Engine::import(const IImporter &importer)
+{
+    m_implementation->import(*this, importer);
 }
 
 } // namespace ptne

@@ -73,6 +73,14 @@ public:
 	 */
 	bool isActive() const;
 
+	std::vector<std::tuple<WeakPtrPlace, size_t>> getActivationPlaces() const;
+
+	std::vector<std::tuple<WeakPtrPlace, size_t>> getDestinationPlaces() const;
+
+	std::vector<ConditionFunctorPtr> getAdditionalActivationConditions() const;
+
+	std::vector<WeakPtrPlace> getInhibitorPlaces() const;
+
 	/*!
 	 * Exception to be thrown when the dimension of the vector containing the activation weights does not match
 	 * the dimension of the vector containing the names of the activation places.
