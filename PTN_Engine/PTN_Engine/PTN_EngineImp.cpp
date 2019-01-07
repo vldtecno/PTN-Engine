@@ -267,6 +267,7 @@ vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<
 
 void PTN_Engine::PTN_EngineImp::export_(IExporter &exporter) const
 {
+	unique_lock<mutex> guard(m_mutex);
 	exportPlaces(exporter);
 	exportTransitions(exporter);
 }
@@ -337,6 +338,7 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 
 void PTN_Engine::PTN_EngineImp::import(PTN_Engine &ptnEngine, const IImporter &importer)
 {
+	unique_lock<mutex> guard(m_mutex);
 	// TODO: Not exception safe, maybe this should go to a constructor instead.
 	m_places.clear();
 	m_transitions.clear();
