@@ -290,6 +290,8 @@ private:
 	 */
 	void exportTransitions(IExporter &exporter) const;
 
+	void clearNet();
+
 	//! Vector with the transitions.
 	/*!
 	 * Insertions on construction. Otherwise (should remain) unchanged.

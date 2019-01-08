@@ -338,12 +338,17 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 
 void PTN_Engine::PTN_EngineImp::import(PTN_Engine &ptnEngine, const IImporter &importer)
 {
-	unique_lock<mutex> guard(m_mutex);
 	// TODO: Not exception safe, maybe this should go to a constructor instead.
-	m_places.clear();
-	m_transitions.clear();
+	clearNet();
 	importer.createPlaces(ptnEngine);
 	importer.createTransitions(ptnEngine);
+}
+
+void PTN_Engine::PTN_EngineImp::clearNet()
+{
+	unique_lock<mutex> guard(m_mutex);
+	m_places.clear();
+	m_transitions.clear();
 }
 
 PTN_Engine::PTN_EngineImp::InvalidNameException::InvalidNameException(const string &name)
