@@ -46,11 +46,22 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
                                                  const vector<ConditionFunctorPtr> &additionalConditions)
 {
 	unique_lock<mutex> guard(m_mutex);
-	vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
+	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+						inhibitorPlaces, additionalConditions);
+}
 
-	vector<WeakPtrPlace> destinationPlacesVector = getPlacesFromNames(destinationPlaces);
+void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
+                                                    const vector<size_t> &activationWeights,
+                                                    const vector<string> &destinationPlaces,
+                                                    const vector<size_t> &destinationWeights,
+                                                    const vector<string> &inhibitorPlaces,
+                                                    const vector<ConditionFunctorPtr> &additionalConditions)
+{
+    vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
 
-	vector<WeakPtrPlace> inhibitorPlacesVector = getPlacesFromNames(inhibitorPlaces);
+    vector<WeakPtrPlace> destinationPlacesVector = getPlacesFromNames(destinationPlaces);
+
+    vector<WeakPtrPlace> inhibitorPlacesVector = getPlacesFromNames(inhibitorPlaces);
 
 	m_transitions.push_back(Transition(activationPlacesVector, activationWeights, destinationPlacesVector,
 									   destinationWeights, inhibitorPlacesVector, additionalConditions));
@@ -63,8 +74,20 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
                                                  const vector<string> &inhibitorPlaces,
                                                  const vector<string> &additionalConditions)
 {
-	createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights, inhibitorPlaces,
-					 getConditionFunctors(additionalConditions));
+	unique_lock<mutex> guard(m_mutex);
+	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+						inhibitorPlaces, getConditionFunctors(additionalConditions));
+}
+
+void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
+                                                    const vector<size_t> &activationWeights,
+                                                    const vector<string> &destinationPlaces,
+                                                    const vector<size_t> &destinationWeights,
+                                                    const vector<string> &inhibitorPlaces,
+                                                    const vector<string> &additionalConditions)
+{
+	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+						inhibitorPlaces, getConditionFunctors(additionalConditions));
 }
 
 vector<Transition *> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
@@ -88,6 +111,15 @@ void PTN_Engine::PTN_EngineImp::createPlace(const string &name,
                                             const bool input)
 {
 	unique_lock<mutex> guard(m_mutex);
+	createPlaceImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+}
+
+void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
+                                               const size_t initialNumberOfTokens,
+                                               ActionFunctorPtr onEnterAction,
+                                               ActionFunctorPtr onExitAction,
+                                               const bool input)
+{
 	if (m_places.find(name) != m_places.end())
 	{
 		throw RepeatedPlaceException(name);
@@ -108,9 +140,19 @@ void PTN_Engine::PTN_EngineImp::createPlaceStr(const string &name,
                                                const string &onExitAction,
                                                const bool input)
 {
+	unique_lock<mutex> guard(m_mutex);
+	createPlaceStrImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+}
+
+void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
+                                                  const size_t initialNumberOfTokens,
+                                                  const string &onEnterAction,
+                                                  const string &onExitAction,
+                                                  const bool input)
+{
 	ActionFunctorPtr onEnter = getActionFunctor(onEnterAction);
 	ActionFunctorPtr onExit = getActionFunctor(onExitAction);
-	createPlace(name, initialNumberOfTokens, onEnter, onExit, input);
+	createPlaceImp(name, initialNumberOfTokens, onEnter, onExit, input);
 }
 
 void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunctorPtr action)
@@ -336,17 +378,29 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 	}
 }
 
-void PTN_Engine::PTN_EngineImp::import(PTN_Engine &ptnEngine, const IImporter &importer)
+void PTN_Engine::PTN_EngineImp::import(const IImporter &importer)
 {
+	unique_lock<mutex> guard(m_mutex);
 	// TODO: Not exception safe, maybe this should go to a constructor instead.
 	clearNet();
-	importer.createPlaces(ptnEngine);
-	importer.createTransitions(ptnEngine);
+
+	// create places
+	for (const IImporter::PlaceInfo &placeInfo : importer.getPlaces())
+	{
+		createPlaceStrImp(get<0>(placeInfo), get<1>(placeInfo), get<2>(placeInfo), get<3>(placeInfo),
+						  get<4>(placeInfo));
+	}
+
+	// create transitions
+	for (const IImporter::TransitionInfo &transitionInfo : importer.getTransitions())
+	{
+		createTransitionImp(get<0>(transitionInfo), get<1>(transitionInfo), get<2>(transitionInfo),
+							get<3>(transitionInfo), get<4>(transitionInfo), get<5>(transitionInfo));
+	}
 }
 
 void PTN_Engine::PTN_EngineImp::clearNet()
 {
-	unique_lock<mutex> guard(m_mutex);
 	m_places.clear();
 	m_transitions.clear();
 }

@@ -42,16 +42,16 @@ public:
 	~XML_Importer() override;
 
 	/*!
-	 * \brief createPlaces
-	 * \param petriNet
+	 * \brief getPlaces
+	 * \return
 	 */
-	void createPlaces(PTN_Engine &petriNet) const override;
+	std::vector<PlaceInfo> getPlaces() const override;
 
 	/*!
-	 * \brief createTransitions
-	 * \param petriNet
+	 * \brief getTransitions
+	 * \return
 	 */
-	void createTransitions(PTN_Engine &petriNet) const override;
+	std::vector<TransitionInfo> getTransitions() const override;
 
 private:
 	// void collectDocumentInformation(const pugi::xml_document &doc) const;

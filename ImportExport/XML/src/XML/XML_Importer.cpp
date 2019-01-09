@@ -50,10 +50,12 @@ XML_Importer::~XML_Importer()
 {
 }
 
-void XML_Importer::createPlaces(PTN_Engine &petriNet) const
+vector<XML_Importer::PlaceInfo> XML_Importer::getPlaces() const
 {
+	vector<PlaceInfo> placesInfoCollection;
 	for (const xml_node &place : m_document.child("PTN-Engine").child("Places"))
 	{
+		PlaceInfo placeInfo;
 		bool isInput = false;
 		const string isInputStr = getAttributeValue(place, "isInput");
 		if (!isInputStr.empty())
@@ -68,26 +70,39 @@ void XML_Importer::createPlaces(PTN_Engine &petriNet) const
 			numberOfTokens = static_cast<size_t>(std::atol(numberOfTokensStr.c_str()));
 		}
 
-		petriNet.createPlace(getAttributeValue(place, "name"), numberOfTokens,
-							 getAttributeValue(place, "onEnterAction"), getAttributeValue(place, "onExitAction"),
-							 isInput);
+		get<0>(placeInfo) = getAttributeValue(place, "name");
+		get<1>(placeInfo) = numberOfTokens;
+		get<2>(placeInfo) = getAttributeValue(place, "onEnterAction");
+		get<3>(placeInfo) = getAttributeValue(place, "onExitAction");
+		get<4>(placeInfo) = isInput;
+
+		placesInfoCollection.emplace_back(placeInfo);
 	}
+	return placesInfoCollection;
 }
 
-void XML_Importer::createTransitions(PTN_Engine &petriNet) const
+vector<XML_Importer::TransitionInfo> XML_Importer::getTransitions() const
 {
+	vector<TransitionInfo> transitionInfoCollection;
 	for (xml_node transition : m_document.child("PTN-Engine").child("Transitions"))
 	{
+		TransitionInfo transitionInfo;
 		const vector<string> activationConditions =
 		collectTransitionAttributes(transition, "ActivationConditions");
 		const vector<string> inhibitorPlaces = collectTransitionAttributes(transition, "InhibitorPlaces");
 		const auto activationArcs = collectArcAttributes(transition, "ActivationPlaces");
 		const auto destinationArcs = collectArcAttributes(transition, "DestinationPlaces");
 
-		// Create Transition
-		petriNet.createTransition(activationArcs.first, activationArcs.second, destinationArcs.first,
-								  destinationArcs.second, inhibitorPlaces, activationConditions);
+		get<0>(transitionInfo) = activationArcs.first;
+		get<1>(transitionInfo) = activationArcs.second;
+		get<2>(transitionInfo) = destinationArcs.first;
+		get<3>(transitionInfo) = destinationArcs.second;
+		get<4>(transitionInfo) = inhibitorPlaces;
+		get<5>(transitionInfo) = activationConditions;
+
+		transitionInfoCollection.emplace_back(transitionInfo);
 	}
+	return transitionInfoCollection;
 }
 
 string XML_Importer::getAttributeValue(const xml_node &node, const string &attrName) const

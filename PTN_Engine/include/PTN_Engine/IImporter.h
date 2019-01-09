@@ -20,6 +20,7 @@
 
 #include "PTN_Engine/Utilities/Explicit.h"
 #include <string>
+#include <vector>
 
 namespace ptne
 {
@@ -30,8 +31,33 @@ class DLL_PUBLIC IImporter
 public:
 	virtual ~IImporter() = default;
 
-	virtual void createPlaces(PTN_Engine &petriNet) const = 0;
-	virtual void createTransitions(PTN_Engine &petriNet) const = 0;
+	using PlaceInfo = std::tuple<std::string, // name
+								 size_t, // number of tokens
+								 std::string, // on enter action
+								 std::string, // on exit action
+								 bool // is input place
+								 >;
+
+	/*!
+	 * \brief getPlaces
+	 * \return
+	 */
+	virtual std::vector<PlaceInfo> getPlaces() const = 0;
+
+
+	using TransitionInfo = std::tuple<std::vector<std::string>, // activation places
+									  std::vector<size_t>, // activation weights
+									  std::vector<std::string>, // destination places
+									  std::vector<size_t>, // destination weights
+									  std::vector<std::string>, // inhibitor places
+									  std::vector<std::string> // activation conditions
+									  >;
+
+	/*!
+	 * \brief getTransitions
+	 * \return
+	 */
+	virtual std::vector<TransitionInfo> getTransitions() const = 0;
 };
 
 } // namespace ptne

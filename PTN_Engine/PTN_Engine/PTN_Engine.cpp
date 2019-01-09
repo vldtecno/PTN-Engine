@@ -207,7 +207,7 @@ void PTN_Engine::export_(IExporter &exporter) const
 
 void PTN_Engine::import(const IImporter &importer)
 {
-    m_implementation->import(*this, importer);
+    m_implementation->import(importer);
 }
 
 } // namespace ptne
