@@ -17,70 +17,74 @@
  */
 
 #include "Controller/Controller.h"
-#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include "ImportExport/ExportFactory.h"
 #include "ImportExport/ImportFactory.h"
 #include "PTN_Engine/IExporter.h"
 #include "PTN_Engine/IImporter.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 
 #include <iostream>
 
 using namespace std;
 
-Controller::Controller():
-	m_pPetriNet{nullptr},
-	m_messageSelected(0)
+Controller::Controller()
+: m_petriNet()
+, m_messageSelected(0)
 {
 }
 
 Controller::~Controller()
-{}
+{
+}
+
+void Controller::initialize()
+{
+	m_petriNet.registerAction("showMainMenu",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::showMainMenu));
+	m_petriNet.registerAction("selectMessagesOption",
+							  make_shared<ControllerAction>(shared_from_this(),
+															&Controller::selectMessagesOption));
+	m_petriNet.registerAction("selectCallsOption",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::selectCallsOption));
+	m_petriNet.registerAction("showCallsMenu",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::showCallsMenu));
+	m_petriNet.registerAction("showMessageMenu",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::showMessageMenu));
+	m_petriNet.registerAction("selectNextMessage",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::selectNextMessage));
+	m_petriNet.registerAction("showMessage",
+							  make_shared<ControllerAction>(shared_from_this(), &Controller::showMessage));
+}
 
 void Controller::pressA()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressA();
-	}
+	m_petriNet.incrementInputPlace("InputA");
+	m_petriNet.execute();
 }
 
 void Controller::pressB()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressB();
-	}
+	m_petriNet.incrementInputPlace("InputB");
+	m_petriNet.execute();
 }
 
 void Controller::pressC()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressC();
-	}
+	m_petriNet.incrementInputPlace("InputC");
+	m_petriNet.execute();
 }
 
 void Controller::exportStateMachine(const string &filePath) const
 {
 	unique_ptr<ptne::IExporter> xmlExporter = ptne::ExportFactory::createXMLExporter();
-	m_pPetriNet->export_(*xmlExporter);
+	m_petriNet.export_(*xmlExporter);
 	xmlExporter->saveFile(filePath);
 }
 
 void Controller::importStateMachine(const string &filePath)
 {
 	unique_ptr<ptne::IImporter> xmlImporter = ptne::ImportFactory::createXMLImporter(filePath);
-	m_pPetriNet->import(*xmlImporter);
-}
-
-void Controller::initialize()
-{
-	if(m_pPetriNet)
-	{
-		return;
-	}
-
-	m_pPetriNet = PtrPetriNet(new MenuStateMachine(shared_from_this()));
+	m_petriNet.import(*xmlImporter);
 }
 
 void Controller::showMainMenu()
@@ -119,7 +123,7 @@ void Controller::selectNextMessage()
 {
 	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
 	++m_messageSelected;
-	if(m_messageSelected == messageList->size())
+	if (m_messageSelected == messageList->size())
 	{
 		m_messageSelected = 0;
 	}

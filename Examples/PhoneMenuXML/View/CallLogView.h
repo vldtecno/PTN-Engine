@@ -25,13 +25,11 @@
 class CallLogView
 {
 public:
-
 	CallLogView() = default;
 
 	/*!
 	 * Print the call logs on screen.
 	 * \param callLog List of calls.
 	 */
-	void viewCallLog(const List<Call>& callLog);
-
+	void viewCallLog(const List<Call> &callLog);
 };

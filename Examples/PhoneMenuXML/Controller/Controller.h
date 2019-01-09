@@ -21,31 +21,27 @@
 #include "Model/Call.h"
 #include "Model/List.h"
 #include "Model/Message.h"
+#include "PTN_Engine/Action.h"
+#include "PTN_Engine/ActivationCondition.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include "View/CallLogView.h"
 #include "View/MainMenuView.h"
 #include "View/MessagesMenuView.h"
-#include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
-#include "View/MainMenuView.h"
-
 
 //! Example of a controller class
 /*!
  * Controls the display of a simplified hypothetical phone's menus,
  * using only three keys.
  */
-class Controller: public std::enable_shared_from_this<Controller>
+class Controller : public std::enable_shared_from_this<Controller>
 {
 public:
-
 	using MessageList = List<Message>;
 
 	using CallList = List<Call>;
 
 	//! Constructor.
 	Controller();
-
-	~Controller();
 
 	//! Necessary to have an initialize method at this point.
 	/*!
@@ -54,7 +50,9 @@ public:
 	 */
 	void initialize();
 
-	//Set pointers to data sources
+	~Controller();
+
+	// Set pointers to data sources
 
 	//! Set the message data (owned by the application).
 	void setMessageList(std::shared_ptr<MessageList>);
@@ -63,7 +61,7 @@ public:
 	void setCallLog(std::shared_ptr<CallList>);
 
 
-	//Set pointers to view components
+	// Set pointers to view components
 
 	//! Set the view of the main menu (owned by the application).
 	void setMainMenuView(std::shared_ptr<MainMenuView>);
@@ -75,7 +73,7 @@ public:
 	void setCallLogView(std::shared_ptr<CallLogView>);
 
 
-	//Actions
+	// Actions
 
 	//! Triggers an event indicating key "A" was pressed.
 	void pressA();
@@ -91,15 +89,8 @@ public:
 	void importStateMachine(const std::string &filePath);
 
 private:
-
-	//! One concrete (nested) class of a Petri net based state machine.
-	class MenuStateMachine;
-
-
-	using PtrPetriNet = std::unique_ptr<MenuStateMachine>;
-
 	//! The state machine of the controller.
-	PtrPetriNet m_pPetriNet;
+	ptne::PTN_Engine m_petriNet;
 
 	//! Show the main menu on screen.
 	void showMainMenu();
@@ -123,7 +114,7 @@ private:
 	void showMessage();
 
 
-	//Views
+	// Views
 
 	//! A view of the main menu (owned by the application).
 	std::weak_ptr<MainMenuView> m_mainMenu;
@@ -135,7 +126,7 @@ private:
 	std::weak_ptr<CallLogView> m_callLogView;
 
 
-	//Data sources
+	// Data sources
 
 	//! The message data (owned by the application).
 	std::weak_ptr<MessageList> m_messageList;
@@ -144,7 +135,7 @@ private:
 	std::weak_ptr<CallList> m_callLog;
 
 
-	//Internals
+	// Internals
 
 	//! Index of the selected message.
 	size_t m_messageSelected;
@@ -159,5 +150,3 @@ template class ptne::ActivationCondition<Controller>;
 
 //!
 using ControllerFireCondition = ptne::ActivationCondition<Controller>;
-
-#include "../../../Examples/PhoneMenuXML/Controller/MenuStateMachine.h"

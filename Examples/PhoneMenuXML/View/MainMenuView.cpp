@@ -23,15 +23,13 @@
 
 using namespace std;
 
-MainMenuView::MainMenuView():
-	m_selection(0)
+MainMenuView::MainMenuView()
+: m_selection(0)
 {
-
 }
 
 MainMenuView::~MainMenuView()
 {
-
 }
 
 void MainMenuView::showMenu() const
@@ -40,7 +38,7 @@ void MainMenuView::showMenu() const
 	cout << "\tCall Log" << endl;
 	cout << "\tMessages" << endl << endl;
 	cout << "SELECTED: ";
-	switch(m_selection)
+	switch (m_selection)
 	{
 	default:
 		throw runtime_error("Undefined");
@@ -55,14 +53,15 @@ void MainMenuView::showMenu() const
 
 void MainMenuView::select(const int option)
 {
-	switch(option)
+	switch (option)
 	{
 	default:
 		throw runtime_error("Invalid option");
 	case 0:
-		m_selection = 0; break;
+		m_selection = 0;
+		break;
 	case 1:
-		m_selection = 1; break;
+		m_selection = 1;
+		break;
 	}
-
 }

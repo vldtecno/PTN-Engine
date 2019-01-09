@@ -22,11 +22,11 @@
 
 using namespace std;
 
-void CallLogView::viewCallLog(const List<Call>& callLog)
+void CallLogView::viewCallLog(const List<Call> &callLog)
 {
-	for(size_t i = 0 ; i < callLog.size(); ++i)
+	for (size_t i = 0; i < callLog.size(); ++i)
 	{
-		const Call& call = callLog.getItem(i);
+		const Call &call = callLog.getItem(i);
 		cout << call.m_date << " - " << call.m_number << endl;
 	}
 }

@@ -17,22 +17,21 @@
  */
 
 #pragma once
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
 //! A very simple list based on std::vector
 template <class T>
 class List
 {
 public:
-
 	List() = default;
 
 	/*!
 	 * Add an item to the list.
 	 * \param item Item.
 	 */
-	void addItem(const T& item)
+	void addItem(const T &item)
 	{
 		m_items.push_back(item);
 	}
@@ -51,9 +50,9 @@ public:
 	 * \param i Index of the selected item.
 	 * \return A copy of the item.
 	 */
-	T getItem(const size_t i ) const
+	T getItem(const size_t i) const
 	{
-		if(i < m_items.size())
+		if (i < m_items.size())
 		{
 			return m_items.at(i);
 		}
@@ -61,7 +60,6 @@ public:
 	}
 
 private:
-
 	//! Collection of items.
 	std::vector<T> m_items;
 };

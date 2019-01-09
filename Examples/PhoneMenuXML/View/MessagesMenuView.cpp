@@ -22,11 +22,11 @@
 
 using namespace std;
 
-void MessagesMenuView::showMessagesList(const MessageList& messageList, const size_t selectedMessage)
+void MessagesMenuView::showMessagesList(const MessageList &messageList, const size_t selectedMessage)
 {
-	for(size_t i = 0 ; i < messageList.size(); ++i)
+	for (size_t i = 0; i < messageList.size(); ++i)
 	{
-		if(i == selectedMessage)
+		if (i == selectedMessage)
 		{
 			cout << "=>";
 		}
@@ -38,12 +38,11 @@ void MessagesMenuView::showMessagesList(const MessageList& messageList, const si
 	}
 }
 
-void MessagesMenuView::displayMessage(const Message& message)
+void MessagesMenuView::displayMessage(const Message &message)
 {
 	cout << "TITLE:" << endl;
-	cout << message.m_title << endl<<endl;
+	cout << message.m_title << endl << endl;
 
 	cout << "MESSAGE:" << endl;
-	cout << message.m_body << endl<<endl;
+	cout << message.m_body << endl << endl;
 }
-

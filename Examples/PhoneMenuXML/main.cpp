@@ -25,9 +25,9 @@ using namespace std;
 
 void initializeMessageList(shared_ptr<Controller::MessageList> messageList)
 {
-	messageList->addItem(Message("Hi...","Hi John, don't forget to water the plants."));
-	messageList->addItem(Message("Is...","Is this thing working?"));
-	messageList->addItem(Message("Please...","Please top up your phone."));
+	messageList->addItem(Message("Hi...", "Hi John, don't forget to water the plants."));
+	messageList->addItem(Message("Is...", "Is this thing working?"));
+	messageList->addItem(Message("Please...", "Please top up your phone."));
 }
 
 
@@ -45,24 +45,24 @@ void programLoop(shared_ptr<Controller> controller)
 	bool exit = false;
 	do
 	{
-		cout<<"a - switch option, b - Select, c - escape, q - quit" << endl;
+		cout << "a - switch option, b - Select, c - escape, q - quit" << endl;
 
 		string userInput;
 		cin >> userInput;
 
-		if(userInput == "a" || userInput == "A")
+		if (userInput == "a" || userInput == "A")
 		{
 			controller->pressA();
 		}
-		else if(userInput == "b" || userInput == "B")
+		else if (userInput == "b" || userInput == "B")
 		{
 			controller->pressB();
 		}
-		else if(userInput == "c" || userInput == "C")
+		else if (userInput == "c" || userInput == "C")
 		{
 			controller->pressC();
 		}
-		else if(userInput == "q" || userInput == "Q")
+		else if (userInput == "q" || userInput == "Q")
 		{
 			cout << "Quitting..." << endl;
 			exit = true;
@@ -72,23 +72,23 @@ void programLoop(shared_ptr<Controller> controller)
 			cout << "Invalid input" << endl;
 		}
 
-	} while(!exit);
+	} while (!exit);
 }
 
-int main(int, char**)
+int main(int, char **)
 {
-	//Set up data
+	// Set up data
 	shared_ptr<Controller::MessageList> messageList = make_shared<Controller::MessageList>();
 	initializeMessageList(messageList);
 	shared_ptr<Controller::CallList> callLog = make_shared<Controller::CallList>();
 	initializeCallList(callLog);
 
-	//Set up views
+	// Set up views
 	shared_ptr<MainMenuView> mainMenu = make_shared<MainMenuView>();
 	shared_ptr<MessagesMenuView> messagesMenu = make_shared<MessagesMenuView>();
 	shared_ptr<CallLogView> callLogView = make_shared<CallLogView>();
 
-	//Set up controller
+	// Set up controller
 	shared_ptr<Controller> controller = make_shared<Controller>();
 	controller->initialize();
 	controller->importStateMachine("./PhoneMenu.xml");
@@ -108,8 +108,3 @@ int main(int, char**)
 
 	return 0;
 }
-
-
-
-
-

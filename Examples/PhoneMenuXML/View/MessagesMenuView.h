@@ -27,7 +27,6 @@
 class MessagesMenuView
 {
 public:
-
 	using MessageList = List<Message>;
 
 	MessagesMenuView() = default;
@@ -37,12 +36,11 @@ public:
 	 * \param messageList List of messages.
 	 * \param selectedMessage Selected message from the list.
 	 */
-	void showMessagesList(const MessageList& messageList, const size_t selectedMessage);
+	void showMessagesList(const MessageList &messageList, const size_t selectedMessage);
 
 	/*!
 	 * Print the selected message on screen.
 	 * \param message Message to be displayed.
 	 */
-	void displayMessage(const Message& message);
-
+	void displayMessage(const Message &message);
 };

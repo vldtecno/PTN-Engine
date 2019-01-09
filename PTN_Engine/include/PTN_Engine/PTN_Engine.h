@@ -290,7 +290,6 @@ public:
 	 */
 	void import(const IImporter &importer);
 
-protected:
 	//! Default constructor
 	PTN_Engine();
 

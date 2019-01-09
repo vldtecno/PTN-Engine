@@ -22,7 +22,6 @@
 class MainMenuView
 {
 public:
-
 	//!
 	MainMenuView();
 
@@ -38,7 +37,6 @@ public:
 	void select(const int i);
 
 private:
-
 	//! Selected option.
 	int m_selection;
 };
