@@ -401,6 +401,7 @@ void PTN_Engine::PTN_EngineImp::import(const IImporter &importer)
 
 void PTN_Engine::PTN_EngineImp::clearNet()
 {
+	m_inputPlaces.clear();
 	m_places.clear();
 	m_transitions.clear();
 }
