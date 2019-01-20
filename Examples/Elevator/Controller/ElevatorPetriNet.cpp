@@ -149,7 +149,7 @@ void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> pt
 
 	createTransition({ "Stopped_", "DoorsClosed_", "ProcessedLists" }, { "DoorsClosed_", "Moving" },
 		{ "OpenDoors" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
+		{ bind(&ElevatorController::isDestinationListNotEmpty, ptrController) });
 
 	createTransition({ "ArrivedDestination", "Moving_" }, { "Stopped", "OpenDoors" });
 
@@ -170,18 +170,18 @@ void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController
 		vector<string>{ "ArrivedDestination" });
 
 	createTransition({ "IncreaseFloor" }, { "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorNotInList) });
+		{ bind(&ElevatorController::isFloorNotInList, ptrController) });
 
 	createTransition({ "DecreaseFloor" }, { "Ready" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorNotInList) });
+		{ bind( &ElevatorController::isFloorNotInList, ptrController) });
 
 	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
+		{ bind( &ElevatorController::isFloorInList, ptrController) });
 
 	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
 	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isFloorInList) });
+		{ bind( &ElevatorController::isFloorInList, ptrController) });
 
 	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
@@ -194,39 +194,39 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
 		{ "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
 
 	createTransition({ "SwapGD" }, { "MergeMinGoingUp1" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeGoingUpGTCurrent" }, { "Ready", "ProcessedLists", "GoingUp" });
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergeMaxGoingDown1" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeMinGoingUp1" }, { "GoingDown", "Ready", "ProcessedLists" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMinSmallerThanCurrent) });
+		{ bind( &ElevatorController::isMinSmallerThanCurrent, ptrController) });
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergePostponedToCurrent11" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMinGreaterThanCurrent) });
+		{ bind( &ElevatorController::isMinGreaterThanCurrent, ptrController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "MergePostponedToCurrent12" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		  make_shared<FireCondition>(ptrController, &ElevatorController::isMaxSmallerThanCurrent) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
+		  bind( &ElevatorController::isMaxSmallerThanCurrent, ptrController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists", "GoingUp" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		  make_shared<FireCondition>(ptrController, &ElevatorController::isMaxGreaterThanCurrent) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
+		  bind( &ElevatorController::isMaxGreaterThanCurrent, ptrController) });
 
 	createTransition({ "MergePostponedToCurrent11" }, { "Ready", "ProcessedLists", "GoingUp" });
 
@@ -238,39 +238,39 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
 		{ "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
 
 	createTransition({ "SwapGU" }, { "MergeMaxGoingDown2" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeGoingDownSTCurrent" }, { "Ready", "ProcessedLists", "GoingDown" });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergeMinGoingUp2" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "GoingUp", "Ready", "ProcessedLists" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMaxGreaterThanCurrent) });
+		{ bind( &ElevatorController::isMaxGreaterThanCurrent, ptrController) });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergePostponedToCurrent21" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMaxSmallerThanCurrent) });
+		{ bind( &ElevatorController::isMaxSmallerThanCurrent, ptrController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListEmpty) });
+		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "MergePostponedToCurrent22" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		  make_shared<FireCondition>(ptrController, &ElevatorController::isMinGreaterThanCurrent) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
+		  bind( &ElevatorController::isMinGreaterThanCurrent, ptrController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists", "GoingDown" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isDestinationListNotEmpty),
-		  make_shared<FireCondition>(ptrController, &ElevatorController::isMinSmallerThanCurrent) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
+		  bind( &ElevatorController::isMinSmallerThanCurrent, ptrController) });
 
 	createTransition({ "MergePostponedToCurrent21" }, { "Ready", "ProcessedLists", "GoingDown" });
 
@@ -282,31 +282,31 @@ void ElevatorPetriNet::createButtonPressingTransitions(shared_ptr<ElevatorContro
 {
 	createTransition({ "DestinationButton", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "DestinationButton", "GoingUp_", "Ready" }, { "D1", "GoingUp_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "DestinationButton", "GoingDown_", "Ready" }, { "D2", "GoingDown_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "D1" }, { "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
 
 	createTransition({ "D1" }, { "AddToNextTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
 
 	createTransition({ "D2" }, { "AddToNextTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
 
 	createTransition({ "D2" }, { "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
 
 	createTransition({ "D3" }, { "GoingUp",  "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
 
 	createTransition({ "D3" }, { "GoingDown",  "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
 
 	createTransition({ "AddToNextTravel" }, { "Ready" });
 
@@ -319,18 +319,18 @@ void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "CallButtonUp", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "CallButtonUp", "GoingUp_", "Ready" }, { "D4", "GoingUp_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "CallButtonUp", "GoingDown_", "Ready" }, { "WaitToGoUp", "GoingDown_" });
 
 	createTransition({ "D4" }, { "WaitToGoUp" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
 
 	createTransition({ "D4" }, { "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
 
 	createTransition({ "WaitToGoUp" }, { "Ready" });
 
@@ -339,18 +339,18 @@ void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "CallButtonDown", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "CallButtonDown", "GoingDown_", "Ready" }, { "D5", "GoingDown_" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorNotCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
 
 	createTransition({ "CallButtonDown", "GoingUp_", "Ready" }, { "WaitToGoDown", "GoingUp_" });
 
 	createTransition({ "D5" }, { "AddToTravel" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorSmallerThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
 
 	createTransition({ "D5" }, { "WaitToGoDown" },
-		{ make_shared<FireCondition>(ptrController, &ElevatorController::isMarkedFloorGreaterThanCurrentFloor) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
 
 	createTransition({ "WaitToGoDown" }, { "Ready" });
 }

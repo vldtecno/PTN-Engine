@@ -43,19 +43,20 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
 												 const vector<string> &destinationPlaces,
 												 const vector<size_t> &destinationWeights,
 												 const vector<string> &inhibitorPlaces,
-												 const vector<ConditionFunctorPtr> &additionalConditions)
+												 const vector<ConditionFunction> &additionalConditions)
 {
 	unique_lock<mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-						inhibitorPlaces, additionalConditions);
+						inhibitorPlaces, createAnonymousConditions(additionalConditions));
 }
 
-void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
-													const vector<size_t> &activationWeights,
-													const vector<string> &destinationPlaces,
-													const vector<size_t> &destinationWeights,
-													const vector<string> &inhibitorPlaces,
-													const vector<ConditionFunctorPtr> &additionalConditions)
+void PTN_Engine::PTN_EngineImp::createTransitionImp(
+const vector<string> &activationPlaces,
+const vector<size_t> &activationWeights,
+const vector<string> &destinationPlaces,
+const vector<size_t> &destinationWeights,
+const vector<string> &inhibitorPlaces,
+const vector<pair<string, ConditionFunction>> &additionalConditions)
 {
 	vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
 
@@ -76,7 +77,7 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
 {
 	unique_lock<mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-						inhibitorPlaces, getConditionFunctors(additionalConditions));
+						inhibitorPlaces, getConditionFunctions(additionalConditions));
 }
 
 void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
@@ -87,7 +88,7 @@ void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activa
 													const vector<string> &additionalConditions)
 {
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-						inhibitorPlaces, getConditionFunctors(additionalConditions));
+						inhibitorPlaces, getConditionFunctions(additionalConditions));
 }
 
 vector<Transition *> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly()
@@ -150,8 +151,8 @@ void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
 												  const string &onExitActionName,
 												  const bool input)
 {
-	ActionFunction onEnterAction = getActionFunctor(onEnterActionName);
-	ActionFunction onExitAction = getActionFunctor(onEnterActionName);
+	ActionFunction onEnterAction = getActionFunction(onEnterActionName);
+	ActionFunction onExitAction = getActionFunction(onEnterActionName);
 
 	if (m_places.find(name) != m_places.end())
 	{
@@ -185,7 +186,7 @@ void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunctio
 	m_actions[name] = action;
 }
 
-void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionFunctorPtr condition)
+void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionFunction condition)
 {
 	unique_lock<mutex> guard(m_mutex);
 	if (name.empty())
@@ -247,7 +248,7 @@ void PTN_Engine::PTN_EngineImp::clearInputPlaces()
 	}
 }
 
-ActionFunction PTN_Engine::PTN_EngineImp::getActionFunctor(const string &name) const
+ActionFunction PTN_Engine::PTN_EngineImp::getActionFunction(const string &name) const
 {
 	if (name.empty())
 	{
@@ -261,9 +262,10 @@ ActionFunction PTN_Engine::PTN_EngineImp::getActionFunctor(const string &name) c
 	return m_actions.at(name);
 }
 
-vector<ConditionFunctorPtr> PTN_Engine::PTN_EngineImp::getConditionFunctors(const vector<string> &names) const
+vector<pair<string, ConditionFunction>>
+PTN_Engine::PTN_EngineImp::getConditionFunctions(const vector<string> &names) const
 {
-	vector<ConditionFunctorPtr> conditions;
+	vector<pair<string, ConditionFunction>> conditions;
 	for_each(names.cbegin(), names.cend(), [&](const string &name) {
 		if (name.empty())
 		{
@@ -274,7 +276,7 @@ vector<ConditionFunctorPtr> PTN_Engine::PTN_EngineImp::getConditionFunctors(cons
 		{
 			throw InvalidFunctionNameException(name);
 		}
-		conditions.push_back(m_conditions.at(name));
+		conditions.push_back(pair<string, ConditionFunction>(name, m_conditions.at(name)));
 	});
 	return conditions;
 }
@@ -377,7 +379,10 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 		vector<string> activationConditionsNames;
 		for (const auto &activationCondition : transition.getAdditionalActivationConditions())
 		{
-			activationConditionsNames.emplace_back(findName(activationCondition, m_conditions));
+			if (m_conditions.find(activationCondition.first) != m_conditions.end())
+			{
+				activationConditionsNames.emplace_back(activationCondition.first);
+			}
 		}
 
 		vector<string> inhibitorPlacesNames;
@@ -462,5 +467,16 @@ void PTN_Engine::PTN_EngineImp::printState(ostream &o) const
 		o << p.first.c_str() << ": " << p.second->getNumberOfTokens() << endl;
 	}
 	o << endl << endl;
+}
+
+const vector<pair<string, ConditionFunction>>
+PTN_Engine::PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &conditions) const
+{
+	vector<pair<string, ConditionFunction>> anonymousConditionsVector;
+	for (const auto &condition : conditions)
+	{
+		anonymousConditionsVector.emplace_back(pair<string, ConditionFunction>("", condition));
+	}
+	return anonymousConditionsVector;
 }
 } // namespace ptne

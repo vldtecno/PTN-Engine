@@ -17,7 +17,6 @@
  */
 
 #include "PTN_Engine/PTN_Engine/Transition.h"
-#include "PTN_Engine/IConditionFunctor.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
@@ -32,7 +31,7 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
                        const vector<WeakPtrPlace> &destinationPlaces,
                        const vector<size_t> &destinationWeights,
                        const vector<WeakPtrPlace> &inhibitorPlaces,
-                       const vector<ConditionFunctorPtr> &additionalActivationConditions)
+					   const vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions)
 : m_additionalActivationConditions{ additionalActivationConditions }
 , m_inhibitorPlaces(inhibitorPlaces)
 {
@@ -128,7 +127,7 @@ vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getDestinationPlaces
 	return m_destinationPlaces;
 }
 
-vector<ConditionFunctorPtr> Transition::getAdditionalActivationConditions() const
+vector<std::pair<std::string, ConditionFunction>> Transition::getAdditionalActivationConditions() const
 {
 	return m_additionalActivationConditions;
 }
@@ -171,15 +170,16 @@ bool Transition::checkActivationPlaces() const
 
 bool Transition::checkAdditionalConditions() const
 {
-	for (const ConditionFunctorPtr &activationCondition : m_additionalActivationConditions)
+	for (const auto &p : m_additionalActivationConditions)
 	{
+		const ConditionFunction &activationCondition = p.second;
 		if (!activationCondition)
 		{
 			return false;
 		}
 		else
 		{
-			if (!((*activationCondition)()))
+			if (!(activationCondition)())
 			{
 				return false;
 			}

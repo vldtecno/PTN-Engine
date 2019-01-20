@@ -35,7 +35,6 @@ class IActionFunctor;
 class IExporter;
 class IImporter;
 
-using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
 using SharedPtrPlace = std::shared_ptr<Place>;
 using WeakPtrPlace = std::weak_ptr<Place>;
 
@@ -60,14 +59,14 @@ public:
 	 * \param destinationPlaces A vector with the names of the destination places.
 	 * \param destinationWeights A vector with the weights of each destination place.
 	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with functors that return bool.
+	 * \param additionalConditions A vector with functions that return bool.
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunctorPtr> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -89,8 +88,8 @@ public:
 	 * Create a new place in the net.
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The functor to be called once a token enters the place.
-	 * \param onExitAction The functor to be called once a token leaves the place.
+	 * \param onEnterAction The function to be called once a token enters the place.
+	 * \param onExitAction The function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlace(const std::string &name,
@@ -104,7 +103,7 @@ public:
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
 	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param onExitAction Name of the function functor to be called once a token leaves the place.
+	 * \param onExitAction Name of the function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlaceStr(const std::string &name,
@@ -116,7 +115,7 @@ public:
 	/*!
 	 * Register an action to be called by the Petri net.
 	 * \param name The name of the place.
-	 * \param action The functor to be called once a token enters the place.
+	 * \param action The function to be called once a token enters the place.
 	 */
 	void registerAction(const std::string &name, ActionFunction action);
 
@@ -125,7 +124,7 @@ public:
 	 * \param name The name of the condition
 	 * \param conditions A function pointer to a condition.
 	 */
-	void registerCondition(const std::string &name, ConditionFunctorPtr condition);
+	void registerCondition(const std::string &name, ConditionFunction condition);
 
 	/*!
 	 * Run until it no more transitions can be fired or stop is flagged.
@@ -253,7 +252,7 @@ private:
 	 * \param name The function name or identifier
 	 * \return The functions pointer of the registered function
 	 */
-	ActionFunction getActionFunctor(const std::string &name) const;
+	ActionFunction getActionFunction(const std::string &name) const;
 
 	/*!
 	 * Get the registered condition function pointers identified by
@@ -261,7 +260,8 @@ private:
 	 * \param names Vector of names
 	 * \return Vector of conditions
 	 */
-	std::vector<ConditionFunctorPtr> getConditionFunctors(const std::vector<std::string> &names) const;
+	std::vector<std::pair<std::string, ConditionFunction>>
+	getConditionFunctions(const std::vector<std::string> &names) const;
 
 	/*!
 	 * Collects and randomizes the order of all active transitions.
@@ -306,8 +306,8 @@ private:
 	 * Create a new place in the net.
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The functor to be called once a token enters the place.
-	 * \param onExitAction The functor to be called once a token leaves the place.
+	 * \param onEnterAction The function to be called once a token enters the place.
+	 * \param onExitAction The function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlaceImp(const std::string &name,
@@ -321,7 +321,7 @@ private:
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
 	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param onExitAction Name of the function functor to be called once a token leaves the place.
+	 * \param onExitAction Name of the function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlaceStrImp(const std::string &name,
@@ -337,14 +337,14 @@ private:
 	 * \param destinationPlaces A vector with the names of the destination places.
 	 * \param destinationWeights A vector with the weights of each destination place.
 	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with functors that return bool.
+	 * \param additionalConditions A vector with a pairs of a name and a function that returns bool.
 	 */
 	void createTransitionImp(const std::vector<std::string> &activationPlaces,
 							 const std::vector<size_t> &activationWeights,
 							 const std::vector<std::string> &destinationPlaces,
 							 const std::vector<size_t> &destinationWeights,
 							 const std::vector<std::string> &inhibitorPlaces,
-							 const std::vector<ConditionFunctorPtr> &additionalConditions);
+							 const std::vector<std::pair<std::string, ConditionFunction>> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -361,6 +361,15 @@ private:
 							 const std::vector<size_t> &destinationWeights,
 							 const std::vector<std::string> &inhibitorPlaces,
 							 const std::vector<std::string> &additionalConditions);
+
+
+	/*!
+	 * \brief createAnonymousConditions
+	 * \param conditions
+	 * \return
+	 */
+	const std::vector<std::pair<std::string, ConditionFunction>>
+	createAnonymousConditions(const std::vector<ConditionFunction> &conditions) const;
 
 	//! Vector with the transitions.
 	/*!
@@ -385,7 +394,7 @@ private:
 	std::unordered_map<std::string, ActionFunction> m_actions;
 
 	//! Conditions that can be used by the Petri net.
-	std::unordered_map<std::string, ConditionFunctorPtr> m_conditions;
+	std::unordered_map<std::string, ConditionFunction> m_conditions;
 
 	//! Translates a vector of names of places to a vector of weak pointers to those places.
 	/*!

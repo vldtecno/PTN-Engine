@@ -128,13 +128,13 @@ private:
 	//!
 	std::string m_onEnterActionName;
 
-	//! Functor to be called when a token enters the place.
+	//! Function to be called when a token enters the place.
 	const ActionFunction m_onEnterAction;
 
 	//!
 	std::string m_onExitActionName;
 
-	//! Functor to be called when a token leaves the place.
+	//! Function to be called when a token leaves the place.
 	const ActionFunction m_onExitAction;
 
 	//! Number of tokens in the place.

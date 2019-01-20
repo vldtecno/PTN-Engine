@@ -18,6 +18,7 @@
 
 #include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include "Mocks/RegisteredFunctions/Controller.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 
 using namespace std;
 
@@ -32,12 +33,9 @@ void RegisteredFunctionsPN::registerCallbacks()
 	auto controller = lockWeakPtr(m_controller);
 	registerAction("actionPlace1", bind(&Controller::actionPlace1, controller));
 	registerAction("actionPlace2", bind(&Controller::actionPlace2, controller));
-	registerCondition("externalCondition1",
-					  make_shared<ControllerFireCondition>(controller, &Controller::externalCondition1));
-	registerCondition("externalCondition2",
-					  make_shared<ControllerFireCondition>(controller, &Controller::externalCondition2));
-	registerCondition("externalCondition3",
-					  make_shared<ControllerFireCondition>(controller, &Controller::externalCondition3));
+	registerCondition("externalCondition1", bind(&Controller::externalCondition1, controller));
+	registerCondition("externalCondition2", bind(&Controller::externalCondition2, controller));
+	registerCondition("externalCondition3", bind(&Controller::externalCondition3, controller));
 }
 
 void RegisteredFunctionsPN::createPetriNetStructure()

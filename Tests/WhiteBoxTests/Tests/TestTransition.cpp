@@ -30,8 +30,7 @@ TEST_F(FixtureTestTransition, T1)
 	vector<size_t> expectedInputTokens{ 0, 0, 0 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 1, 1, 1 };
-	VectorOfConditions conditions{ make_shared<ControllerFireCondition>(
-	ControllerFireCondition(m_controller, &Controller::activationCondition)) };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
 	bool expectedFireResult = true;
 
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions,
@@ -44,8 +43,7 @@ TEST_F(FixtureTestTransition, T2)
 	vector<size_t> expectedInputTokens{ 1, 0, 1 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 0, 0, 0 };
-	VectorOfConditions conditions{ make_shared<ControllerFireCondition>(
-	ControllerFireCondition(m_controller, &Controller::activationCondition)) };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
 	bool expectedFireResult = false;
 
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions,
@@ -58,8 +56,7 @@ TEST_F(FixtureTestTransition, T3)
 	vector<size_t> expectedInputTokens{ 1, 1, 1 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 0, 0, 0 };
-	VectorOfConditions conditions{ make_shared<ControllerFireCondition>(
-	ControllerFireCondition(m_controller, &Controller::activationCondition)) };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
 	bool expectedFireResult = false;
 	m_controller->setFireCondition(false);
 

@@ -39,13 +39,14 @@ Controller::~Controller()
 
 void Controller::initialize()
 {
-	m_petriNet.registerAction("showMainMenu", bind(&Controller::showMainMenu,shared_from_this()));
-	m_petriNet.registerAction("selectMessagesOption", bind(&Controller::selectMessagesOption,shared_from_this()));
-	m_petriNet.registerAction("selectCallsOption", bind(&Controller::selectCallsOption,shared_from_this()));
-	m_petriNet.registerAction("showCallsMenu", bind(&Controller::showCallsMenu,shared_from_this()));
-	m_petriNet.registerAction("showMessageMenu", bind(&Controller::showMessageMenu,shared_from_this()));
-	m_petriNet.registerAction("selectNextMessage", bind(&Controller::selectNextMessage,shared_from_this()));
-	m_petriNet.registerAction("showMessage", bind(&Controller::showMessage,shared_from_this()));
+	m_petriNet.registerAction("showMainMenu", bind(&Controller::showMainMenu, shared_from_this()));
+	m_petriNet.registerAction("selectMessagesOption", bind(&Controller::selectMessagesOption, shared_from_this()));
+	m_petriNet.registerAction("selectCallsOption", bind(&Controller::selectCallsOption, shared_from_this()));
+	m_petriNet.registerAction("showCallsMenu", bind(&Controller::showCallsMenu, shared_from_this()));
+	m_petriNet.registerAction("showMessageMenu", bind(&Controller::showMessageMenu, shared_from_this()));
+	m_petriNet.registerAction("selectNextMessage", bind(&Controller::selectNextMessage, shared_from_this()));
+	m_petriNet.registerAction("showMessage", bind(&Controller::showMessage, shared_from_this()));
+	m_petriNet.registerCondition("DummyFunction", bind(&Controller::justReturnTrue, shared_from_this()));
 }
 
 void Controller::pressA()
@@ -127,6 +128,12 @@ void Controller::showMessage()
 	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtr(m_messagesMenu);
 	messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
 }
+
+bool Controller::justReturnTrue()
+{
+	return true;
+}
+
 
 void Controller::setMessageList(shared_ptr<MessageList> messageList)
 {

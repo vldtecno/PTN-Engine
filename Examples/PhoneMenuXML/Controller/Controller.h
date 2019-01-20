@@ -21,7 +21,6 @@
 #include "Model/Call.h"
 #include "Model/List.h"
 #include "Model/Message.h"
-#include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include "View/CallLogView.h"
 #include "View/MainMenuView.h"
@@ -112,6 +111,8 @@ private:
 	//! Show the selected message.
 	void showMessage();
 
+	//! Dummy function for showing in import export from files
+	bool justReturnTrue();
 
 	// Views
 
@@ -139,9 +140,3 @@ private:
 	//! Index of the selected message.
 	size_t m_messageSelected;
 };
-
-
-template class ptne::ActivationCondition<Controller>;
-
-//!
-using ControllerFireCondition = ptne::ActivationCondition<Controller>;

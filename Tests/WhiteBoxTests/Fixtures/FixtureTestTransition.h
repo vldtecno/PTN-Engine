@@ -33,7 +33,7 @@ public:
 
 	using VectorOfPlaces = std::vector<std::weak_ptr<ptne::Place>>;
 
-	using VectorOfConditions = std::vector<ptne::ConditionFunctorPtr>;
+	using VectorOfConditions = std::vector<std::pair<std::string, ptne::ConditionFunction>>;
 
 	/*!
 	 * Test creating a transition and makes it available for further testing.

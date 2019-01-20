@@ -72,17 +72,17 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 
 	createTransition({ "CounterA" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 
 	createTransition({ "CounterB" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 }
 
 void Dispatcher::FreeChoicePetriNet::dispatch()

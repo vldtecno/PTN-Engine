@@ -21,7 +21,6 @@
 #include <memory>
 #include <string>
 
-#include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/PTN_Engine.h"
 
 class RegisteredFunctionsPN;
@@ -61,6 +60,3 @@ private:
 
 	std::string m_someString;
 };
-
-template class ptne::ActivationCondition<Controller>;
-using ControllerFireCondition = ptne::ActivationCondition<Controller>;

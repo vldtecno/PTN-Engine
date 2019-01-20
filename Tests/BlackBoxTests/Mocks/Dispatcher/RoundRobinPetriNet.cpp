@@ -72,7 +72,7 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 	// Reset Counter
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 }
 
 void Dispatcher::RoundRobinPetriNet::dispatch()
