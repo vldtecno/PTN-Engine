@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "PTN_Engine/Action.h"
 #include "PTN_Engine/ActivationCondition.h"
 
 
@@ -146,9 +145,6 @@ public:
 	//! Select inhibited Petri net.
 	void setInhibitedPN();
 };
-
-template class ptne::Action<Dispatcher>;
-using DispatcherAction = ptne::Action<Dispatcher>;
 
 template class ptne::ActivationCondition<Dispatcher>;
 using DispatcherFireCondition = ptne::ActivationCondition<Dispatcher>;

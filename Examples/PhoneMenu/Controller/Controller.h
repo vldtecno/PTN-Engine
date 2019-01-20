@@ -25,7 +25,6 @@
 #include "View/MainMenuView.h"
 #include "View/MessagesMenuView.h"
 #include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
 #include "View/MainMenuView.h"
 
 
@@ -148,11 +147,6 @@ private:
 	//! Index of the selected message.
 	size_t m_messageSelected;
 };
-
-template class ptne::Action<Controller>;
-
-//!
-using ControllerAction = ptne::Action<Controller>;
 
 template class ptne::ActivationCondition<Controller>;
 

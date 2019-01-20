@@ -81,24 +81,24 @@ void ElevatorPetriNet::createInputPlaces()
 
 void ElevatorPetriNet::createCabinePlaces(shared_ptr<ElevatorController> ptrController)
 {
-	createPlace("Stopped", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorStopped));
+	createPlace("Stopped", 0, bind( &ElevatorController::elevatorStopped, ptrController));
 	createPlace("Stopped_", 1);
-	createPlace("Moving", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::elevatorMoving));
+	createPlace("Moving", 0, bind( &ElevatorController::elevatorMoving, ptrController));
 	createPlace("Moving_", 0);
-	createPlace("DoorsOpened", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreOpen));
-	createPlace("DoorsClosed", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::doorsAreClosed));
+	createPlace("DoorsOpened", 1, bind( &ElevatorController::doorsAreOpen, ptrController));
+	createPlace("DoorsClosed", 0, bind( &ElevatorController::doorsAreClosed, ptrController));
 	createPlace("DoorsClosed_", 0);
 	
-	createPlace("RemoveFromListGU", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::removeDestinationGU));
-	createPlace("RemoveFromListGD", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::removeDestinationGD));
+	createPlace("RemoveFromListGU", 0, bind( &ElevatorController::removeDestinationGU, ptrController));
+	createPlace("RemoveFromListGD", 0, bind( &ElevatorController::removeDestinationGD, ptrController));
 	createPlace("ArrivedDestination", 0);
 
 	createPlace("ProcessLists", 0);
-	createPlace("ProcessedLists", 1, make_shared<ControllerAction>(ptrController, &ElevatorController::processedLists));
+	createPlace("ProcessedLists", 1, bind( &ElevatorController::processedLists, ptrController));
 	
-	createPlace("GoingUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingUp));
+	createPlace("GoingUp", 0, bind( &ElevatorController::goingUp, ptrController));
 	createPlace("GoingUp_", 0);
-	createPlace("GoingDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::goingDown));
+	createPlace("GoingDown", 0, bind( &ElevatorController::goingDown, ptrController));
 	createPlace("GoingDown_", 0);
 }
 
@@ -106,28 +106,28 @@ void ElevatorPetriNet::createArrivalPlaces(shared_ptr<ElevatorController> ptrCon
 {
 	createPlace("Ready", 1);
 
-	createPlace("SwapGD", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::rotateLists));
-	createPlace("SwapGU", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::rotateLists));
+	createPlace("SwapGD", 0, bind( &ElevatorController::rotateLists, ptrController));
+	createPlace("SwapGU", 0, bind( &ElevatorController::rotateLists, ptrController));
 
-	createPlace("MergeGoingUpGTCurrent", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeGoingUpGTCurrent));
-	createPlace("MergeMinGoingUp1", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeMinGoingUp));
-	createPlace("MergeMaxGoingDown1", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeMaxGoingDown));
-	createPlace("MergePostponedToCurrent11", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergePostponedToCurrent));
-	createPlace("MergePostponedToCurrent12", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergePostponedToCurrent));
+	createPlace("MergeGoingUpGTCurrent", 0, bind( &ElevatorController::mergeGoingUpGTCurrent, ptrController));
+	createPlace("MergeMinGoingUp1", 0, bind( &ElevatorController::mergeMinGoingUp, ptrController));
+	createPlace("MergeMaxGoingDown1", 0, bind( &ElevatorController::mergeMaxGoingDown, ptrController));
+	createPlace("MergePostponedToCurrent11", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
+	createPlace("MergePostponedToCurrent12", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
 
-	createPlace("MergeGoingDownSTCurrent", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeGoingDownSTCurrent));
-	createPlace("MergeMaxGoingDown2", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeMaxGoingDown));
-	createPlace("MergeMinGoingUp2", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergeMinGoingUp));
-	createPlace("MergePostponedToCurrent21", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergePostponedToCurrent));
-	createPlace("MergePostponedToCurrent22", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::mergePostponedToCurrent));
+	createPlace("MergeGoingDownSTCurrent", 0, bind( &ElevatorController::mergeGoingDownSTCurrent, ptrController));
+	createPlace("MergeMaxGoingDown2", 0, bind( &ElevatorController::mergeMaxGoingDown, ptrController));
+	createPlace("MergeMinGoingUp2", 0, bind( &ElevatorController::mergeMinGoingUp, ptrController));
+	createPlace("MergePostponedToCurrent21", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
+	createPlace("MergePostponedToCurrent22", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
 }
 
 void ElevatorPetriNet::createButtonPressPlaces(shared_ptr<ElevatorController> ptrController)
 {
-	createPlace("AddToTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination1));
-	createPlace("AddToNextTravel", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addDestination2));
-	createPlace("WaitToGoUp", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoUp));
-	createPlace("WaitToGoDown", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::addWaitingToGoDown));
+	createPlace("AddToTravel", 0, bind( &ElevatorController::addDestination1, ptrController));
+	createPlace("AddToNextTravel", 0, bind( &ElevatorController::addDestination2, ptrController));
+	createPlace("WaitToGoUp", 0, bind( &ElevatorController::addWaitingToGoUp, ptrController));
+	createPlace("WaitToGoDown", 0, bind( &ElevatorController::addWaitingToGoDown, ptrController));
 	createPlace("D1", 0);
 	createPlace("D2", 0);
 	createPlace("D3", 0);
@@ -137,8 +137,8 @@ void ElevatorPetriNet::createButtonPressPlaces(shared_ptr<ElevatorController> pt
 
 void ElevatorPetriNet::createSimulationPlaces(shared_ptr<ElevatorController> ptrController)
 {
-	createPlace("IncreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::increaseFloor));
-	createPlace("DecreaseFloor", 0, make_shared<ControllerAction>(ptrController, &ElevatorController::decreaseFloor));
+	createPlace("IncreaseFloor", 0, bind(&ElevatorController::increaseFloor, ptrController));
+	createPlace("DecreaseFloor", 0, bind(&ElevatorController::decreaseFloor, ptrController));
 }
 
 void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> ptrController)

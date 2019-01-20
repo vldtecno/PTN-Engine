@@ -23,7 +23,6 @@
 #include <ostream>
 #include <set>
 
-#include "PTN_Engine/Action.h"
 #include "PTN_Engine/ActivationCondition.h"
 
 //! A very simple controller with a very simple petri net.
@@ -55,9 +54,6 @@ private:
 
 	std::set<std::thread::id> m_collectedThreadIds;
 };
-
-template class ptne::Action<SimpleController>;
-using ControllerAction = ptne::Action<SimpleController>;
 
 template class ptne::ActivationCondition<SimpleController>;
 using ControllerFireCondition = ptne::ActivationCondition<SimpleController>;

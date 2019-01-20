@@ -30,8 +30,8 @@ RegisteredFunctionsPN::RegisteredFunctionsPN(shared_ptr<Controller> controller)
 void RegisteredFunctionsPN::registerCallbacks()
 {
 	auto controller = lockWeakPtr(m_controller);
-	registerAction("actionPlace1", make_shared<ControllerAction>(controller, &Controller::actionPlace1));
-	registerAction("actionPlace2", make_shared<ControllerAction>(controller, &Controller::actionPlace2));
+	registerAction("actionPlace1", bind(&Controller::actionPlace1, controller));
+	registerAction("actionPlace2", bind(&Controller::actionPlace2, controller));
 	registerCondition("externalCondition1",
 					  make_shared<ControllerFireCondition>(controller, &Controller::externalCondition1));
 	registerCondition("externalCondition2",

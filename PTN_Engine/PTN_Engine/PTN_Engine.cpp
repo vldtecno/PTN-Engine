@@ -128,8 +128,8 @@ void PTN_Engine::createTransition(const std::vector<std::string> &activationPlac
 
 void PTN_Engine::createPlace(const string &name,
                              const size_t initialNumberOfTokens,
-                             ActionFunctorPtr onEnterAction,
-                             ActionFunctorPtr onExitAction,
+                             ActionFunction onEnterAction,
+                             ActionFunction onExitAction,
                              const bool input)
 {
     m_implementation->createPlace(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
@@ -151,7 +151,7 @@ void PTN_Engine::createPlace(const string &name, const size_t initialNumberOfTok
 
 void PTN_Engine::createPlace(const string &name,
                              const size_t initialNumberOfTokens,
-                             ActionFunctorPtr onEnterAction,
+                             ActionFunction onEnterAction,
                              const bool input)
 {
     m_implementation->createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
@@ -165,7 +165,7 @@ void PTN_Engine::createPlace(const string &name,
     m_implementation->createPlaceStr(name, initialNumberOfTokens, onEnterAction, "", input);
 }
 
-void PTN_Engine::registerAction(const string &name, ActionFunctorPtr action)
+void PTN_Engine::registerAction(const string &name, ActionFunction action)
 {
     m_implementation->registerAction(name, action);
 }

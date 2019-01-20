@@ -39,11 +39,11 @@ PTN_Engine::PTN_EngineImp::~PTN_EngineImp()
 }
 
 void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-                                                 const vector<size_t> &activationWeights,
-                                                 const vector<string> &destinationPlaces,
-                                                 const vector<size_t> &destinationWeights,
-                                                 const vector<string> &inhibitorPlaces,
-                                                 const vector<ConditionFunctorPtr> &additionalConditions)
+												 const vector<size_t> &activationWeights,
+												 const vector<string> &destinationPlaces,
+												 const vector<size_t> &destinationWeights,
+												 const vector<string> &inhibitorPlaces,
+												 const vector<ConditionFunctorPtr> &additionalConditions)
 {
 	unique_lock<mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
@@ -51,28 +51,28 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
 }
 
 void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
-                                                    const vector<size_t> &activationWeights,
-                                                    const vector<string> &destinationPlaces,
-                                                    const vector<size_t> &destinationWeights,
-                                                    const vector<string> &inhibitorPlaces,
-                                                    const vector<ConditionFunctorPtr> &additionalConditions)
+													const vector<size_t> &activationWeights,
+													const vector<string> &destinationPlaces,
+													const vector<size_t> &destinationWeights,
+													const vector<string> &inhibitorPlaces,
+													const vector<ConditionFunctorPtr> &additionalConditions)
 {
-    vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
+	vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
 
-    vector<WeakPtrPlace> destinationPlacesVector = getPlacesFromNames(destinationPlaces);
+	vector<WeakPtrPlace> destinationPlacesVector = getPlacesFromNames(destinationPlaces);
 
-    vector<WeakPtrPlace> inhibitorPlacesVector = getPlacesFromNames(inhibitorPlaces);
+	vector<WeakPtrPlace> inhibitorPlacesVector = getPlacesFromNames(inhibitorPlaces);
 
 	m_transitions.push_back(Transition(activationPlacesVector, activationWeights, destinationPlacesVector,
 									   destinationWeights, inhibitorPlacesVector, additionalConditions));
 }
 
 void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-                                                 const vector<size_t> &activationWeights,
-                                                 const vector<string> &destinationPlaces,
-                                                 const vector<size_t> &destinationWeights,
-                                                 const vector<string> &inhibitorPlaces,
-                                                 const vector<string> &additionalConditions)
+												 const vector<size_t> &activationWeights,
+												 const vector<string> &destinationPlaces,
+												 const vector<size_t> &destinationWeights,
+												 const vector<string> &inhibitorPlaces,
+												 const vector<string> &additionalConditions)
 {
 	unique_lock<mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
@@ -80,11 +80,11 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
 }
 
 void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
-                                                    const vector<size_t> &activationWeights,
-                                                    const vector<string> &destinationPlaces,
-                                                    const vector<size_t> &destinationWeights,
-                                                    const vector<string> &inhibitorPlaces,
-                                                    const vector<string> &additionalConditions)
+													const vector<size_t> &activationWeights,
+													const vector<string> &destinationPlaces,
+													const vector<size_t> &destinationWeights,
+													const vector<string> &inhibitorPlaces,
+													const vector<string> &additionalConditions)
 {
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, getConditionFunctors(additionalConditions));
@@ -105,20 +105,20 @@ vector<Transition *> PTN_Engine::PTN_EngineImp::collectActiveTransitionsRandomly
 }
 
 void PTN_Engine::PTN_EngineImp::createPlace(const string &name,
-                                            const size_t initialNumberOfTokens,
-                                            ActionFunctorPtr onEnterAction,
-                                            ActionFunctorPtr onExitAction,
-                                            const bool input)
+											const size_t initialNumberOfTokens,
+											ActionFunction onEnterAction,
+											ActionFunction onExitAction,
+											const bool input)
 {
 	unique_lock<mutex> guard(m_mutex);
 	createPlaceImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
-                                               const size_t initialNumberOfTokens,
-                                               ActionFunctorPtr onEnterAction,
-                                               ActionFunctorPtr onExitAction,
-                                               const bool input)
+											   const size_t initialNumberOfTokens,
+											   ActionFunction onEnterAction,
+											   ActionFunction onExitAction,
+											   const bool input)
 {
 	if (m_places.find(name) != m_places.end())
 	{
@@ -135,27 +135,40 @@ void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceStr(const string &name,
-                                               const size_t initialNumberOfTokens,
-                                               const string &onEnterAction,
-                                               const string &onExitAction,
-                                               const bool input)
+											   const size_t initialNumberOfTokens,
+											   const string &onEnterAction,
+											   const string &onExitAction,
+											   const bool input)
 {
 	unique_lock<mutex> guard(m_mutex);
 	createPlaceStrImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
-                                                  const size_t initialNumberOfTokens,
-                                                  const string &onEnterAction,
-                                                  const string &onExitAction,
-                                                  const bool input)
+												  const size_t initialNumberOfTokens,
+												  const string &onEnterActionName,
+												  const string &onExitActionName,
+												  const bool input)
 {
-	ActionFunctorPtr onEnter = getActionFunctor(onEnterAction);
-	ActionFunctorPtr onExit = getActionFunctor(onExitAction);
-	createPlaceImp(name, initialNumberOfTokens, onEnter, onExit, input);
+	ActionFunction onEnterAction = getActionFunctor(onEnterActionName);
+	ActionFunction onExitAction = getActionFunctor(onEnterActionName);
+
+	if (m_places.find(name) != m_places.end())
+	{
+		throw RepeatedPlaceException(name);
+	}
+
+	SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens, onEnterActionName, onEnterAction,
+											  onExitActionName, onExitAction, input);
+
+	m_places[name] = place;
+	if (place->isInputPlace())
+	{
+		m_inputPlaces.push_back(place);
+	}
 }
 
-void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunctorPtr action)
+void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunction action)
 {
 	unique_lock<mutex> guard(m_mutex);
 	if (name.empty())
@@ -234,7 +247,7 @@ void PTN_Engine::PTN_EngineImp::clearInputPlaces()
 	}
 }
 
-ActionFunctorPtr PTN_Engine::PTN_EngineImp::getActionFunctor(const string &name) const
+ActionFunction PTN_Engine::PTN_EngineImp::getActionFunctor(const string &name) const
 {
 	if (name.empty())
 	{
@@ -320,7 +333,7 @@ void PTN_Engine::PTN_EngineImp::exportPlaces(IExporter &exporter) const
 	{
 		string onEnter;
 		auto itFound = find_if(m_actions.cbegin(), m_actions.cend(),
-							   [&](const auto &it) { return it.second == place.second->m_onEnterAction; });
+							   [&](const auto &it) { return it.first == place.second->getOnEnterActionName(); });
 		if (itFound != m_actions.cend())
 		{
 			onEnter = itFound->first; // on enter
@@ -328,7 +341,7 @@ void PTN_Engine::PTN_EngineImp::exportPlaces(IExporter &exporter) const
 
 		string onExit;
 		itFound = find_if(m_actions.cbegin(), m_actions.cend(),
-						  [&](const auto &it) { return it.second == place.second->m_onExitAction; });
+						  [&](const auto &it) { return it.first == place.second->getOnExitActionName(); });
 		if (itFound != m_actions.cend())
 		{
 			onExit = itFound->first; // on enter

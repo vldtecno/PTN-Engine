@@ -36,7 +36,6 @@ class IExporter;
 class IImporter;
 
 using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
-using ActionFunctorPtr = std::shared_ptr<IActionFunctor>;
 using SharedPtrPlace = std::shared_ptr<Place>;
 using WeakPtrPlace = std::weak_ptr<Place>;
 
@@ -96,8 +95,8 @@ public:
 	 */
 	void createPlace(const std::string &name,
 					 const size_t initialNumberOfTokens,
-					 ActionFunctorPtr onEnterAction,
-					 ActionFunctorPtr onExitAction,
+					 ActionFunction onEnterAction,
+					 ActionFunction onExitAction,
 					 const bool input = false);
 
 	/*!
@@ -119,7 +118,7 @@ public:
 	 * \param name The name of the place.
 	 * \param action The functor to be called once a token enters the place.
 	 */
-	void registerAction(const std::string &name, ActionFunctorPtr action);
+	void registerAction(const std::string &name, ActionFunction action);
 
 	/*!
 	 * Register a condition
@@ -254,7 +253,7 @@ private:
 	 * \param name The function name or identifier
 	 * \return The functions pointer of the registered function
 	 */
-	ActionFunctorPtr getActionFunctor(const std::string &name) const;
+	ActionFunction getActionFunctor(const std::string &name) const;
 
 	/*!
 	 * Get the registered condition function pointers identified by
@@ -313,8 +312,8 @@ private:
 	 */
 	void createPlaceImp(const std::string &name,
 						const size_t initialNumberOfTokens,
-						ActionFunctorPtr onEnterAction,
-						ActionFunctorPtr onExitAction,
+						ActionFunction onEnterAction,
+						ActionFunction onExitAction,
 						const bool input = false);
 
 	/*!
@@ -383,7 +382,7 @@ private:
 	std::unordered_map<std::string, SharedPtrPlace> m_places;
 
 	//! Actions that can be called by the Petri net.
-	std::unordered_map<std::string, ActionFunctorPtr> m_actions;
+	std::unordered_map<std::string, ActionFunction> m_actions;
 
 	//! Conditions that can be used by the Petri net.
 	std::unordered_map<std::string, ConditionFunctorPtr> m_conditions;

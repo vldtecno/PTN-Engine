@@ -21,7 +21,6 @@
 #include "Model/Call.h"
 #include "Model/List.h"
 #include "Model/Message.h"
-#include "PTN_Engine/Action.h"
 #include "PTN_Engine/ActivationCondition.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include "View/CallLogView.h"
@@ -141,10 +140,6 @@ private:
 	size_t m_messageSelected;
 };
 
-template class ptne::Action<Controller>;
-
-//!
-using ControllerAction = ptne::Action<Controller>;
 
 template class ptne::ActivationCondition<Controller>;
 

@@ -20,7 +20,6 @@
 
 
 #include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
 #include <unordered_set>
 
 
@@ -154,11 +153,6 @@ private:
 
 };
 
-template class ptne::Action<ElevatorController>;
-
-//!
-using ControllerAction = ptne::Action<ElevatorController>;
-using ControllerActionPtr = std::shared_ptr<ControllerAction>;
 
 template class ptne::ActivationCondition<ElevatorController>;
 

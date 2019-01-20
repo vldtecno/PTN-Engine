@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "PTN_Engine/Action.h"
 #include "PTN_Engine/ActivationCondition.h"
 
 //! Sample controller.
@@ -59,9 +58,6 @@ private:
 	//! Activation condition.
 	bool m_canFire;
 };
-
-template class ptne::Action<Controller>;
-using ControllerAction = ptne::Action<Controller>;
 
 template class ptne::ActivationCondition<Controller>;
 using ControllerFireCondition = ptne::ActivationCondition<Controller>;

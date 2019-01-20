@@ -21,9 +21,8 @@
 using namespace ptne;
 
 FixtureTestPlace::FixtureTestPlace()
-: m_controller{ std::make_shared<Controller>(Controller{}) }
-, m_place{ size_t(0), std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
-		   std::make_shared<ControllerAction>(m_controller, &Controller::onExit) }
+: m_controller(std::make_shared<Controller>(Controller{}))
+, m_place(size_t(0), std::bind(&Controller::onEnter, m_controller), std::bind(&Controller::onExit, m_controller))
 {
 }
 
@@ -99,7 +98,7 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 
 void FixtureTestPlace::inputPlace()
 {
-	ptne::Place inputPlace(size_t(0), std::make_shared<ControllerAction>(m_controller, &Controller::onEnter),
-						   std::make_shared<ControllerAction>(m_controller, &Controller::onExit));
+	ptne::Place inputPlace(size_t(0), std::bind(&Controller::onEnter, m_controller),
+						   std::bind(&Controller::onExit, m_controller));
 	EXPECT_EQ(false, inputPlace.isInputPlace());
 }
