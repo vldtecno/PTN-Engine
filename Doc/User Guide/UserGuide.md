@@ -78,26 +78,12 @@ public:
 
 ```
 
-### 4. Create your own Action type and ActivationCondition type
-
-To allow the PTN Engine to call the functions from your own class, you should
-to create two functor types.
-
-```c++
-
-
-using ControllerAction = ptne::Action<Controller>;
-
-using ControllerFireCondition = ptne::ActivationCondition<Controller>;
-
-```
-
-### 5. Implement the Petri net
+### 4. Implement the Petri net
 
 In the constructor of the class that inherits from PTN_Engine (MyPetriNet in
 this example) is where the Petri net is defined.
 
-#### 5.1 Create the Petri net places
+#### 4.1 Create the Petri net places
 
 The first step is to create *all* the places in the net.
 
@@ -118,14 +104,14 @@ MyPetriNet::MyPetriNet(std::shared_ptr<Controller> ptrMenuController):
 	addPlace(
 	    "Place2",   //Place name
 	    1,          //Initial number of tokens
-	    make_shared<ControllerAction>(ptrController, &Controller::onEnterAction2), //on enter action
-	    make_shared<ControllerAction>(ptrController, &Controller::onExitAction2),  //on exit action
+	    std::bind(&Controller::onEnterAction2, ptrController), //on enter action
+	    std::bind(&Controller::onExitAction2, ptrController),  //on exit action
 	    );
 
 
 ```
 
-#### 5.2 Create the Petri net transitions
+#### 4.2 Create the Petri net transitions
 
 The last step is to create *all* transitions in the net.
 
@@ -144,8 +130,8 @@ createTransition(
         {"MessagesMenu"},              //Destination places   
         //Vector of addditional conditions      
         {
-            make_shared<ControllerFireCondition>(ptrController, &Controller::isCondition1),
-            make_shared<ControllerFireCondition>(ptrController, &Controller::isCondition2),           
+            std::bind(&Controller::isCondition1, ptrController),
+            std::bind(&Controller::isCondition2, ptrController),           
         }
         );                                 
 
@@ -153,7 +139,7 @@ createTransition(
 
 ```
 
-### 6 - Create access to input places
+### 5 - Create access to input places
 
 To control the PTN Engine net, you need to provide access to it via public 
 methods in your new class.
