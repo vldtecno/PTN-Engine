@@ -19,12 +19,11 @@
 #pragma once
 
 #include "PTN_Engine/PTN_Exception.h"
+#include <functional>
 #include <memory>
 
 namespace ptne
 {
-class IActionFunctor;
-
 //! Implements a place of a Petri net.
 /*!
  * Implements a place of a Petri net.
@@ -32,8 +31,7 @@ class IActionFunctor;
 class Place final
 {
 public:
-	//! Shared pointer to member functions of the controller.
-	using ActionFunctorPtr = std::shared_ptr<IActionFunctor>;
+	using ActionFunction = std::function<void(void)>;
 
 	/*!
 	 * Place constructor.
@@ -43,17 +41,19 @@ public:
 	 * \param input Flag that marks the place as an input place.
 	 */
 	Place(const size_t initialNumberOfTokens,
-		  ActionFunctorPtr onEnterAction,
-		  ActionFunctorPtr onExitAction,
+		  ActionFunction onEnterAction,
+		  ActionFunction onExitAction,
+		  const bool input = false);
+
+	Place(const size_t initialNumberOfTokens,
+		  const std::string &onEnterActionName,
+		  ActionFunction onEnterAction,
+		  const std::string &onExitActionName,
+		  ActionFunction onExitAction,
 		  const bool input = false);
 
 	~Place();
 
-	//! Functor to be called when a token enters the place.
-	const ActionFunctorPtr m_onEnterAction;
-
-	//! Functor to be called when a token leaves the place.
-	const ActionFunctorPtr m_onExitAction;
 
 	//! Increase number of tokens and call on enter action.
 	void enterPlace(const size_t tokens = 1);
@@ -78,6 +78,18 @@ public:
 	 * \return If the place is an input place.
 	 */
 	bool isInputPlace() const;
+
+	/*!
+	 * \brief getOnEnterActionName
+	 * \return
+	 */
+	const std::string getOnEnterActionName() const;
+
+	/*!
+	 * \brief getOnExitActionName
+	 * \return
+	 */
+	const std::string getOnExitActionName() const;
 
 	//! Exception thrown if attempted to remove 0 tokens from a place.
 	class NullTokensException : public PTN_Exception
@@ -112,6 +124,18 @@ private:
 	 * \param tokens Number of tokens to be removed. Must be at least 1.
 	 */
 	void decreaseNumberOfTokens(const size_t tokens = 1);
+
+	//!
+	std::string m_onEnterActionName;
+
+	//! Function to be called when a token enters the place.
+	const ActionFunction m_onEnterAction;
+
+	//!
+	std::string m_onExitActionName;
+
+	//! Function to be called when a token leaves the place.
+	const ActionFunction m_onExitAction;
 
 	//! Number of tokens in the place.
 	size_t m_numberOfTokens;

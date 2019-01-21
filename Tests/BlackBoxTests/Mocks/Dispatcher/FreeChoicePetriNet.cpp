@@ -30,16 +30,16 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
+	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, ptrDispatcher),
+				bind(&Dispatcher::onLeaveWaitPackage, ptrDispatcher));
 
-	createPlace("ChannelA", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
+	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, ptrDispatcher),
+				bind(&Dispatcher::onLeaveChannelA, ptrDispatcher));
 
 	createPlace("CounterA", 0);
 
-	createPlace("ChannelB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelB),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelB));
+	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, ptrDispatcher),
+				bind(&Dispatcher::onLeaveChannelB, ptrDispatcher));
 
 	createPlace("CounterB", 0);
 
@@ -72,17 +72,17 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 
 	createTransition({ "CounterA" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 
 	createTransition({ "CounterB" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 }
 
 void Dispatcher::FreeChoicePetriNet::dispatch()

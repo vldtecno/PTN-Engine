@@ -26,25 +26,23 @@ using namespace std;
 Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
 : PTN_Engine{}
 {
-
-
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionWaitPackage),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveWaitPackage));
+	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, ptrDispatcher),
+				bind(&Dispatcher::onLeaveWaitPackage, ptrDispatcher));
 
-	createPlace("ChannelA", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelA),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelA));
+	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, ptrDispatcher),
+				bind(&Dispatcher::onLeaveChannelA, ptrDispatcher));
 
-	createPlace("ChannelB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionChannelB),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveChannelB));
+	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, ptrDispatcher),
+				bind(&Dispatcher::onLeaveChannelB, ptrDispatcher));
 
-	createPlace("SelectA", 1, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionSelectA),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveSelectChannelA));
+	createPlace("SelectA", 1, bind(&Dispatcher::actionSelectA, ptrDispatcher),
+				bind(&Dispatcher::onLeaveSelectChannelA, ptrDispatcher));
 
-	createPlace("SelectB", 0, make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::actionSelectB),
-				make_shared<DispatcherAction>(ptrDispatcher, &Dispatcher::onLeaveSelectChannelB));
+	createPlace("SelectB", 0, bind(&Dispatcher::actionSelectB, ptrDispatcher),
+				bind(&Dispatcher::onLeaveSelectChannelB, ptrDispatcher));
 
 	createPlace("PackageCounter", 0);
 
@@ -74,7 +72,7 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 	// Reset Counter
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
-					 { make_shared<DispatcherFireCondition>(ptrDispatcher, &Dispatcher::resetCounter) });
+					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
 }
 
 void Dispatcher::RoundRobinPetriNet::dispatch()

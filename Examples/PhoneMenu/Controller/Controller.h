@@ -24,9 +24,8 @@
 #include "View/CallLogView.h"
 #include "View/MainMenuView.h"
 #include "View/MessagesMenuView.h"
-#include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
 #include "View/MainMenuView.h"
+#include <memory>
 
 
 //! Example of a controller class
@@ -149,14 +148,5 @@ private:
 	size_t m_messageSelected;
 };
 
-template class ptne::Action<Controller>;
-
-//!
-using ControllerAction = ptne::Action<Controller>;
-
-template class ptne::ActivationCondition<Controller>;
-
-//!
-using ControllerFireCondition = ptne::ActivationCondition<Controller>;
 
 #include "../../../Examples/PhoneMenu/Controller/MenuStateMachine.h"

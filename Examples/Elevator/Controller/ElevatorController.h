@@ -18,9 +18,7 @@
 
 #pragma once
 
-
-#include "PTN_Engine/ActivationCondition.h"
-#include "PTN_Engine/Action.h"
+#include <memory>
 #include <unordered_set>
 
 
@@ -153,16 +151,4 @@ private:
 	bool isMaxGreaterThanCurrent() const;
 
 };
-
-template class ptne::Action<ElevatorController>;
-
-//!
-using ControllerAction = ptne::Action<ElevatorController>;
-using ControllerActionPtr = std::shared_ptr<ControllerAction>;
-
-template class ptne::ActivationCondition<ElevatorController>;
-
-//!
-using FireCondition = ptne::ActivationCondition<ElevatorController>;
-using FireConditionPtr = std::shared_ptr<FireCondition>;
 

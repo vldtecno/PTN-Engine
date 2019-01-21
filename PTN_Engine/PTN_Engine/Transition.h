@@ -19,17 +19,17 @@
 #pragma once
 
 #include "PTN_Engine/PTN_Exception.h"
+#include <functional>
 #include <memory>
 #include <tuple>
 #include <vector>
 
 namespace ptne
 {
-class IConditionFunctor;
 class Place;
 
 //! Shared pointer to member functions of the controller.
-using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
+using ConditionFunction = std::function<bool(void)>;
 
 //! Implements a Petri net transition.
 /*!
@@ -59,7 +59,7 @@ public:
 			   const std::vector<WeakPtrPlace> &destinationPlaces,
 			   const std::vector<size_t> &destinationWeights,
 			   const std::vector<WeakPtrPlace> &inhibitorPlaces,
-			   const std::vector<ConditionFunctorPtr> &additionalActivationConditions);
+			   const std::vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions);
 
 	/*!
 	 * Evaluate the activation places and transit the tokens if possible.
@@ -77,7 +77,7 @@ public:
 
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getDestinationPlaces() const;
 
-	std::vector<ConditionFunctorPtr> getAdditionalActivationConditions() const;
+	std::vector<std::pair<std::string, ConditionFunction>> getAdditionalActivationConditions() const;
 
 	std::vector<WeakPtrPlace> getInhibitorPlaces() const;
 
@@ -161,7 +161,7 @@ private:
 	std::vector<std::tuple<WeakPtrPlace, size_t>> m_destinationPlaces;
 
 	//! Pointers to the controller's functions that evaluate if the transition can be fired.
-	std::vector<ConditionFunctorPtr> m_additionalActivationConditions;
+	std::vector<std::pair<std::string, ConditionFunction>> m_additionalActivationConditions;
 
 	//! Inhibitor arcs
 	std::vector<WeakPtrPlace> m_inhibitorPlaces;

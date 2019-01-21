@@ -23,7 +23,7 @@ using namespace std;
 SimpleController::SimplePetriNet::SimplePetriNet(shared_ptr<SimpleController> controller)
 : ptne::PTN_Engine()
 {
-	createPlace("P1", 0, make_shared<ControllerAction>(controller, &SimpleController::collectThreadId), true);
+	createPlace("P1", 0, bind(&SimpleController::collectThreadId, controller), true);
 	createPlace("P2", 0);
 
 	createTransition({ "P1" }, { "P2" });

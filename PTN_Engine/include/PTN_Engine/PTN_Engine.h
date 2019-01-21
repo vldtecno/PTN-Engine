@@ -19,6 +19,7 @@
 #pragma once
 
 #include "PTN_Engine/Utilities/Explicit.h"
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -27,14 +28,12 @@
 
 namespace ptne
 {
-class IConditionFunctor;
-class IActionFunctor;
 class IExporter;
 class IImporter;
 
 
-using ConditionFunctorPtr = std::shared_ptr<IConditionFunctor>;
-using ActionFunctorPtr = std::shared_ptr<IActionFunctor>;
+using ConditionFunction = std::function<bool(void)>;
+using ActionFunction = std::function<void(void)>;
 
 //! Base class that implements the Petri net logic.
 /*!
@@ -61,7 +60,7 @@ public:
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunctorPtr> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -117,7 +116,7 @@ public:
 						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<ConditionFunctorPtr> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -145,7 +144,7 @@ public:
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<ConditionFunctorPtr> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -157,7 +156,7 @@ public:
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunctorPtr> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions);
 
 	/*!
 	 * Create a new transition
@@ -175,14 +174,14 @@ public:
 	 * Create a new place in the net.
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The functor to be called once a token enters the place.
-	 * \param onExitAction The functor to be called once a token leaves the place.
+	 * \param onEnterAction The function to be called once a token enters the place.
+	 * \param onExitAction The function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlace(const std::string &name,
 					 const size_t initialNumberOfTokens,
-					 ActionFunctorPtr onEnterAction,
-					 ActionFunctorPtr onExitAction,
+					 ActionFunction onEnterAction,
+					 ActionFunction onExitAction,
 					 const bool input = false);
 
 	/*!
@@ -211,12 +210,12 @@ public:
 	 * Create a new place in the net.
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The functor to be called once a token enters the place.
+	 * \param onEnterAction The function to be called once a token enters the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlace(const std::string &name,
 					 const size_t initialNumberOfTokens,
-					 ActionFunctorPtr onEnterAction,
+					 ActionFunction onEnterAction,
 					 const bool input = false);
 
 	/*!
@@ -234,16 +233,16 @@ public:
 	/*!
 	 * Register an action to be called by the Petri net.
 	 * \param name The name of the place.
-	 * \param action The functor to be called once a token enters the place.
+	 * \param action The function to be called once a token enters the place.
 	 */
-	void registerAction(const std::string &name, ActionFunctorPtr action);
+	void registerAction(const std::string &name, ActionFunction action);
 
 	/*!
 	 * Register a condition
 	 * \param name The name of the condition
 	 * \param conditions A function pointer to a condition.
 	 */
-	void registerCondition(const std::string &name, ConditionFunctorPtr condition);
+	void registerCondition(const std::string &name, ConditionFunction condition);
 
 	/*!
 	 * Run until it no more transitions can be fired or stop is flagged.

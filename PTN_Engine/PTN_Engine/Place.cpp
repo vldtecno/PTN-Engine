@@ -17,7 +17,6 @@
  */
 
 #include "PTN_Engine/PTN_Engine/Place.h"
-#include "PTN_Engine/IActionFunctor.h"
 #include "limits.h"
 #include <string>
 
@@ -26,13 +25,28 @@ namespace ptne
 using namespace std;
 
 Place::Place(const size_t initialNumberOfTokens,
-             ActionFunctorPtr onEnterEventHandler,
-             ActionFunctorPtr onExitEventHandler,
-             const bool input)
+			 ActionFunction onEnterEventHandler,
+			 ActionFunction onExitEventHandler,
+			 const bool input)
 : m_onEnterAction{ onEnterEventHandler }
 , m_onExitAction{ onExitEventHandler }
 , m_numberOfTokens{ initialNumberOfTokens }
 , m_isInputPlace{ input }
+{
+}
+
+Place::Place(const size_t initialNumberOfTokens,
+			 const string &onEnterActionName,
+			 ActionFunction onEnterAction,
+			 const string &onExitActionName,
+			 ActionFunction onExitAction,
+			 const bool input)
+: m_onEnterActionName(onEnterActionName)
+, m_onEnterAction(onEnterAction)
+, m_onExitActionName(onExitActionName)
+, m_onExitAction(onExitAction)
+, m_numberOfTokens(initialNumberOfTokens)
+, m_isInputPlace(input)
 {
 }
 
@@ -45,7 +59,7 @@ void Place::enterPlace(const size_t tokens)
 	increaseNumberOfTokens(tokens);
 	if (m_onEnterAction != nullptr)
 	{
-		(*m_onEnterAction)();
+		m_onEnterAction();
 	}
 }
 
@@ -54,7 +68,7 @@ void Place::exitPlace(const size_t tokens)
 	decreaseNumberOfTokens(tokens);
 	if (m_onExitAction != nullptr)
 	{
-		(*m_onExitAction)();
+		m_onExitAction();
 	}
 }
 
@@ -102,6 +116,16 @@ size_t Place::getNumberOfTokens() const
 bool Place::isInputPlace() const
 {
 	return m_isInputPlace;
+}
+
+const string Place::getOnEnterActionName() const
+{
+	return m_onEnterActionName;
+}
+
+const string Place::getOnExitActionName() const
+{
+	return m_onExitActionName;
 }
 
 Place::NullTokensException::NullTokensException()

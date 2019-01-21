@@ -19,6 +19,7 @@
 #include "Fixtures/F2/F2.h"
 #include "Mocks/RegisteredFunctions/Controller.h"
 #include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
+#include "PTN_Engine/PTN_Exception.h"
 
 using namespace std;
 
