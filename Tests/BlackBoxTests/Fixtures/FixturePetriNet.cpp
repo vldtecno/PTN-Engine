@@ -18,6 +18,7 @@
 
 #include "Fixtures/FixturePetriNet.h"
 #include "Mocks/Simple/SimpleController.h"
+#include <cmath>
 
 using namespace std;
 
@@ -101,7 +102,7 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 
 	EXPECT_TRUE(tokens[3] > 0 || tokens[5] > 0) << tokens[3] << " " << tokens[5];
 
-	float metric = abs(static_cast<float>(tokens[3]) - static_cast<float>(tokens[5])) / (tokens[3] + tokens[5]);
+    float metric = std::abs(static_cast<float>(tokens[3]) - static_cast<float>(tokens[5])) / (tokens[3] + tokens[5]);
 
 	EXPECT_TRUE(metric < 0.041f);
 }
