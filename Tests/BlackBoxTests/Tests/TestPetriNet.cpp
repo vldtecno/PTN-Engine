@@ -148,3 +148,8 @@ TEST_F(F2, AlreadyRegisteredMethods)
 {
 	testRepeatedRegisteredMethods();
 }
+
+TEST_F(FixturePetriNet, AdditionalActivationConditions)
+{
+	testAdditionalActivationConditions();
+}

@@ -19,9 +19,10 @@
 #include "Mocks/Controller.h"
 
 Controller::Controller()
-: m_enterCounter{ 0 }
-, m_exitCounter{ 0 }
-, m_canFire{ true }
+	: m_activationConditionCallCounter(0)
+	, m_enterCounter(0)
+	, m_exitCounter(0)
+	, m_canFire(true)
 {
 }
 
@@ -47,10 +48,16 @@ size_t Controller::getExitCounter() const
 
 bool Controller::activationCondition() const
 {
+	++m_activationConditionCallCounter;
 	return m_canFire;
 }
 
 void Controller::setFireCondition(const bool canFire)
 {
 	m_canFire = canFire;
+}
+
+size_t Controller::activationConditionCallCounter() const
+{
+	return m_activationConditionCallCounter;
 }

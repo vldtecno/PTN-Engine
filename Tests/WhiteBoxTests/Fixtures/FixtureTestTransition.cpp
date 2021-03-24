@@ -22,7 +22,7 @@ using namespace ptne;
 using namespace std;
 
 FixtureTestTransition::FixtureTestTransition()
-: m_controller{ make_shared<Controller>(Controller{}) }
+: m_controller{ make_shared<Controller>() }
 {
 }
 
@@ -125,7 +125,7 @@ vector<weak_ptr<Place>> FixtureTestTransition::createPlaceWPtrs(const vector<sha
 {
 	// Create input places
 	vector<weak_ptr<Place>> wPtrPlaces;
-	for (shared_ptr<Place> spPlace : places)
+	for (const shared_ptr<Place> &spPlace : places)
 	{
 		wPtrPlaces.push_back(weak_ptr<Place>(spPlace));
 	}

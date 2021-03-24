@@ -2,6 +2,7 @@
  * This file is part of PTN Engine
  *
  * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2021 Kale Evans
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +23,9 @@
 #include "PTN_Engine/PTN_Exception.h"
 #include <iostream>
 #include <memory>
+#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
-#include <shared_mutex>
 
 namespace ptne
 {

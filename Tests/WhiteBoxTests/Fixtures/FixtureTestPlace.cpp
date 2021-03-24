@@ -21,7 +21,7 @@
 using namespace ptne;
 
 FixtureTestPlace::FixtureTestPlace()
-: m_controller(std::make_shared<Controller>(Controller{}))
+: m_controller(std::make_shared<Controller>())
 , m_place(size_t(0), std::bind(&Controller::onEnter, m_controller), std::bind(&Controller::onExit, m_controller))
 {
 }

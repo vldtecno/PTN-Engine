@@ -102,7 +102,8 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 
 	EXPECT_TRUE(tokens[3] > 0 || tokens[5] > 0) << tokens[3] << " " << tokens[5];
 
-    float metric = std::abs(static_cast<float>(tokens[3]) - static_cast<float>(tokens[5])) / (tokens[3] + tokens[5]);
+	float metric =
+	std::abs(static_cast<float>(tokens[3]) - static_cast<float>(tokens[5])) / (tokens[3] + tokens[5]);
 
 	EXPECT_TRUE(metric < 0.041f);
 }
@@ -173,7 +174,7 @@ void FixturePetriNet::testInhibitedState(const size_t expectedTokens[s_numberOfI
 
 void FixturePetriNet::testThreadSafety()
 {
-	std::shared_ptr<SimpleController> simpleController = make_shared<SimpleController>();
+	shared_ptr<SimpleController> simpleController = make_shared<SimpleController>();
 	simpleController->initialize();
 
 	const size_t numberOfThreads = 8;
@@ -182,4 +183,64 @@ void FixturePetriNet::testThreadSafety()
 
 	// TODO get a better way to test
 	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
+}
+
+
+void FixturePetriNet::testAdditionalActivationConditions()
+{
+	class Controller : public enable_shared_from_this<Controller>
+	{
+		class PetriNet : public ptne::PTN_Engine
+		{
+			friend class FixturePetriNet;
+
+		public:
+			explicit PetriNet(shared_ptr<Controller> controller)
+			{
+				createPlace("P1", 0, true);
+				createPlace("P2", 0);
+
+				createTransition({ "P1" }, { "P2" }, vector<ptne::ConditionFunction>{ [controller]() {
+									 ++controller->m_callCount;
+									 return controller->m_hasConnectionToServer;
+								 } });
+			}
+		};
+
+	public:
+		Controller()
+		: m_petriNet(nullptr)
+		, m_callCount(0)
+		, m_hasConnectionToServer(true){};
+
+		void initialize()
+		{
+			m_petriNet = make_unique<Controller::PetriNet>(shared_from_this());
+		}
+
+		void execute()
+		{
+			m_petriNet->incrementInputPlace("P1");
+			m_petriNet->execute();
+		}
+
+		vector<size_t> getNumberOfTokens()
+		{
+			vector<size_t> numberOfTokens;
+			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P1"));
+			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P2"));
+			return numberOfTokens;
+		}
+
+		unique_ptr<PetriNet> m_petriNet;
+		size_t m_callCount = 0;
+		bool m_hasConnectionToServer = false;
+	};
+
+	auto controller = make_shared<Controller>();
+	controller->initialize();
+	EXPECT_EQ(0, controller->m_callCount);
+	controller->execute();
+	EXPECT_EQ(1, controller->m_callCount);
+	EXPECT_EQ(vector<size_t>({ 0, 1 }), controller->getNumberOfTokens());
 }

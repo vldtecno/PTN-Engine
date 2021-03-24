@@ -2,6 +2,7 @@
  * This file is part of PTN Engine
  *
  * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2021 Kale Evans
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,13 +40,13 @@ PTN_Engine::PTN_EngineImp::~PTN_EngineImp()
 }
 
 void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-												 const vector<size_t> &activationWeights,
-												 const vector<string> &destinationPlaces,
-												 const vector<size_t> &destinationWeights,
-												 const vector<string> &inhibitorPlaces,
-												 const vector<ConditionFunction> &additionalConditions)
+                                                 const vector<size_t> &activationWeights,
+                                                 const vector<string> &destinationPlaces,
+                                                 const vector<size_t> &destinationWeights,
+                                                 const vector<string> &inhibitorPlaces,
+                                                 const vector<ConditionFunction> &additionalConditions)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, createAnonymousConditions(additionalConditions));
 }
@@ -69,23 +70,23 @@ const vector<pair<string, ConditionFunction>> &additionalConditions)
 }
 
 void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-												 const vector<size_t> &activationWeights,
-												 const vector<string> &destinationPlaces,
-												 const vector<size_t> &destinationWeights,
-												 const vector<string> &inhibitorPlaces,
-												 const vector<string> &additionalConditions)
+                                                 const vector<size_t> &activationWeights,
+                                                 const vector<string> &destinationPlaces,
+                                                 const vector<size_t> &destinationWeights,
+                                                 const vector<string> &inhibitorPlaces,
+                                                 const vector<string> &additionalConditions)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, getConditionFunctions(additionalConditions));
 }
 
 void PTN_Engine::PTN_EngineImp::createTransitionImp(const vector<string> &activationPlaces,
-													const vector<size_t> &activationWeights,
-													const vector<string> &destinationPlaces,
-													const vector<size_t> &destinationWeights,
-													const vector<string> &inhibitorPlaces,
-													const vector<string> &additionalConditions)
+                                                    const vector<size_t> &activationWeights,
+                                                    const vector<string> &destinationPlaces,
+                                                    const vector<size_t> &destinationWeights,
+                                                    const vector<string> &inhibitorPlaces,
+                                                    const vector<string> &additionalConditions)
 {
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, getConditionFunctions(additionalConditions));
@@ -98,7 +99,7 @@ vector<Transition *> PTN_Engine::PTN_EngineImp::collectEnabledTransitionsRandoml
 	{
 		if (transition.isEnabled())
 		{
-            enabledTransitions.push_back(&transition);
+			enabledTransitions.push_back(&transition);
 		}
 	}
 	random_shuffle(enabledTransitions.begin(), enabledTransitions.end());
@@ -106,20 +107,20 @@ vector<Transition *> PTN_Engine::PTN_EngineImp::collectEnabledTransitionsRandoml
 }
 
 void PTN_Engine::PTN_EngineImp::createPlace(const string &name,
-											const size_t initialNumberOfTokens,
-											ActionFunction onEnterAction,
-											ActionFunction onExitAction,
-											const bool input)
+                                            const size_t initialNumberOfTokens,
+                                            ActionFunction onEnterAction,
+                                            ActionFunction onExitAction,
+                                            const bool input)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createPlaceImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
-											   const size_t initialNumberOfTokens,
-											   ActionFunction onEnterAction,
-											   ActionFunction onExitAction,
-											   const bool input)
+                                               const size_t initialNumberOfTokens,
+                                               ActionFunction onEnterAction,
+                                               ActionFunction onExitAction,
+                                               const bool input)
 {
 	if (m_places.find(name) != m_places.end())
 	{
@@ -136,20 +137,20 @@ void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceStr(const string &name,
-											   const size_t initialNumberOfTokens,
-											   const string &onEnterAction,
-											   const string &onExitAction,
-											   const bool input)
+                                               const size_t initialNumberOfTokens,
+                                               const string &onEnterAction,
+                                               const string &onExitAction,
+                                               const bool input)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createPlaceStrImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
-												  const size_t initialNumberOfTokens,
-												  const string &onEnterActionName,
-												  const string &onExitActionName,
-												  const bool input)
+                                                  const size_t initialNumberOfTokens,
+                                                  const string &onEnterActionName,
+                                                  const string &onExitActionName,
+                                                  const bool input)
 {
 	ActionFunction onEnterAction = getActionFunction(onEnterActionName);
 	ActionFunction onExitAction = getActionFunction(onEnterActionName);
@@ -171,7 +172,7 @@ void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
 
 void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunction action)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	if (name.empty())
 	{
 		throw InvalidFunctionNameException(name);
@@ -188,7 +189,7 @@ void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunctio
 
 void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionFunction condition)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	if (name.empty())
 	{
 		throw InvalidFunctionNameException(name);
@@ -205,7 +206,7 @@ void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionF
 
 void PTN_Engine::PTN_EngineImp::execute(const bool log, ostream &o)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	m_stop = false;
 	bool transitionFired;
 
@@ -283,7 +284,7 @@ PTN_Engine::PTN_EngineImp::getConditionFunctions(const vector<string> &names) co
 
 size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string &place) const
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	shared_lock<shared_timed_mutex> guard(m_mutex);
 	if (m_places.find(place) == m_places.end())
 	{
 		throw InvalidNameException(place);
@@ -293,7 +294,7 @@ size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string &place) const
 
 void PTN_Engine::PTN_EngineImp::incrementInputPlace(const string &place)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 
 	if (m_places.find(place) == m_places.end())
 	{
@@ -324,7 +325,7 @@ vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<
 
 void PTN_Engine::PTN_EngineImp::export_(IExporter &exporter) const
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	shared_lock<shared_timed_mutex> guard(m_mutex);
 	exportPlaces(exporter);
 	exportTransitions(exporter);
 }
@@ -398,7 +399,7 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 
 void PTN_Engine::PTN_EngineImp::import(const IImporter &importer)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> guard(m_mutex);
 	// TODO: Not exception safe, maybe this should go to a constructor instead.
 	clearNet();
 
