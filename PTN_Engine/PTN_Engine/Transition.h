@@ -73,6 +73,12 @@ public:
 	 */
 	bool isActive() const;
 
+    /*!
+     * Evaluates if the transition can attempt to be fired.
+     * \return True if can attepmted to be fired, false if it cannot.
+     */
+    bool isEnabled() const;
+
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getActivationPlaces() const;
 
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getDestinationPlaces() const;

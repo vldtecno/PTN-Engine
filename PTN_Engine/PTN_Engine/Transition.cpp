@@ -97,24 +97,25 @@ bool Transition::execute()
 	return true;
 }
 
+bool Transition::isEnabled() const
+{
+    if (!checkInhibitorPlaces())
+    {
+        return false;
+    }
+
+    if (!checkActivationPlaces())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool Transition::isActive() const
 {
-	if (!checkInhibitorPlaces())
-	{
-		return false;
-	}
 
-	if (!checkActivationPlaces())
-	{
-		return false;
-	}
-
-	if (!checkAdditionalConditions())
-	{
-		return false;
-	}
-
-	return true;
+	return isEnabled() && checkAdditionalConditions();
 }
 
 vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getActivationPlaces() const

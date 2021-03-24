@@ -22,9 +22,9 @@
 #include "PTN_Engine/PTN_Exception.h"
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <unordered_map>
 #include <vector>
+#include <shared_mutex>
 
 namespace ptne
 {
@@ -238,9 +238,8 @@ public:
 private:
 	/*!
 	 * Shared mutex to synchronize API calls, allowing simultaneous reads (readers-writer lock).
-	 * Replace the normal mutex for a shared mutex once GCC supports it.
 	 */
-	mutable std::mutex m_mutex;
+	mutable std::shared_timed_mutex m_mutex;
 
 	/*!
 	 * Clear the token counter from all input places.
@@ -264,10 +263,10 @@ private:
 	getConditionFunctions(const std::vector<std::string> &names) const;
 
 	/*!
-	 * Collects and randomizes the order of all active transitions.
-	 * \return Vector of unique pointers to active transitions.
+	 * Collects and randomizes the order of all enabled transitions.
+	 * \return Vector of unique pointers to enabled transitions.
 	 */
-	std::vector<Transition *> collectActiveTransitionsRandomly();
+	std::vector<Transition *> collectEnabledTransitionsRandomly();
 
 	/*!
 	 *
