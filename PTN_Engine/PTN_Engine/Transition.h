@@ -2,6 +2,7 @@
  * This file is part of PTN Engine
  *
  * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2021 Kale Evans
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +73,12 @@ public:
 	 * \return True if can be fired, false if it cannot.
 	 */
 	bool isActive() const;
+
+	/*!
+	 * Evaluates if the transition can attempt to be fired.
+	 * \return True if can attepmted to be fired, false if it cannot.
+	 */
+	bool isEnabled() const;
 
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getActivationPlaces() const;
 

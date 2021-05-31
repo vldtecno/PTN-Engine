@@ -2,6 +2,7 @@
  * This file is part of PTN Engine
  *
  * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2021 Kale Evans
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +32,7 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
                        const vector<WeakPtrPlace> &destinationPlaces,
                        const vector<size_t> &destinationWeights,
                        const vector<WeakPtrPlace> &inhibitorPlaces,
-					   const vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions)
+                       const vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions)
 : m_additionalActivationConditions{ additionalActivationConditions }
 , m_inhibitorPlaces(inhibitorPlaces)
 {
@@ -97,7 +98,7 @@ bool Transition::execute()
 	return true;
 }
 
-bool Transition::isActive() const
+bool Transition::isEnabled() const
 {
 	if (!checkInhibitorPlaces())
 	{
@@ -109,12 +110,12 @@ bool Transition::isActive() const
 		return false;
 	}
 
-	if (!checkAdditionalConditions())
-	{
-		return false;
-	}
-
 	return true;
+}
+
+bool Transition::isActive() const
+{
+	return isEnabled() && checkAdditionalConditions();
 }
 
 vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getActivationPlaces() const

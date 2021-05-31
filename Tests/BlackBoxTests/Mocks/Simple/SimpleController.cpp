@@ -42,16 +42,15 @@ void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 		}
 	};
 
-	vector<future<void>> tasks;
+	vector<thread> threads;
 	for (size_t i = 0; i < numberOfThreads; ++i)
 	{
-		auto fut = async(launch::async, f);
-		tasks.push_back(move(fut));
+		threads.emplace_back(thread(f));
 	}
 
-	for (auto &task : tasks)
+	for (auto &t : threads)
 	{
-		task.wait();
+		t.join();
 	}
 }
 

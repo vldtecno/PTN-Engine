@@ -68,11 +68,11 @@ public:
 	 */
 	void testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces]);
 
-	/*!
-	 *
-	 *
-	 */
+	//! Have multiple threads incrementing a place concurrently
 	void testThreadSafety();
+
+	//! Test additional activation conditions
+	void testAdditionalActivationConditions();
 
 	//! Controller containing the PTN Engine net.
 	std::shared_ptr<Dispatcher> m_dispatcher;

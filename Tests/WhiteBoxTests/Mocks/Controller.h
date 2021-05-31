@@ -47,7 +47,13 @@ public:
 	//! Set if the activation condition should return true or false.
 	void setFireCondition(const bool);
 
+	//! Get the count of calls of the activation condition
+	size_t activationConditionCallCounter() const;
+
 private:
+	//! Activation condition call counter
+	mutable size_t m_activationConditionCallCounter;
+
 	//! Counter of times entered.
 	size_t m_enterCounter;
 
