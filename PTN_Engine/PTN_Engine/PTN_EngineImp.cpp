@@ -25,6 +25,7 @@
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
+#include <mutex>
 
 namespace ptne
 {
@@ -267,18 +268,20 @@ vector<pair<string, ConditionFunction>>
 PTN_Engine::PTN_EngineImp::getConditionFunctions(const vector<string> &names) const
 {
 	vector<pair<string, ConditionFunction>> conditions;
-	for_each(names.cbegin(), names.cend(), [&](const string &name) {
-		if (name.empty())
-		{
-			return;
-		}
+	for_each(names.cbegin(), names.cend(),
+			 [&](const string &name)
+			 {
+				 if (name.empty())
+				 {
+					 return;
+				 }
 
-		if (m_conditions.find(name) == m_conditions.end())
-		{
-			throw InvalidFunctionNameException(name);
-		}
-		conditions.push_back(pair<string, ConditionFunction>(name, m_conditions.at(name)));
-	});
+				 if (m_conditions.find(name) == m_conditions.end())
+				 {
+					 throw InvalidFunctionNameException(name);
+				 }
+				 conditions.push_back(pair<string, ConditionFunction>(name, m_conditions.at(name)));
+			 });
 	return conditions;
 }
 

@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "PTN_Engine/Utilities/Explicit.h"
 #include <PTN_Engine/IExporter.h>
 #include <memory>
 #include <pugixml.hpp>

@@ -41,7 +41,6 @@ void initializeCallList(shared_ptr<Controller::CallList> callLog)
 
 void programLoop(shared_ptr<Controller> controller)
 {
-	string userInput;
 	bool exit = false;
 	do
 	{
