@@ -50,6 +50,11 @@ XML_Importer::~XML_Importer()
 {
 }
 
+std::string XML_Importer::getActionsThreadOption() const
+{
+	return m_document.child("PTN-Engine").attribute("actionsThreadOption").as_string();
+}
+
 vector<XML_Importer::PlaceInfo> XML_Importer::getPlaces() const
 {
 	vector<PlaceInfo> placesInfoCollection;

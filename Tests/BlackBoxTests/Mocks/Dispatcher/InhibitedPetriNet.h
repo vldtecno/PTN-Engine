@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,19 @@
 /*!
  * The behaviour is defined in the constructor.
  */
-class Dispatcher::InhibitedPetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
+class InhibitedPetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 {
 	// For testing purposes.
 	friend class FixturePetriNet;
 
 public:
-	/*!
-	 * Constructor.
-	 * \param ptrDispatcher Shared pointer to the dispatcher.
-	 */
-	InhibitedPetriNet(std::shared_ptr<Dispatcher> ptrDispatcher);
+	InhibitedPetriNet(
+	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 
 	//! Trigger the dispatch process.
 	void dispatch() override;
+
+	bool stillRunning() const override;
+
+	void stop() override;
 };

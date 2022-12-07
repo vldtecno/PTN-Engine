@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<PTN-Engine version="2.0" format="1" name="PhoneMenu">
+<PTN-Engine version="2.0" format="1" name="PhoneMenu" actionsThreadOption="EVENT_LOOP">
 	<Places>
 		<Place name="InputA" isInput="true" />
 		<Place name="InputB" isInput="true" />

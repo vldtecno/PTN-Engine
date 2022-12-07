@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,30 @@
  */
 
 #include "Fixtures/FixturePetriNet.h"
-#include "Mocks/Simple/SimpleController.h"
+#include "Mocks/Dispatcher/FreeChoicePetriNet.h"
+#include "Mocks/Dispatcher/InhibitedPetriNet.h"
+#include "Mocks/Dispatcher/RoundRobinPetriNet.h"
+#include "Mocks/Dispatcher/WeightedPetriNet.h"
 #include <cmath>
+#include <thread>
 
 using namespace std;
+using namespace std::chrono;
 
 FixturePetriNet::FixturePetriNet()
-: m_dispatcher(make_shared<Dispatcher>())
 {
-	m_dispatcher->initialize();
 }
 
 void FixturePetriNet::testRoundRobinState(const size_t expectedTokens[s_numberOfRoundRobinPlaces])
 {
-	if (!m_dispatcher)
-	{
-		throw runtime_error("No dispatcher available");
-	}
-
 	size_t tokens[s_numberOfRoundRobinPlaces];
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
-	Dispatcher::IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher->m_pPetriNet.get();
+	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (Dispatcher::RoundRobinPetriNet *roundRobinPetriNet =
-		dynamic_cast<Dispatcher::RoundRobinPetriNet *>(dispatcherPetriNet))
+	if (RoundRobinPetriNet *roundRobinPetriNet = dynamic_cast<RoundRobinPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = roundRobinPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = roundRobinPetriNet->getNumberOfTokens("WaitPackage");
@@ -61,23 +58,16 @@ void FixturePetriNet::testRoundRobinState(const size_t expectedTokens[s_numberOf
 	}
 }
 
-
 void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOfFreeChoicePlaces])
 {
-	if (!m_dispatcher)
-	{
-		throw runtime_error("No dispatcher available");
-	}
-
 	size_t tokens[s_numberOfFreeChoicePlaces];
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
-	Dispatcher::IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher->m_pPetriNet.get();
+	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (Dispatcher::FreeChoicePetriNet *freeChoicePetriNet =
-		dynamic_cast<Dispatcher::FreeChoicePetriNet *>(dispatcherPetriNet))
+	if (FreeChoicePetriNet *freeChoicePetriNet = dynamic_cast<FreeChoicePetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = freeChoicePetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = freeChoicePetriNet->getNumberOfTokens("WaitPackage");
@@ -102,28 +92,24 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 
 	EXPECT_TRUE(tokens[3] > 0 || tokens[5] > 0) << tokens[3] << " " << tokens[5];
 
-	float metric =
-	std::abs(static_cast<float>(tokens[3]) - static_cast<float>(tokens[5])) / (tokens[3] + tokens[5]);
+	float bucket1 = tokens[3];
+	float bucket2 = tokens[5];
 
-	EXPECT_TRUE(metric < 0.041f);
+	float metric = abs(bucket1 - bucket2) / (bucket1 + bucket2);
+
+	EXPECT_TRUE(metric < 0.041f) << metric;
 }
 
 void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces])
 {
-	if (!m_dispatcher)
-	{
-		throw runtime_error("No dispatcher available");
-	}
-
 	size_t tokens[s_numberOfWeightedPlaces];
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
-	Dispatcher::IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher->m_pPetriNet.get();
+	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (Dispatcher::WeightedPetriNet *weightedPetriNet =
-		dynamic_cast<Dispatcher::WeightedPetriNet *>(dispatcherPetriNet))
+	if (WeightedPetriNet *weightedPetriNet = dynamic_cast<WeightedPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = weightedPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = weightedPetriNet->getNumberOfTokens("WaitPackage");
@@ -138,23 +124,16 @@ void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWe
 	}
 }
 
-
 void FixturePetriNet::testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces])
 {
-	if (!m_dispatcher)
-	{
-		throw runtime_error("No dispatcher available");
-	}
-
 	size_t tokens[s_numberOfInhibitedNetPlaces];
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
-	Dispatcher::IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher->m_pPetriNet.get();
+	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (Dispatcher::InhibitedPetriNet *weightedPetriNet =
-		dynamic_cast<Dispatcher::InhibitedPetriNet *>(dispatcherPetriNet))
+	if (InhibitedPetriNet *weightedPetriNet = dynamic_cast<InhibitedPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = weightedPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = weightedPetriNet->getNumberOfTokens("P1");
@@ -169,78 +148,4 @@ void FixturePetriNet::testInhibitedState(const size_t expectedTokens[s_numberOfI
 		size_t a = expectedTokens[i];
 		EXPECT_EQ(a, tokens[i]);
 	}
-}
-
-
-void FixturePetriNet::testThreadSafety()
-{
-	shared_ptr<SimpleController> simpleController = make_shared<SimpleController>();
-	simpleController->initialize();
-
-	const size_t numberOfThreads = 8;
-	simpleController->doSomethingConcurrently(numberOfThreads);
-	EXPECT_EQ(numberOfThreads, simpleController->getNumberOfDifferentThreads());
-
-	// TODO get a better way to test
-	EXPECT_EQ(0, simpleController->m_petriNet->getNumberOfTokens("P2"));
-}
-
-
-void FixturePetriNet::testAdditionalActivationConditions()
-{
-	class Controller : public enable_shared_from_this<Controller>
-	{
-		class PetriNet : public ptne::PTN_Engine
-		{
-			friend class FixturePetriNet;
-
-		public:
-			explicit PetriNet(shared_ptr<Controller> controller)
-			{
-				createPlace("P1", 0, true);
-				createPlace("P2", 0);
-
-				createTransition({ "P1" }, { "P2" }, vector<ptne::ConditionFunction>{ [controller]() {
-									 ++controller->m_callCount;
-									 return controller->m_hasConnectionToServer;
-								 } });
-			}
-		};
-
-	public:
-		Controller()
-		: m_petriNet(nullptr)
-		, m_callCount(0)
-		, m_hasConnectionToServer(true){};
-
-		void initialize()
-		{
-			m_petriNet = make_unique<Controller::PetriNet>(shared_from_this());
-		}
-
-		void execute()
-		{
-			m_petriNet->incrementInputPlace("P1");
-			m_petriNet->execute();
-		}
-
-		vector<size_t> getNumberOfTokens()
-		{
-			vector<size_t> numberOfTokens;
-			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P1"));
-			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P2"));
-			return numberOfTokens;
-		}
-
-		unique_ptr<PetriNet> m_petriNet;
-		size_t m_callCount = 0;
-		bool m_hasConnectionToServer = false;
-	};
-
-	auto controller = make_shared<Controller>();
-	controller->initialize();
-	EXPECT_EQ(0, controller->m_callCount);
-	controller->execute();
-	EXPECT_EQ(1, controller->m_callCount);
-	EXPECT_EQ(vector<size_t>({ 0, 1 }), controller->getNumberOfTokens());
 }

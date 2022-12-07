@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,13 @@
  */
 
 #include "Mocks/Dispatcher/WeightedPetriNet.h"
-#include "PTN_Engine/Place.h"
-
 
 using namespace ptne;
 using namespace std;
 
-Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
-: PTN_Engine{}
+WeightedPetriNet::WeightedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: PTN_Engine(actionsThreadOption)
 {
-
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 	createPlace("WaitPackage", 0);
@@ -45,8 +42,18 @@ Dispatcher::WeightedPetriNet::WeightedPetriNet(shared_ptr<Dispatcher> ptrDispatc
 					 vector<size_t>{ 4, 10 });
 }
 
-void Dispatcher::WeightedPetriNet::dispatch()
+void WeightedPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
 	execute();
+}
+
+bool WeightedPetriNet::stillRunning() const
+{
+	return PTN_Engine::isEventLoopRunning();
+}
+
+void WeightedPetriNet::stop()
+{
+	PTN_Engine::stop();
 }

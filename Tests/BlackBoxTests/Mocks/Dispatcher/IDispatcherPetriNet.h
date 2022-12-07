@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 #include "Mocks/Dispatcher/Dispatcher.h"
 
 //! Base class for a PTN Engine net that controls the dispatcher.
-class Dispatcher::IDispatcherPetriNet
+class IDispatcherPetriNet
 {
 	friend class FixturePetriNet;
 
@@ -32,4 +32,8 @@ public:
 
 	//! Trigger a dispatch process.
 	virtual void dispatch() = 0;
+
+	virtual bool stillRunning() const = 0;
+
+	virtual void stop() = 0;
 };

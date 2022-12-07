@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,27 @@
  */
 
 #include "Mocks/Dispatcher/FreeChoicePetriNet.h"
-#include "PTN_Engine/Place.h"
-
 
 using namespace ptne;
 using namespace std;
 
-Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDispatcher)
-: PTN_Engine{}
+FreeChoicePetriNet::FreeChoicePetriNet(Dispatcher &dispatcher,
+									   PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: PTN_Engine(actionsThreadOption)
 {
-
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, ptrDispatcher),
-				bind(&Dispatcher::onLeaveWaitPackage, ptrDispatcher));
+	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, &dispatcher),
+				bind(&Dispatcher::onLeaveWaitPackage, &dispatcher));
 
-	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, ptrDispatcher),
-				bind(&Dispatcher::onLeaveChannelA, ptrDispatcher));
+	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, &dispatcher),
+				bind(&Dispatcher::onLeaveChannelA, &dispatcher));
 
 	createPlace("CounterA", 0);
 
-	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, ptrDispatcher),
-				bind(&Dispatcher::onLeaveChannelB, ptrDispatcher));
+	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, &dispatcher),
+				bind(&Dispatcher::onLeaveChannelB, &dispatcher));
 
 	createPlace("CounterB", 0);
 
@@ -72,21 +70,31 @@ Dispatcher::FreeChoicePetriNet::FreeChoicePetriNet(shared_ptr<Dispatcher> ptrDis
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
+					 { bind(&Dispatcher::resetCounter, &dispatcher) });
 
 	createTransition({ "CounterA" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
+					 { bind(&Dispatcher::resetCounter, &dispatcher) });
 
 	createTransition({ "CounterB" }, // activation
 					 {}, // destination
 					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
+					 { bind(&Dispatcher::resetCounter, &dispatcher) });
 }
 
-void Dispatcher::FreeChoicePetriNet::dispatch()
+void FreeChoicePetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
 	execute();
+}
+
+bool FreeChoicePetriNet::stillRunning() const
+{
+	return PTN_Engine::isEventLoopRunning();
+}
+
+void FreeChoicePetriNet::stop()
+{
+	PTN_Engine::stop();
 }

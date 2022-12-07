@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@ using namespace ptne;
 
 FixtureTestPlace::FixtureTestPlace()
 : m_controller(std::make_shared<Controller>())
-, m_place(size_t(0), std::bind(&Controller::onEnter, m_controller), std::bind(&Controller::onExit, m_controller))
+, m_place(m_ptnEngine,
+          size_t(0),
+          std::bind(&Controller::onEnter, m_controller),
+          std::bind(&Controller::onExit, m_controller))
 {
+    m_ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
 
 void FixtureTestPlace::enterPlace()
@@ -61,6 +65,13 @@ void FixtureTestPlace::exitPlace()
 	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
 }
 
+void FixtureTestPlace::inputPlace()
+{
+	ptne::Place inputPlace(m_ptnEngine, size_t(0), std::bind(&Controller::onEnter, m_controller),
+						   std::bind(&Controller::onExit, m_controller));
+	EXPECT_EQ(false, inputPlace.isInputPlace());
+}
+
 void FixtureTestPlace::enterPlace(const size_t tokens)
 {
 	size_t numberOfTokens = m_place.getNumberOfTokens();
@@ -94,11 +105,4 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
 	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
-}
-
-void FixtureTestPlace::inputPlace()
-{
-	ptne::Place inputPlace(size_t(0), std::bind(&Controller::onEnter, m_controller),
-						   std::bind(&Controller::onExit, m_controller));
-	EXPECT_EQ(false, inputPlace.isInputPlace());
 }

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #include <ostream>
 #include <set>
 
+class SimplePetriNet;
+
 //! A very simple controller with a very simple petri net.
-class SimpleController : public std::enable_shared_from_this<SimpleController>
+class SimpleController
 {
-	class SimplePetriNet;
 	friend class SimplePetriNet;
 	friend class FixturePetriNet;
 
@@ -37,13 +38,15 @@ public:
 
 	SimpleController &operator=(const SimpleController &) = delete;
 
-	~SimpleController() = default;
-
-	void initialize();
+	~SimpleController();
 
 	void doSomethingConcurrently(const size_t numberOfThreads);
 
+	void stop();
+
 	size_t getNumberOfDifferentThreads() const;
+
+	size_t getNumberOfTokens(const std::string &placeName) const;
 
 private:
 	void collectThreadId();
@@ -52,5 +55,3 @@ private:
 
 	std::set<std::thread::id> m_collectedThreadIds;
 };
-
-#include "Mocks/Simple/SimplePetriNet.h"

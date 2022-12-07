@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,14 @@
 #include "PTN_Engine/PTN_Engine.h"
 
 
-class SimpleController::SimplePetriNet : public ptne::PTN_Engine
+class SimplePetriNet : public ptne::PTN_Engine
 {
 	friend class FixturePetriNet;
 
 public:
-	SimplePetriNet(std::shared_ptr<SimpleController> controller);
+	SimplePetriNet(SimpleController &controller);
 
 	void addExecuteP1();
+
+	size_t getNumberOfTokens(const std::string &placeName) const;
 };

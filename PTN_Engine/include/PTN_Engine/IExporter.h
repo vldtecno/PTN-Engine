@@ -31,6 +31,8 @@ class DLL_PUBLIC IExporter
 public:
 	virtual ~IExporter() = default;
 
+	virtual void exportActionsThreadOption(const std::string &actionsThreadOption) = 0;
+
 	virtual void exportPlace(const std::string &name,
 							 const std::string &tokens,
 							 const std::string &isInput,

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2019-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,16 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "XML/XML_Exporter.h"
+#include <PTN_Engine/ImportExport/ExportFactory.h>
 
-#include "Controller/MenuStateMachine.h"
-
-//!Base class for a PTN Engine net that controls the Controller.
-class Controller::IControllerPetriNet
+namespace ptne
 {
-public:
+using namespace std;
 
-	virtual ~IControllerPetriNet(){}
+unique_ptr<IExporter> ExportFactory::createXMLExporter()
+{
+    return make_unique<XML_Exporter>();
+}
 
-	//! Press A key event.
-	virtual void pressA() = 0;
-
-	//! Press B key event.
-	virtual void pressB() = 0;
-
-	//! Press C key event.
-	virtual void pressC() = 0;
-
-};
+} // namespace ptne

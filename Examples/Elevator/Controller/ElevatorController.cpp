@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  */
 
 #include "Controller/ElevatorController.h"
-#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include "Controller/ElevatorPetriNet.h"
 
 #include <iostream>
@@ -25,47 +24,41 @@
 
 using namespace std;
 
-ElevatorController::ElevatorController():
-	m_pPetriNet{nullptr},
-	m_currentFloor(s_bottomFloor),
-	m_toAddToDestination(s_bottomFloor),
-	m_destinations(),
-	m_nextTravelDestinations(),
-	m_floorsWaitingToGoUp(),
-	m_floorsWaitingToGoDown()
-{}
+ElevatorController::ElevatorController()
+	: m_pPetriNet(nullptr)
+	, m_currentFloor(s_bottomFloor)
+	, m_toAddToDestination(s_bottomFloor)
+	, m_destinations()
+	, m_nextTravelDestinations()
+	, m_floorsWaitingToGoUp()
+	, m_floorsWaitingToGoDown()
+{
+	m_pPetriNet = make_unique<ElevatorPetriNet>(*this);
+	m_pPetriNet->execute(false);
+}
 
 ElevatorController::~ElevatorController()
 {}
 
-void ElevatorController::initialize()
+void ElevatorController::checkPetriNetPointer() const
 {
-	if(m_pPetriNet)
+	if (m_pPetriNet == nullptr)
 	{
-		return;
+		throw runtime_error("Petri net not available.");
 	}
-
-	m_pPetriNet = PtrPetriNet(new ElevatorPetriNet(shared_from_this()));
 }
 
 void ElevatorController::openDoors()
 {
-	if (!m_pPetriNet)
-	{
-		throw runtime_error("Petri net not available.");
-	}
+	checkPetriNetPointer();
 	m_pPetriNet->openDoors();
 }
 
 void ElevatorController::closeDoors()
 {
-	if (!m_pPetriNet)
-	{
-		throw runtime_error("Petri net not available.");
-	}
+	checkPetriNetPointer();
 	m_pPetriNet->closeDoors();
 }
-
 
 bool ElevatorController::callElevatorUp(const int floor)
 {
@@ -73,10 +66,7 @@ bool ElevatorController::callElevatorUp(const int floor)
 	{
 		return false;
 	}
-	if (!m_pPetriNet)
-	{
-		throw runtime_error("Petri net not available.");
-	}
+	checkPetriNetPointer();
 	m_toAddToDestination = floor;
 	m_pPetriNet->callButtonUp();
 	return true;
@@ -88,10 +78,7 @@ bool ElevatorController::callElevatorDown(const int floor)
 	{
 		return false;
 	}
-	if (!m_pPetriNet)
-	{
-		throw runtime_error("Petri net not available.");
-	}
+	checkPetriNetPointer();
 	m_toAddToDestination = floor;
 	m_pPetriNet->callButtonDown();
 	return true;
@@ -103,23 +90,21 @@ bool ElevatorController::setDestinationFloor(const int floor)
 	{
 		return false;
 	}
-	if (!m_pPetriNet)
-	{
-		throw runtime_error("Petri net not available.");
-	}
+	checkPetriNetPointer();
 	m_toAddToDestination = floor;
 	m_pPetriNet->destinationButton();
 	return true;
 }
 
+void ElevatorController::stop()
+{
+	m_pPetriNet->stop();
+}
+
 //Actions
 void ElevatorController::addDestination1()
 {
-	if (m_nextTravelDestinations.find(m_toAddToDestination) != m_nextTravelDestinations.end())
-	{
-		m_nextTravelDestinations.erase(m_toAddToDestination);
-	}	
-
+	m_nextTravelDestinations.erase(m_toAddToDestination);
 	m_destinations.insert(m_toAddToDestination);
 
 	printDestinations();
@@ -265,16 +250,15 @@ void ElevatorController::mergeToDestinations(unordered_set<int>& toAdd, const bo
 	do
 	{
 		deleted = false;
-		for (const int floor : toAdd)
+		auto floorIt = std::find_if(toAdd.cbegin(), toAdd.cend(), [this, &lessThan](const int floor) {
+						return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor);
+					 });
+		if (floorIt != toAdd.cend())
 		{
-			if ( ( lessThan && floor < m_currentFloor) ||
-				 (!lessThan && floor > m_currentFloor) )
-			{
-				m_destinations.insert(floor);
-				toAdd.erase(floor);
-				deleted = true;
-				break;
-			}
+			auto& floor = *floorIt;
+			m_destinations.insert(floor);
+			toAdd.erase(floor);
+			deleted = true;
 		}
 	} while (deleted);
 
@@ -447,5 +431,3 @@ void ElevatorController::printSchedule() const
 	printWaitingGoUp();
 	cout << endl;
 }
-
-

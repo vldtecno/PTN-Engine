@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,57 +17,68 @@
  */
 
 #include "Controller/ElevatorPetriNet.h"
+#include "Controller/ElevatorController.h"
 
 using namespace ptne;
 using namespace std;
 
-ElevatorPetriNet::ElevatorPetriNet(shared_ptr<ElevatorController> ptrController):
-	PTN_Engine{}
+ElevatorPetriNet::ElevatorPetriNet(ElevatorController& elevatorController)
+	: PTN_Engine(ACTIONS_THREAD_OPTION::JOB_QUEUE)
+	, m_elevatorController(elevatorController)
 {
 	//Create places
 	createInputPlaces();
-	createCabinePlaces(ptrController);
-	createArrivalPlaces(ptrController);
-	createButtonPressPlaces(ptrController);
-	createSimulationPlaces(ptrController);	
+	createCabinePlaces();
+	createArrivalPlaces();
+	createButtonPressPlaces();
+	createSimulationPlaces();
 
 	//CreateTransitions
-	createCabineTransitions(ptrController);
-	createSimulationTransitions(ptrController);
-	createArrivingFloorTransitions(ptrController);
-	createButtonPressingTransitions(ptrController);
-	createCallingButtonTransitions(ptrController);
+	createCabineTransitions();
+	createSimulationTransitions();
+	createArrivingFloorTransitions();
+	createButtonPressingTransitions();
+	createCallingButtonTransitions();
 }
 
 void ElevatorPetriNet::closeDoors()
 {
-	incrementAndExecute("CloseDoors");
+	incrementInput("CloseDoors");
 }
 
 void ElevatorPetriNet::openDoors()
 {
-	incrementAndExecute("OpenDoors");
+	incrementInput("OpenDoors");
 }
 
 void ElevatorPetriNet::callButtonUp()
 {
-	incrementAndExecute("CallButtonUp");
+	incrementInput("CallButtonUp");
 }
 
 void ElevatorPetriNet::callButtonDown()
 {
-	incrementAndExecute("CallButtonDown");
+	incrementInput("CallButtonDown");
 }
 
 void ElevatorPetriNet::destinationButton()
 {
-	incrementAndExecute("DestinationButton");
+	incrementInput("DestinationButton");
 }
 
-void ElevatorPetriNet::incrementAndExecute(const string& inputPlace, const bool debug)
+void ElevatorPetriNet::incrementInput(const string& inputPlace, const bool debug)
 {
 	incrementInputPlace(inputPlace);
-	execute(debug);
+}
+
+void ElevatorPetriNet::execute(const bool debug)
+{
+	PTN_Engine::execute(debug);
+}
+
+void ElevatorPetriNet::stop()
+{
+	PTN_Engine::stop();
 }
 
 void ElevatorPetriNet::createInputPlaces()
@@ -79,55 +90,55 @@ void ElevatorPetriNet::createInputPlaces()
 	createPlace("DestinationButton", 0, true);
 }
 
-void ElevatorPetriNet::createCabinePlaces(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createCabinePlaces()
 {
-	createPlace("Stopped", 0, bind( &ElevatorController::elevatorStopped, ptrController));
+	createPlace("Stopped", 0, bind( &ElevatorController::elevatorStopped, &m_elevatorController));
 	createPlace("Stopped_", 1);
-	createPlace("Moving", 0, bind( &ElevatorController::elevatorMoving, ptrController));
+	createPlace("Moving", 0, bind( &ElevatorController::elevatorMoving, &m_elevatorController));
 	createPlace("Moving_", 0);
-	createPlace("DoorsOpened", 1, bind( &ElevatorController::doorsAreOpen, ptrController));
-	createPlace("DoorsClosed", 0, bind( &ElevatorController::doorsAreClosed, ptrController));
+	createPlace("DoorsOpened", 1, bind( &ElevatorController::doorsAreOpen, &m_elevatorController));
+	createPlace("DoorsClosed", 0, bind( &ElevatorController::doorsAreClosed, &m_elevatorController));
 	createPlace("DoorsClosed_", 0);
 	
-	createPlace("RemoveFromListGU", 0, bind( &ElevatorController::removeDestinationGU, ptrController));
-	createPlace("RemoveFromListGD", 0, bind( &ElevatorController::removeDestinationGD, ptrController));
+	createPlace("RemoveFromListGU", 0, bind( &ElevatorController::removeDestinationGU, &m_elevatorController));
+	createPlace("RemoveFromListGD", 0, bind( &ElevatorController::removeDestinationGD, &m_elevatorController));
 	createPlace("ArrivedDestination", 0);
 
 	createPlace("ProcessLists", 0);
-	createPlace("ProcessedLists", 1, bind( &ElevatorController::processedLists, ptrController));
+	createPlace("ProcessedLists", 1, bind( &ElevatorController::processedLists, &m_elevatorController));
 	
-	createPlace("GoingUp", 0, bind( &ElevatorController::goingUp, ptrController));
+	createPlace("GoingUp", 0, bind( &ElevatorController::goingUp, &m_elevatorController));
 	createPlace("GoingUp_", 0);
-	createPlace("GoingDown", 0, bind( &ElevatorController::goingDown, ptrController));
+	createPlace("GoingDown", 0, bind( &ElevatorController::goingDown, &m_elevatorController));
 	createPlace("GoingDown_", 0);
 }
 
-void ElevatorPetriNet::createArrivalPlaces(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createArrivalPlaces()
 {
 	createPlace("Ready", 1);
 
-	createPlace("SwapGD", 0, bind( &ElevatorController::rotateLists, ptrController));
-	createPlace("SwapGU", 0, bind( &ElevatorController::rotateLists, ptrController));
+	createPlace("SwapGD", 0, bind( &ElevatorController::rotateLists, &m_elevatorController));
+	createPlace("SwapGU", 0, bind( &ElevatorController::rotateLists, &m_elevatorController));
 
-	createPlace("MergeGoingUpGTCurrent", 0, bind( &ElevatorController::mergeGoingUpGTCurrent, ptrController));
-	createPlace("MergeMinGoingUp1", 0, bind( &ElevatorController::mergeMinGoingUp, ptrController));
-	createPlace("MergeMaxGoingDown1", 0, bind( &ElevatorController::mergeMaxGoingDown, ptrController));
-	createPlace("MergePostponedToCurrent11", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
-	createPlace("MergePostponedToCurrent12", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
+	createPlace("MergeGoingUpGTCurrent", 0, bind( &ElevatorController::mergeGoingUpGTCurrent, &m_elevatorController));
+	createPlace("MergeMinGoingUp1", 0, bind( &ElevatorController::mergeMinGoingUp, &m_elevatorController));
+	createPlace("MergeMaxGoingDown1", 0, bind( &ElevatorController::mergeMaxGoingDown, &m_elevatorController));
+	createPlace("MergePostponedToCurrent11", 0, bind( &ElevatorController::mergePostponedToCurrent, &m_elevatorController));
+	createPlace("MergePostponedToCurrent12", 0, bind( &ElevatorController::mergePostponedToCurrent, &m_elevatorController));
 
-	createPlace("MergeGoingDownSTCurrent", 0, bind( &ElevatorController::mergeGoingDownSTCurrent, ptrController));
-	createPlace("MergeMaxGoingDown2", 0, bind( &ElevatorController::mergeMaxGoingDown, ptrController));
-	createPlace("MergeMinGoingUp2", 0, bind( &ElevatorController::mergeMinGoingUp, ptrController));
-	createPlace("MergePostponedToCurrent21", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
-	createPlace("MergePostponedToCurrent22", 0, bind( &ElevatorController::mergePostponedToCurrent, ptrController));
+	createPlace("MergeGoingDownSTCurrent", 0, bind( &ElevatorController::mergeGoingDownSTCurrent, &m_elevatorController));
+	createPlace("MergeMaxGoingDown2", 0, bind( &ElevatorController::mergeMaxGoingDown, &m_elevatorController));
+	createPlace("MergeMinGoingUp2", 0, bind( &ElevatorController::mergeMinGoingUp, &m_elevatorController));
+	createPlace("MergePostponedToCurrent21", 0, bind( &ElevatorController::mergePostponedToCurrent, &m_elevatorController));
+	createPlace("MergePostponedToCurrent22", 0, bind( &ElevatorController::mergePostponedToCurrent, &m_elevatorController));
 }
 
-void ElevatorPetriNet::createButtonPressPlaces(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createButtonPressPlaces()
 {
-	createPlace("AddToTravel", 0, bind( &ElevatorController::addDestination1, ptrController));
-	createPlace("AddToNextTravel", 0, bind( &ElevatorController::addDestination2, ptrController));
-	createPlace("WaitToGoUp", 0, bind( &ElevatorController::addWaitingToGoUp, ptrController));
-	createPlace("WaitToGoDown", 0, bind( &ElevatorController::addWaitingToGoDown, ptrController));
+	createPlace("AddToTravel", 0, bind( &ElevatorController::addDestination1, &m_elevatorController));
+	createPlace("AddToNextTravel", 0, bind( &ElevatorController::addDestination2, &m_elevatorController));
+	createPlace("WaitToGoUp", 0, bind( &ElevatorController::addWaitingToGoUp, &m_elevatorController));
+	createPlace("WaitToGoDown", 0, bind( &ElevatorController::addWaitingToGoDown, &m_elevatorController));
 	createPlace("D1", 0);
 	createPlace("D2", 0);
 	createPlace("D3", 0);
@@ -135,13 +146,13 @@ void ElevatorPetriNet::createButtonPressPlaces(shared_ptr<ElevatorController> pt
 	createPlace("D5", 0);
 }
 
-void ElevatorPetriNet::createSimulationPlaces(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createSimulationPlaces()
 {
-	createPlace("IncreaseFloor", 0, bind(&ElevatorController::increaseFloor, ptrController));
-	createPlace("DecreaseFloor", 0, bind(&ElevatorController::decreaseFloor, ptrController));
+	createPlace("IncreaseFloor", 0, bind(&ElevatorController::increaseFloor, &m_elevatorController));
+	createPlace("DecreaseFloor", 0, bind(&ElevatorController::decreaseFloor, &m_elevatorController));
 }
 
-void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createCabineTransitions()
 {
 	createTransition({ "CloseDoors", "Stopped_", "DoorsOpened" }, { "Stopped_", "DoorsClosed" });
 
@@ -149,7 +160,7 @@ void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> pt
 
 	createTransition({ "Stopped_", "DoorsClosed_", "ProcessedLists" }, { "DoorsClosed_", "Moving" },
 		{ "OpenDoors" },
-		{ bind(&ElevatorController::isDestinationListNotEmpty, ptrController) });
+		{ bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
 
 	createTransition({ "ArrivedDestination", "Moving_" }, { "Stopped", "OpenDoors" });
 
@@ -161,7 +172,7 @@ void ElevatorPetriNet::createCabineTransitions(shared_ptr<ElevatorController> pt
 	createTransition({ "GoingDown" }, { "GoingDown_" });
 }
 
-void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createSimulationTransitions()
 {
 	createTransition({ "GoingUp_", "Ready", "Moving_" }, { "Moving_", "GoingUp_", "IncreaseFloor" },
 		vector<string>{ "ArrivedDestination" });
@@ -170,63 +181,62 @@ void ElevatorPetriNet::createSimulationTransitions(shared_ptr<ElevatorController
 		vector<string>{ "ArrivedDestination" });
 
 	createTransition({ "IncreaseFloor" }, { "Ready" },
-		{ bind(&ElevatorController::isFloorNotInList, ptrController) });
+		{ bind(&ElevatorController::isFloorNotInList, &m_elevatorController) });
 
 	createTransition({ "DecreaseFloor" }, { "Ready" },
-		{ bind( &ElevatorController::isFloorNotInList, ptrController) });
+		{ bind( &ElevatorController::isFloorNotInList, &m_elevatorController) });
 
 	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
-		{ bind( &ElevatorController::isFloorInList, ptrController) });
+		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) });
 
 	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
 	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
-		{ bind( &ElevatorController::isFloorInList, ptrController) });
+		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) });
 
 	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" });
-
 }
 
-void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createArrivingFloorTransitions()
 {
 	// Arriving a floor going down.	
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
 		{ "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
 
 	createTransition({ "SwapGD" }, { "MergeMinGoingUp1" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeGoingUpGTCurrent" }, { "Ready", "ProcessedLists", "GoingUp" });
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergeMaxGoingDown1" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeMinGoingUp1" }, { "GoingDown", "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isMinSmallerThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergePostponedToCurrent11" },
-		{ bind( &ElevatorController::isMinGreaterThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "MergePostponedToCurrent12" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
-		  bind( &ElevatorController::isMaxSmallerThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+		  bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists", "GoingUp" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
-		  bind( &ElevatorController::isMaxGreaterThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+		  bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergePostponedToCurrent11" }, { "Ready", "ProcessedLists", "GoingUp" });
 
@@ -238,99 +248,98 @@ void ElevatorPetriNet::createArrivingFloorTransitions(shared_ptr<ElevatorControl
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
 		{ "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
 
 	createTransition({ "SwapGU" }, { "MergeMaxGoingDown2" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeGoingDownSTCurrent" }, { "Ready", "ProcessedLists", "GoingDown" });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergeMinGoingUp2" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "GoingUp", "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isMaxGreaterThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergePostponedToCurrent21" },
-		{ bind( &ElevatorController::isMaxSmallerThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isDestinationListEmpty, ptrController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "MergePostponedToCurrent22" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
-		  bind( &ElevatorController::isMinGreaterThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+		  bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists", "GoingDown" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, ptrController),
-		  bind( &ElevatorController::isMinSmallerThanCurrent, ptrController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+		  bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) });
 
 	createTransition({ "MergePostponedToCurrent21" }, { "Ready", "ProcessedLists", "GoingDown" });
 
 	createTransition({ "MergePostponedToCurrent22" }, { "Ready", "ProcessedLists", "GoingUp" });
-
 }
 
-void ElevatorPetriNet::createButtonPressingTransitions(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createButtonPressingTransitions()
 {
 	createTransition({ "DestinationButton", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "DestinationButton", "GoingUp_", "Ready" }, { "D1", "GoingUp_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "DestinationButton", "GoingDown_", "Ready" }, { "D2", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D1" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D1" }, { "AddToNextTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D2" }, { "AddToNextTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D2" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
 
-	createTransition({ "D3" }, { "GoingUp",  "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
+	createTransition({ "D3" }, { "GoingUp", "AddToTravel" },
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
 
-	createTransition({ "D3" }, { "GoingDown",  "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
+	createTransition({ "D3" }, { "GoingDown", "AddToTravel" },
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "AddToNextTravel" }, { "Ready" });
 
 	createTransition({ "AddToTravel" }, { "Ready" });
 }
 
-void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorController> ptrController)
+void ElevatorPetriNet::createCallingButtonTransitions()
 {
 	// Calling the elevator to go up.
 
 	createTransition({ "CallButtonUp", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "CallButtonUp", "GoingUp_", "Ready" }, { "D4", "GoingUp_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "CallButtonUp", "GoingDown_", "Ready" }, { "WaitToGoUp", "GoingDown_" });
 
 	createTransition({ "D4" }, { "WaitToGoUp" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D4" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "WaitToGoUp" }, { "Ready" });
 
@@ -339,19 +348,18 @@ void ElevatorPetriNet::createCallingButtonTransitions(shared_ptr<ElevatorControl
 
 	createTransition({ "CallButtonDown", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "CallButtonDown", "GoingDown_", "Ready" }, { "D5", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "CallButtonDown", "GoingUp_", "Ready" }, { "WaitToGoDown", "GoingUp_" });
 
 	createTransition({ "D5" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "D5" }, { "WaitToGoDown" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, ptrController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
 
 	createTransition({ "WaitToGoDown" }, { "Ready" });
 }
-

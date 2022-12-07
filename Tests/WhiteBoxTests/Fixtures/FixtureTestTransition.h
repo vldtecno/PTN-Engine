@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Mocks/Controller.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Transition.h"
 #include "gtest/gtest.h"
@@ -92,4 +93,6 @@ public:
 protected:
 	//!
 	std::shared_ptr<Controller> m_controller;
+
+	ptne::PTN_Engine m_ptnEngine;
 };

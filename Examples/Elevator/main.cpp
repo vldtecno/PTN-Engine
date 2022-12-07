@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@
 
 using namespace std;
 
-
-
-void callElevatorUpMenu(shared_ptr<ElevatorController> controller)
+void callElevatorUpMenu(ElevatorController& controller)
 {
 	bool exit = false;
 	do
@@ -46,7 +44,7 @@ void callElevatorUpMenu(shared_ptr<ElevatorController> controller)
 			{
 				int callerFloor = stoi(userInput);
 
-				if (controller->callElevatorUp(callerFloor))
+				if (controller.callElevatorUp(callerFloor))
 				{
 					exit = true;
 				}
@@ -64,7 +62,7 @@ void callElevatorUpMenu(shared_ptr<ElevatorController> controller)
 	} while (!exit);
 }
 
-void callElevatorDownMenu(shared_ptr<ElevatorController> controller)
+void callElevatorDownMenu(ElevatorController& controller)
 {
 	bool exit = false;
 	do
@@ -86,7 +84,7 @@ void callElevatorDownMenu(shared_ptr<ElevatorController> controller)
 			{
 				int callerFloor = stoi(userInput);
 
-				if (controller->callElevatorDown(callerFloor))
+				if (controller.callElevatorDown(callerFloor))
 				{
 					exit = true;					
 				}
@@ -106,7 +104,7 @@ void callElevatorDownMenu(shared_ptr<ElevatorController> controller)
 	
 }
 
-void setDestinationMenu(shared_ptr<ElevatorController> controller)
+void setDestinationMenu(ElevatorController& controller)
 {
 	bool exit = false;
 	do
@@ -128,7 +126,7 @@ void setDestinationMenu(shared_ptr<ElevatorController> controller)
 			{
 				int destination = stoi(userInput);
 
-				if (controller->setDestinationFloor(destination))
+				if (controller.setDestinationFloor(destination))
 				{
 					exit = true;
 				}
@@ -146,10 +144,7 @@ void setDestinationMenu(shared_ptr<ElevatorController> controller)
 	} while (!exit);
 }
 
-
-
-
-void programLoop(shared_ptr<ElevatorController> controller)
+void programLoop(ElevatorController& controller)
 {	
 	bool exit = false;
 	do
@@ -168,11 +163,11 @@ void programLoop(shared_ptr<ElevatorController> controller)
 
 		if (userInput == "1")
 		{
-			controller->openDoors();
+			controller.openDoors();
 		}
 		else if (userInput == "2")
 		{
-			controller->closeDoors();
+			controller.closeDoors();
 		}
 		else if (userInput == "3")
 		{
@@ -189,6 +184,7 @@ void programLoop(shared_ptr<ElevatorController> controller)
 		else if (userInput == "q" || userInput == "Q")
 		{
 			cout << "Quitting..." << endl;
+			controller.stop();
 			exit = true;
 		}
 		else
@@ -202,8 +198,7 @@ void programLoop(shared_ptr<ElevatorController> controller)
 int main(int , char** )
 {
 	//Set up controller
-	shared_ptr<ElevatorController> controller = make_shared<ElevatorController>();
-	controller->initialize();
+	ElevatorController controller;
 
 	cout << "This program is part of the PTN Engine distribution." << endl;
 	cout << "The PTN Engine is available at: https://github.com/vldtecno/PTN-Engine" << endl;
@@ -217,8 +212,3 @@ int main(int , char** )
 	cout << "Successfully terminated" << endl;
 	return 0;
 }
-
-
-
-
-

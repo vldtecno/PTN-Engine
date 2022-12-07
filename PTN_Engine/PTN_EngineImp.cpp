@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
+ * Copyright (c) 2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +18,40 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
+#include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/IExporter.h"
 #include "PTN_Engine/IImporter.h"
-#include "PTN_Engine/PTN_Engine/Transition.h"
+#include "PTN_Engine/JobQueue/JobQueue.h"
 #include "PTN_Engine/Place.h"
+#include "PTN_Engine/Transition.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
+#include <chrono>
+#include <future>
 #include <mutex>
+#include <random>
+#include <thread>
+
 
 namespace ptne
 {
 using namespace std;
 
-PTN_Engine::PTN_EngineImp::PTN_EngineImp()
-: m_stop{ false }
+PTN_Engine::PTN_EngineImp::PTN_EngineImp(PTN_Engine &parent, ACTIONS_THREAD_OPTION actionsThreadOption)
+: m_ptnEngine(parent)
+, m_stop(true)
+, m_eventLoopThread(nullptr)
 {
+	setActionsThreadOption(actionsThreadOption);
 }
 
 PTN_Engine::PTN_EngineImp::~PTN_EngineImp()
 {
+	if (m_eventLoopThread != nullptr && m_eventLoopThread->joinable())
+	{
+		m_eventLoopThread->join();
+	}
 }
 
 void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
@@ -47,7 +61,6 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
                                                  const vector<string> &inhibitorPlaces,
                                                  const vector<ConditionFunction> &additionalConditions)
 {
-	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, createAnonymousConditions(additionalConditions));
 }
@@ -60,11 +73,15 @@ const vector<size_t> &destinationWeights,
 const vector<string> &inhibitorPlaces,
 const vector<pair<string, ConditionFunction>> &additionalConditions)
 {
+	unique_lock<shared_timed_mutex> guard(m_mutex);
+
 	vector<WeakPtrPlace> activationPlacesVector = getPlacesFromNames(activationPlaces);
 
 	vector<WeakPtrPlace> destinationPlacesVector = getPlacesFromNames(destinationPlaces);
 
 	vector<WeakPtrPlace> inhibitorPlacesVector = getPlacesFromNames(inhibitorPlaces);
+
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
 
 	m_transitions.push_back(Transition(activationPlacesVector, activationWeights, destinationPlacesVector,
 									   destinationWeights, inhibitorPlacesVector, additionalConditions));
@@ -77,7 +94,6 @@ void PTN_Engine::PTN_EngineImp::createTransition(const vector<string> &activatio
                                                  const vector<string> &inhibitorPlaces,
                                                  const vector<string> &additionalConditions)
 {
-	unique_lock<shared_timed_mutex> guard(m_mutex);
 	createTransitionImp(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 						inhibitorPlaces, getConditionFunctions(additionalConditions));
 }
@@ -103,7 +119,8 @@ vector<Transition *> PTN_Engine::PTN_EngineImp::collectEnabledTransitionsRandoml
 			enabledTransitions.push_back(&transition);
 		}
 	}
-	random_shuffle(enabledTransitions.begin(), enabledTransitions.end());
+	unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+	shuffle(enabledTransitions.begin(), enabledTransitions.end(), minstd_rand0(seed));
 	return enabledTransitions;
 }
 
@@ -113,8 +130,7 @@ void PTN_Engine::PTN_EngineImp::createPlace(const string &name,
                                             ActionFunction onExitAction,
                                             const bool input)
 {
-	unique_lock<shared_timed_mutex> guard(m_mutex);
-	createPlaceImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+    createPlaceImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
@@ -123,12 +139,16 @@ void PTN_Engine::PTN_EngineImp::createPlaceImp(const string &name,
                                                ActionFunction onExitAction,
                                                const bool input)
 {
+	unique_lock<shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	if (m_places.find(name) != m_places.end())
 	{
 		throw RepeatedPlaceException(name);
 	}
 
-	SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens, onEnterAction, onExitAction, input);
+	SharedPtrPlace place =
+	make_shared<Place>(m_ptnEngine, initialNumberOfTokens, onEnterAction, onExitAction, input);
 
 	m_places[name] = place;
 	if (place->isInputPlace())
@@ -143,8 +163,7 @@ void PTN_Engine::PTN_EngineImp::createPlaceStr(const string &name,
                                                const string &onExitAction,
                                                const bool input)
 {
-	unique_lock<shared_timed_mutex> guard(m_mutex);
-	createPlaceStrImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+    createPlaceStrImp(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
@@ -153,16 +172,20 @@ void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
                                                   const string &onExitActionName,
                                                   const bool input)
 {
+    unique_lock<shared_timed_mutex> guard(m_mutex);
+
 	ActionFunction onEnterAction = getActionFunction(onEnterActionName);
-	ActionFunction onExitAction = getActionFunction(onEnterActionName);
+	ActionFunction onExitAction = getActionFunction(onExitActionName);
 
 	if (m_places.find(name) != m_places.end())
 	{
 		throw RepeatedPlaceException(name);
 	}
 
-	SharedPtrPlace place = make_shared<Place>(initialNumberOfTokens, onEnterActionName, onEnterAction,
+	SharedPtrPlace place = make_shared<Place>(m_ptnEngine, initialNumberOfTokens, onEnterActionName, onEnterAction,
 											  onExitActionName, onExitAction, input);
+
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
 
 	m_places[name] = place;
 	if (place->isInputPlace())
@@ -174,6 +197,8 @@ void PTN_Engine::PTN_EngineImp::createPlaceStrImp(const string &name,
 void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunction action)
 {
 	unique_lock<shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	if (name.empty())
 	{
 		throw InvalidFunctionNameException(name);
@@ -191,6 +216,8 @@ void PTN_Engine::PTN_EngineImp::registerAction(const string &name, ActionFunctio
 void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionFunction condition)
 {
 	unique_lock<shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	if (name.empty())
 	{
 		throw InvalidFunctionNameException(name);
@@ -208,50 +235,87 @@ void PTN_Engine::PTN_EngineImp::registerCondition(const string &name, ConditionF
 void PTN_Engine::PTN_EngineImp::execute(const bool log, ostream &o)
 {
 	unique_lock<shared_timed_mutex> guard(m_mutex);
-	m_stop = false;
-	bool transitionFired;
 
-	do
+	if (m_stop == false) // already running
 	{
-		if (log)
-		{
-			printState(o);
-		}
+		return;
+	}
 
-		// TODO: Create an iterator for active transitions
-		// Safe to use raw pointers here. Nothing justifies deleting a
-		// transition from m_transitions, so there should never be an
-		// invalid pointer. At the moment this is only single threaded,
-		// so synchronization problems are not an issue.
-		vector<Transition *> enabledTransitions(collectEnabledTransitionsRandomly());
-
-		transitionFired = false;
-		for (Transition *transition : enabledTransitions)
-		{
-			transitionFired |= transition->execute();
-		}
-	} while (transitionFired && !m_stop);
-
-	clearInputPlaces();
+	if (m_eventLoopThread && m_eventLoopThread->joinable())
+	{
+		stop();
+	}
 	m_stop = false;
+
+	auto execution = [this, log, &o]()
+	{
+		do
+		{
+			bool firedAtLeastOneTransition = false;
+			{
+				std::unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
+				m_newInputReceived = false;
+
+				if (log)
+				{
+					printState(o);
+				}
+
+				// TODO: Create an iterator for active transitions
+				// Safe to use raw pointers here. Nothing justifies deleting a
+				// transition from m_transitions, so there should never be an
+				// invalid pointer. At the moment this is only single threaded,
+				// so synchronization problems are not an issue.
+				vector<Transition *> enabledTransitions(collectEnabledTransitionsRandomly());
+
+				for (Transition *transition : enabledTransitions)
+				{
+					firedAtLeastOneTransition |= transition->execute();
+				}
+			}
+
+			if (!firedAtLeastOneTransition)
+			{
+				std::unique_lock<mutex> eventNotifierGuard(m_eventNotifierMutex);
+				m_eventNotifier.wait_for(eventNotifierGuard, 100ms, [this] { return m_newInputReceived; });
+			}
+		} while (!m_stop);
+	};
+
+	m_eventLoopThread = std::make_unique<std::thread>(std::thread(execution));
 }
 
-void PTN_Engine::PTN_EngineImp::execute()
+void PTN_Engine::PTN_EngineImp::stop()
 {
-	execute(false);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
+	m_stop = true;
+	if (m_eventLoopThread != nullptr && m_eventLoopThread->joinable())
+	{
+		m_eventLoopThread->join();
+		m_eventLoopThread.release();
+	}
 }
 
 void PTN_Engine::PTN_EngineImp::clearInputPlaces()
 {
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	for (const WeakPtrPlace &place : m_inputPlaces)
 	{
 		SharedPtrPlace spPlace = lockWeakPtr(place);
 		spPlace->setNumberOfTokens(0);
 	}
+
+	std::unique_lock<mutex> eventNotifierGuard(m_eventNotifierMutex);
+	m_newInputReceived = false;
 }
 
 ActionFunction PTN_Engine::PTN_EngineImp::getActionFunction(const string &name) const
 {
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	if (name.empty())
 	{
 		return nullptr;
@@ -267,6 +331,8 @@ ActionFunction PTN_Engine::PTN_EngineImp::getActionFunction(const string &name) 
 vector<pair<string, ConditionFunction>>
 PTN_Engine::PTN_EngineImp::getConditionFunctions(const vector<string> &names) const
 {
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	vector<pair<string, ConditionFunction>> conditions;
 	for_each(names.cbegin(), names.cend(),
 			 [&](const string &name)
@@ -288,6 +354,8 @@ PTN_Engine::PTN_EngineImp::getConditionFunctions(const vector<string> &names) co
 size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string &place) const
 {
 	shared_lock<shared_timed_mutex> guard(m_mutex);
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	if (m_places.find(place) == m_places.end())
 	{
 		throw InvalidNameException(place);
@@ -298,6 +366,7 @@ size_t PTN_Engine::PTN_EngineImp::getNumberOfTokens(const string &place) const
 void PTN_Engine::PTN_EngineImp::incrementInputPlace(const string &place)
 {
 	unique_lock<shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
 
 	if (m_places.find(place) == m_places.end())
 	{
@@ -308,10 +377,16 @@ void PTN_Engine::PTN_EngineImp::incrementInputPlace(const string &place)
 		throw NotInputPlaceException(place);
 	}
 	m_places.at(place)->enterPlace(1);
+
+	std::unique_lock<mutex> eventNotifierGuard(m_eventNotifierMutex);
+	m_newInputReceived = true;
+	m_eventNotifier.notify_all();
 }
 
 vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<string> &placesNames) const
 {
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	utility::detectRepeatedNames<string, RepeatedPlaceNamesException>(placesNames);
 
 	vector<WeakPtrPlace> placesVector;
@@ -329,12 +404,23 @@ vector<WeakPtrPlace> PTN_Engine::PTN_EngineImp::getPlacesFromNames(const vector<
 void PTN_Engine::PTN_EngineImp::export_(IExporter &exporter) const
 {
 	shared_lock<shared_timed_mutex> guard(m_mutex);
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
+	std::string actionsThreadOptionStr;
+	if (!ACTIONS_THREAD_OPTION_toString(m_actionsThreadOption, actionsThreadOptionStr))
+	{
+		throw PTN_Exception("Invalid ACTIONS_THREAD_OPTION");
+	}
+	exporter.exportActionsThreadOption(actionsThreadOptionStr);
+
 	exportPlaces(exporter);
 	exportTransitions(exporter);
 }
 
 void PTN_Engine::PTN_EngineImp::exportPlaces(IExporter &exporter) const
 {
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	for (const auto &place : m_places)
 	{
 		string onEnter;
@@ -360,6 +446,8 @@ void PTN_Engine::PTN_EngineImp::exportPlaces(IExporter &exporter) const
 
 void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 {
+	shared_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+
 	for (const auto &transition : m_transitions)
 	{
 		vector<tuple<string, size_t>> activationPlacesExport;
@@ -402,9 +490,19 @@ void PTN_Engine::PTN_EngineImp::exportTransitions(IExporter &exporter) const
 
 void PTN_Engine::PTN_EngineImp::import(const IImporter &importer)
 {
-	unique_lock<shared_timed_mutex> guard(m_mutex);
 	// TODO: Not exception safe, maybe this should go to a constructor instead.
 	clearNet();
+
+	ACTIONS_THREAD_OPTION actionThreadOption = m_actionsThreadOption;
+	std::string actionsThreadOptionStr = importer.getActionsThreadOption();
+	if (ACTIONS_THREAD_OPTION_fromString(actionsThreadOptionStr, actionThreadOption))
+	{
+		setActionsThreadOption(actionThreadOption);
+	}
+	else
+	{
+		throw PTN_Exception("Invalid input ACTIONS_THREAD_OPTION string");
+	}
 
 	// create places
 	for (const IImporter::PlaceInfo &placeInfo : importer.getPlaces())
@@ -421,8 +519,16 @@ void PTN_Engine::PTN_EngineImp::import(const IImporter &importer)
 	}
 }
 
+bool PTN_Engine::PTN_EngineImp::isEventLoopRunning() const
+{
+	unique_lock<shared_timed_mutex> guard(m_mutex);
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
+	return !m_stop;
+}
+
 void PTN_Engine::PTN_EngineImp::clearNet()
 {
+	unique_lock<shared_timed_mutex> eventLoopGuard(m_eventLoopMutex);
 	m_inputPlaces.clear();
 	m_places.clear();
 	m_transitions.clear();
@@ -483,4 +589,83 @@ PTN_Engine::PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunct
 	}
 	return anonymousConditionsVector;
 }
+
+void PTN_Engine::PTN_EngineImp::setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption)
+{
+	unique_lock<shared_timed_mutex> guard(m_mutex);
+
+	if (m_actionsThreadOption == actionsThreadOption)
+	{
+		return;
+	}
+	if (actionsThreadOption == ACTIONS_THREAD_OPTION::JOB_QUEUE && m_jobQueue == nullptr)
+	{
+		m_jobQueue = make_unique<JobQueue>();
+	}
+	else if (actionsThreadOption != ACTIONS_THREAD_OPTION::JOB_QUEUE && m_jobQueue != nullptr)
+	{
+		m_jobQueue.reset();
+	}
+	m_actionsThreadOption = actionsThreadOption;
+}
+
+PTN_Engine::ACTIONS_THREAD_OPTION PTN_Engine::PTN_EngineImp::getActionsThreadOption()
+{
+	return m_actionsThreadOption;
+}
+
+void PTN_Engine::PTN_EngineImp::addJob(const ActionFunction &actionFunction)
+{
+	if (m_actionsThreadOption != ACTIONS_THREAD_OPTION::JOB_QUEUE || m_jobQueue == nullptr ||
+		!m_jobQueue->isActive())
+	{
+		throw PTN_Exception("addJob incorrectly called");
+	}
+
+	m_jobQueue->addJob(actionFunction);
+}
+
+bool PTN_Engine::PTN_EngineImp::ACTIONS_THREAD_OPTION_fromString(const std::string &actionsThreadOptionStr,
+																 ACTIONS_THREAD_OPTION &out)
+{
+	if (actionsThreadOptionStr == "DETACHED")
+	{
+		out = ACTIONS_THREAD_OPTION::DETACHED;
+	}
+	else if (actionsThreadOptionStr == "EVENT_LOOP")
+	{
+		out = ACTIONS_THREAD_OPTION::EVENT_LOOP;
+	}
+	else if (actionsThreadOptionStr == "JOB_QUEUE")
+	{
+		out = ACTIONS_THREAD_OPTION::JOB_QUEUE;
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+bool PTN_Engine::PTN_EngineImp::ACTIONS_THREAD_OPTION_toString(const ACTIONS_THREAD_OPTION actionsThreadOption,
+															   std::string &out)
+{
+	switch (actionsThreadOption)
+	{
+	case ACTIONS_THREAD_OPTION::DETACHED:
+		out = "DETACHED";
+		break;
+	case ACTIONS_THREAD_OPTION::EVENT_LOOP:
+		out = "EVENT_LOOP";
+		break;
+	case ACTIONS_THREAD_OPTION::JOB_QUEUE:
+		out = "JOB_QUEUE";
+		break;
+	default:
+		return false;
+		break;
+	}
+	return true;
+}
+
 } // namespace ptne

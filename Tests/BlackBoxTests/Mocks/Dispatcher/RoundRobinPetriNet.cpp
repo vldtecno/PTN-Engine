@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,31 @@
  */
 
 #include "Mocks/Dispatcher/RoundRobinPetriNet.h"
-#include "PTN_Engine/Place.h"
-
 
 using namespace ptne;
 using namespace std;
 
-Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
-: PTN_Engine{}
+RoundRobinPetriNet::RoundRobinPetriNet(Dispatcher &dispatcher,
+									   PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: PTN_Engine(actionsThreadOption)
 {
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 
-	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, ptrDispatcher),
-				bind(&Dispatcher::onLeaveWaitPackage, ptrDispatcher));
+	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, &dispatcher),
+				bind(&Dispatcher::onLeaveWaitPackage, &dispatcher));
 
-	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, ptrDispatcher),
-				bind(&Dispatcher::onLeaveChannelA, ptrDispatcher));
+	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, &dispatcher),
+				bind(&Dispatcher::onLeaveChannelA, &dispatcher));
 
-	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, ptrDispatcher),
-				bind(&Dispatcher::onLeaveChannelB, ptrDispatcher));
+	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, &dispatcher),
+				bind(&Dispatcher::onLeaveChannelB, &dispatcher));
 
-	createPlace("SelectA", 1, bind(&Dispatcher::actionSelectA, ptrDispatcher),
-				bind(&Dispatcher::onLeaveSelectChannelA, ptrDispatcher));
+	createPlace("SelectA", 1, bind(&Dispatcher::actionSelectA, &dispatcher),
+				bind(&Dispatcher::onLeaveSelectChannelA, &dispatcher));
 
-	createPlace("SelectB", 0, bind(&Dispatcher::actionSelectB, ptrDispatcher),
-				bind(&Dispatcher::onLeaveSelectChannelB, ptrDispatcher));
+	createPlace("SelectB", 0, bind(&Dispatcher::actionSelectB, &dispatcher),
+				bind(&Dispatcher::onLeaveSelectChannelB, &dispatcher));
 
 	createPlace("PackageCounter", 0);
 
@@ -72,11 +71,21 @@ Dispatcher::RoundRobinPetriNet::RoundRobinPetriNet(shared_ptr<Dispatcher> ptrDis
 	// Reset Counter
 	createTransition({ "PackageCounter" }, // activation
 					 {}, // destination
-					 { bind(&Dispatcher::resetCounter, ptrDispatcher) });
+					 { bind(&Dispatcher::resetCounter, &dispatcher) });
 }
 
-void Dispatcher::RoundRobinPetriNet::dispatch()
+void RoundRobinPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
 	execute();
+}
+
+bool RoundRobinPetriNet::stillRunning() const
+{
+	return PTN_Engine::isEventLoopRunning();
+}
+
+void RoundRobinPetriNet::stop()
+{
+	PTN_Engine::stop();
 }

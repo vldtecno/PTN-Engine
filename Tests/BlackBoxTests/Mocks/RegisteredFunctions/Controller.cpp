@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,14 @@
 
 using namespace std;
 
+std::mutex Controller::s_mut;
+
 Controller::Controller()
 : m_petriNet(nullptr)
+{
+}
+
+Controller::~Controller()
 {
 }
 
@@ -31,7 +37,7 @@ void Controller::initialize()
 {
 	if (!m_petriNet)
 	{
-		m_petriNet = make_unique<RegisteredFunctionsPN>(shared_from_this());
+		m_petriNet = make_unique<RegisteredFunctionsPN>(*this);
 	}
 	m_petriNet->registerCallbacks();
 	m_petriNet->createPetriNetStructure();
@@ -44,16 +50,19 @@ void Controller::startExecution()
 
 string Controller::getSomeString() const
 {
+	std::lock_guard<std::mutex> g(s_mut);
 	return m_someString;
 }
 
 void Controller::actionPlace1()
 {
+	std::lock_guard<std::mutex> g(s_mut);
 	m_someString = "actionPlace1";
 }
 
 void Controller::actionPlace2()
 {
+	std::lock_guard<std::mutex> g(s_mut);
 	m_someString = "actionPlace2";
 }
 
@@ -70,4 +79,19 @@ bool Controller::externalCondition2() const
 bool Controller::externalCondition3() const
 {
 	return false;
+}
+
+bool Controller::isEventLoopRunning() const
+{
+	return m_petriNet->isEventLoopRunning();
+}
+
+size_t Controller::getNumberOfTokens(const std::string &placeName) const
+{
+	return m_petriNet->getNumberOfTokens(placeName);
+}
+
+void Controller::stop()
+{
+	m_petriNet->stop();
 }

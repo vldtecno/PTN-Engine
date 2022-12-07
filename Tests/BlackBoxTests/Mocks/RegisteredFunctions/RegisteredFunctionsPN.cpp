@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,23 @@
 
 #include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include "Mocks/RegisteredFunctions/Controller.h"
-#include "PTN_Engine/Utilities/LockWeakPtr.h"
 
 using namespace std;
 
-RegisteredFunctionsPN::RegisteredFunctionsPN(shared_ptr<Controller> controller)
-: ptne::PTN_Engine()
+RegisteredFunctionsPN::RegisteredFunctionsPN(Controller &controller,
+                                             PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: ptne::PTN_Engine(actionsThreadOption)
 , m_controller(controller)
 {
 }
 
 void RegisteredFunctionsPN::registerCallbacks()
 {
-	auto controller = lockWeakPtr(m_controller);
-	registerAction("actionPlace1", bind(&Controller::actionPlace1, controller));
-	registerAction("actionPlace2", bind(&Controller::actionPlace2, controller));
-	registerCondition("externalCondition1", bind(&Controller::externalCondition1, controller));
-	registerCondition("externalCondition2", bind(&Controller::externalCondition2, controller));
-	registerCondition("externalCondition3", bind(&Controller::externalCondition3, controller));
+	registerAction("actionPlace1", bind(&Controller::actionPlace1, &m_controller));
+	registerAction("actionPlace2", bind(&Controller::actionPlace2, &m_controller));
+	registerCondition("externalCondition1", bind(&Controller::externalCondition1, &m_controller));
+	registerCondition("externalCondition2", bind(&Controller::externalCondition2, &m_controller));
+	registerCondition("externalCondition3", bind(&Controller::externalCondition3, &m_controller));
 }
 
 void RegisteredFunctionsPN::createPetriNetStructure()
@@ -52,4 +51,14 @@ void RegisteredFunctionsPN::addExecuteP0()
 {
 	incrementInputPlace("P0");
 	execute();
+}
+
+bool RegisteredFunctionsPN::isEventLoopRunning() const
+{
+	return PTN_Engine::isEventLoopRunning();
+}
+
+size_t RegisteredFunctionsPN::getNumberOfTokens(const std::string &placeName) const
+{
+	return PTN_Engine::getNumberOfTokens(placeName);
 }

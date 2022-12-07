@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ class RegisteredFunctionsPN : public ptne::PTN_Engine
 	friend class F2;
 
 public:
-	RegisteredFunctionsPN(std::shared_ptr<Controller> controller);
+	RegisteredFunctionsPN(
+	Controller &controller,
+	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 
 	void registerCallbacks();
 
@@ -35,5 +37,9 @@ public:
 
 	void addExecuteP0();
 
-	std::weak_ptr<Controller> m_controller;
+	Controller &m_controller;
+
+	bool isEventLoopRunning() const;
+
+	size_t getNumberOfTokens(const std::string &placeName) const;
 };

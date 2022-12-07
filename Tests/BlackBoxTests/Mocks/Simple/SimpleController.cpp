@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,18 @@ using namespace std;
 SimpleController::SimpleController()
 : m_petriNet(nullptr)
 {
+	m_petriNet = make_unique<SimplePetriNet>(*this);
 }
 
-void SimpleController::initialize()
+SimpleController::~SimpleController()
 {
-	m_petriNet = make_unique<SimpleController::SimplePetriNet>(shared_from_this());
 }
 
 void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 {
 	m_collectedThreadIds.clear();
-	auto f = [&]() -> void {
+	auto f = [&]() -> void
+	{
 		this_thread::sleep_for(chrono::milliseconds(5));
 		for (int i = 0; i < 10; ++i)
 		{
@@ -62,4 +63,14 @@ size_t SimpleController::getNumberOfDifferentThreads() const
 void SimpleController::collectThreadId()
 {
 	m_collectedThreadIds.insert(this_thread::get_id());
+}
+
+size_t SimpleController::getNumberOfTokens(const std::string &placeName) const
+{
+	return m_petriNet->getNumberOfTokens(placeName);
+}
+
+void SimpleController::stop()
+{
+	m_petriNet->stop();
 }

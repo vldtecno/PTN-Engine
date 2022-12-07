@@ -2,6 +2,8 @@
  * This file is part of PTN Engine
  *
  * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2021 Kale Evans
+ * Copyright (c) 2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +43,7 @@ void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
 
 	for (size_t i : outputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(i, nullptr, nullptr));
+		shared_ptr<Place> newPlace(new Place(m_ptnEngine, i, nullptr, nullptr));
 		outputPlaces.push_back(newPlace);
 		wOutputPlaces.push_back(newPlace);
 	}
@@ -115,7 +117,7 @@ vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_
 	vector<shared_ptr<Place>> inputPlaces;
 	for (size_t i : inputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(i, nullptr, nullptr));
+		shared_ptr<Place> newPlace(new Place(m_ptnEngine, i, nullptr, nullptr));
 		inputPlaces.push_back(newPlace);
 	}
 	return inputPlaces;

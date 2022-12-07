@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,23 @@
 
 using namespace std;
 
-SimpleController::SimplePetriNet::SimplePetriNet(shared_ptr<SimpleController> controller)
-: ptne::PTN_Engine()
+SimplePetriNet::SimplePetriNet(SimpleController &controller)
+: PTN_Engine(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
 {
-	createPlace("P1", 0, bind(&SimpleController::collectThreadId, controller), true);
+	createPlace("P1", 0, bind(&SimpleController::collectThreadId, &controller), true);
 	createPlace("P2", 0);
 
 	createTransition({ "P1" }, { "P2" });
 	createTransition({ "P2" }, {});
 }
 
-void SimpleController::SimplePetriNet::addExecuteP1()
+void SimplePetriNet::addExecuteP1()
 {
 	incrementInputPlace("P1");
 	execute();
+}
+
+size_t SimplePetriNet::getNumberOfTokens(const std::string &placeName) const
+{
+	return ptne::PTN_Engine::getNumberOfTokens(placeName);
 }

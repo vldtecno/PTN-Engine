@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@
 #include <memory>
 #include <unordered_set>
 
-
 class IElevatorPetriNet;
 
 //! Elevator controller class
-class ElevatorController: public std::enable_shared_from_this<ElevatorController>
+class ElevatorController
 {
 	friend class ElevatorPetriNet;
 
@@ -35,13 +34,6 @@ public:
 	ElevatorController();
 
 	~ElevatorController();
-
-	//! Necessary to have an initialize method at this point.
-	/*!
-	 * Passes a shared pointer from "this" to the PTN Engine net.
-	 * "shared_from_this" cannot be called in the constructor.
-	 */
-	void initialize();	
 
 	//! Command to open elevator doors.
 	void openDoors();
@@ -57,6 +49,8 @@ public:
 
 	//! Command to press a floor button in the elevator.
 	bool setDestinationFloor(const int floor);
+
+	void stop();
 
 	static const int s_bottomFloor = 0;
 	static const int s_topFloor = 10;
@@ -100,6 +94,9 @@ private:
 
 	//! Remove current floor from m_floorsWaitingToGoUp
 	void removeCurrentFromWaitingToGoUp();
+
+	//! Check if pointer to PTN is valid.
+	void checkPetriNetPointer() const;
 
 	//Information
 	void printCurrentFloor() const;

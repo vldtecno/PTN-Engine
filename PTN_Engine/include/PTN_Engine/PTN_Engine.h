@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ namespace ptne
 class IExporter;
 class IImporter;
 
-
 using ConditionFunction = std::function<bool(void)>;
 using ActionFunction = std::function<void(void)>;
 
@@ -44,6 +43,13 @@ using ActionFunction = std::function<void(void)>;
 class DLL_PUBLIC PTN_Engine
 {
 public:
+	enum class ACTIONS_THREAD_OPTION
+	{
+		EVENT_LOOP,
+		DETACHED,
+		JOB_QUEUE
+	};
+
 	virtual ~PTN_Engine();
 
 	/*!
@@ -245,17 +251,12 @@ public:
 	void registerCondition(const std::string &name, ConditionFunction condition);
 
 	/*!
-	 * Run until it no more transitions can be fired or stop is flagged.
+	 * Start the petri net event loop.
+	 * \param returnWhenStopped run the net only until no transition is fireable.
 	 * \param log Flag logging the state of the net on or off.
 	 * \param o Log output stream.
 	 */
-	void execute(const bool log, std::ostream &o = std::cout);
-
-	/*!
-	 * Run until it no more transitions can be fired or stop is flagged.
-	 * No state logging performed.
-	 */
-	void execute();
+	void execute(const bool log = false, std::ostream &o = std::cout);
 
 	/*!
 	 * Return the number of tokens in a given place.
@@ -289,8 +290,31 @@ public:
 	 */
 	void import(const IImporter &importer);
 
-	//! Default constructor
-	PTN_Engine();
+	//! Constructor
+	explicit PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread = ACTIONS_THREAD_OPTION::DETACHED);
+
+	//! Specify the thread where the actions should be run.
+	void setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption);
+
+	//! Get the information on which thread the actions are run.
+	ACTIONS_THREAD_OPTION getActionsThreadOption() const;
+
+	/*!
+	 * \brief Whether the Petri Net's event loop is running or not.
+	 * \return True if the event loop is running, false otherwise.
+	 */
+	bool isEventLoopRunning() const;
+
+	/*!
+	 * \brief Stop the execution loop.
+	 */
+	void stop();
+
+	/*!
+	 * \brief Add job to job queue.
+	 * \param Function to be executed in the job queue.
+	 */
+	void addJob(const ActionFunction &actionFunction);
 
 private:
 	class PTN_EngineImp;

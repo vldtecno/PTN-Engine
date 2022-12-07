@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #include "Controller/IElevatorPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 
+class ElevatorController;
+
 //! Implements PTN Engine net defining the phone menu behaviour.
 /*!
  * The behaviour is defined in the constructor.
@@ -36,7 +38,7 @@ public:
 	 * Constructor.
 	 * \param ptrDispatcher Shared pointer to the controller.
 	 */
-	ElevatorPetriNet(std::shared_ptr<ElevatorController> ptrMenuController);
+	ElevatorPetriNet(ElevatorController& elevatorController);
 
 	//Events
 
@@ -50,23 +52,25 @@ public:
 
 	void destinationButton() override;
 
+	void execute(const bool debug) override;
+
+	void stop() override;
 
 private:
 
 	void createInputPlaces();
-	void createCabinePlaces(std::shared_ptr<ElevatorController> ptrController);
-	void createArrivalPlaces(std::shared_ptr<ElevatorController> ptrController);
-	void createButtonPressPlaces(std::shared_ptr<ElevatorController> ptrController);
-	void createSimulationPlaces(std::shared_ptr<ElevatorController> ptrController);
+	void createCabinePlaces();
+	void createArrivalPlaces();
+	void createButtonPressPlaces();
+	void createSimulationPlaces();
 
-	void createCabineTransitions(std::shared_ptr<ElevatorController> ptrController);
-	void createSimulationTransitions(std::shared_ptr<ElevatorController> ptrController);
-	void createArrivingFloorTransitions(std::shared_ptr<ElevatorController> ptrController);
-	void createButtonPressingTransitions(std::shared_ptr<ElevatorController> ptrController);
-	void createCallingButtonTransitions(std::shared_ptr<ElevatorController> ptrController);
+	void createCabineTransitions();
+	void createSimulationTransitions();
+	void createArrivingFloorTransitions();
+	void createButtonPressingTransitions();
+	void createCallingButtonTransitions();
 
-	void incrementAndExecute(const std::string& inputPlace, const bool debug = false);
+	void incrementInput(const std::string& inputPlace, const bool debug = false);
 
-
-
+	ElevatorController& m_elevatorController;
 };

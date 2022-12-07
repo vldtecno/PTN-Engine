@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
  */
 
 #include "Mocks/Dispatcher/Dispatcher.h"
+#include "Mocks/Dispatcher/FreeChoicePetriNet.h"
+#include "Mocks/Dispatcher/InhibitedPetriNet.h"
+#include "Mocks/Dispatcher/RoundRobinPetriNet.h"
+#include "Mocks/Dispatcher/WeightedPetriNet.h"
 
 #include <iostream>
 
@@ -24,24 +28,15 @@ using namespace std;
 
 
 Dispatcher::Dispatcher()
-: m_pPetriNet{ nullptr }
-, m_resetCounter{ false }
-, m_isWaitingPackage{ true }
-, m_isUsingChannelA{ false }
-, m_isUsingChannelB{ false }
-, m_isChannelASelected{ true }
-, m_isChannelBSelected{ false }
+: m_pPetriNet(nullptr)
+, m_resetCounter(false)
+, m_isWaitingPackage(true)
+, m_isUsingChannelA(false)
+, m_isUsingChannelB(false)
+, m_isChannelASelected(true)
+, m_isChannelBSelected(false)
 {
-}
-
-void Dispatcher::initialize()
-{
-	if (m_pPetriNet)
-	{
-		return;
-	}
-
-	setRoundRobinMode();
+	setRoundRobinMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
 
 Dispatcher::~Dispatcher()
@@ -103,6 +98,15 @@ bool Dispatcher::resetCounter() const
 	return m_resetCounter;
 }
 
+bool Dispatcher::stillRunning() const
+{
+	if (m_pPetriNet)
+	{
+		return m_pPetriNet->stillRunning();
+	}
+	return false;
+}
+
 void Dispatcher::setResetCounter(const bool resetCounter)
 {
 	m_resetCounter = resetCounter;
@@ -116,22 +120,27 @@ void Dispatcher::dispatch()
 	}
 }
 
-void Dispatcher::setRoundRobinMode()
+void Dispatcher::setRoundRobinMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
-	m_pPetriNet = move(PtrRoundRobinPetriNet(new RoundRobinPetriNet(shared_from_this())));
+	m_pPetriNet = make_unique<RoundRobinPetriNet>(*this, actionsThreadOption);
 }
 
-void Dispatcher::setFreeChoiceMode()
+void Dispatcher::setFreeChoiceMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
-	m_pPetriNet = move(PtrFreeChoicePetriNet(new FreeChoicePetriNet(shared_from_this())));
+	m_pPetriNet = make_unique<FreeChoicePetriNet>(*this, actionsThreadOption);
 }
 
-void Dispatcher::setWeightedPN()
+void Dispatcher::setWeightedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
-	m_pPetriNet = move(PtrWeightedPetriNet(new WeightedPetriNet(shared_from_this())));
+	m_pPetriNet = make_unique<WeightedPetriNet>(actionsThreadOption);
 }
 
-void Dispatcher::setInhibitedPN()
+void Dispatcher::setInhibitedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
-	m_pPetriNet = move(PtrInhibitedPetriNet(new InhibitedPetriNet(shared_from_this())));
+	m_pPetriNet = make_unique<InhibitedPetriNet>(actionsThreadOption);
+}
+
+void Dispatcher::stop()
+{
+	m_pPetriNet->stop();
 }

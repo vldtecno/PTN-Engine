@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
+ * Copyright (c) 2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +22,24 @@
 
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include <atomic>
+#include <condition_variable>
 #include <iostream>
 #include <memory>
 #include <shared_mutex>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
 namespace ptne
 {
-class Place;
-class Transition;
 class IConditionFunctor;
 class IActionFunctor;
 class IExporter;
 class IImporter;
+class JobQueue;
+class Place;
+class Transition;
 
 using SharedPtrPlace = std::shared_ptr<Place>;
 using WeakPtrPlace = std::weak_ptr<Place>;
@@ -49,7 +54,7 @@ class PTN_Engine::PTN_EngineImp final
 {
 public:
 	//! Constructor.
-	PTN_EngineImp();
+	PTN_EngineImp(PTN_Engine &parent, ACTIONS_THREAD_OPTION actionsRuntimeThread);
 
 	~PTN_EngineImp();
 
@@ -128,16 +133,16 @@ public:
 	void registerCondition(const std::string &name, ConditionFunction condition);
 
 	/*!
-	 * Run until it no more transitions can be fired or stop is flagged.
+	 * Start the petri net event loop.
 	 * \param log Flag logging the state of the net on or off.
 	 * \param o Log output stream.
 	 */
-	void execute(const bool log, std::ostream &o = std::cout);
+	void execute(const bool log = false, std::ostream &o = std::cout);
 
 	/*!
-	 * Run until it no more transitions can be fired or stop is flagged.No state logging performed.
+	 * \brief Stop the execution loop.
 	 */
-	void execute();
+	void stop();
 
 	/*!
 	 * Return the number of tokens in a given place.
@@ -169,6 +174,24 @@ public:
 	 * \param importer
 	 */
 	void import(const IImporter &importer);
+
+	/*!
+	 * \brief Imports the Petri net using the provided importer.
+	 * \param importer Object containing all necessary information to create a new Petri net.
+	 */
+	bool isEventLoopRunning() const;
+
+	/*!
+	 * \brief Add job to job queue.
+	 * \param Function to be executed in the job queue.
+	 */
+	void addJob(const ActionFunction &actionFunction);
+
+	//! Specify the thread where the actions should be run.
+	void setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption);
+
+	//! Get the information on which thread the actions are run.
+	ACTIONS_THREAD_OPTION getActionsThreadOption();
 
 	/*!
 	 * Exception to be thrown when trying to use a place with a wrong name.
@@ -237,10 +260,20 @@ public:
 	};
 
 private:
+	static bool
+	ACTIONS_THREAD_OPTION_fromString(const std::string &actionsThreadOptionStr, ACTIONS_THREAD_OPTION &out);
+
+	static bool ACTIONS_THREAD_OPTION_toString(const ACTIONS_THREAD_OPTION actionsThreadOption, std::string &out);
+
 	/*!
 	 * Shared mutex to synchronize API calls, allowing simultaneous reads (readers-writer lock).
 	 */
 	mutable std::shared_timed_mutex m_mutex;
+
+	/*!
+	 * Shared mutex to synchronize the event loop thread (readers-writer lock).
+	 */
+	mutable std::shared_timed_mutex m_eventLoopMutex;
 
 	/*!
 	 * Clear the token counter from all input places.
@@ -371,6 +404,9 @@ private:
 	const std::vector<std::pair<std::string, ConditionFunction>>
 	createAnonymousConditions(const std::vector<ConditionFunction> &conditions) const;
 
+	//! Reference to parent containing this implementation.
+	PTN_Engine &m_ptnEngine;
+
 	//! Vector with the transitions.
 	/*!
 	 * Insertions on construction. Otherwise (should remain) unchanged.
@@ -404,11 +440,25 @@ private:
 	std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string> &names) const;
 
 	//! Flag to stop the execution of the net.
-	/*!
-	 * For future use in multi-threaded operation. Will probably become atomic.
-	 */
-	bool m_stop;
-};
+	std::atomic<bool> m_stop;
 
+	//! Event loop thread.
+	std::unique_ptr<std::thread> m_eventLoopThread;
+
+	//! Mutex to synchronize the event notifier condition variable m_eventNotifier.
+	std::mutex m_eventNotifierMutex;
+
+	//! Condition variable to wake up the event loop thread when some event happens.
+	std::condition_variable m_eventNotifier;
+
+	//! Flag reporting a new input event.
+	bool m_newInputReceived = false;
+
+	//! Determines how the actions will be executed.
+	ACTIONS_THREAD_OPTION m_actionsThreadOption;
+
+	//! Job queue to dispatch actions.
+	std::unique_ptr<JobQueue> m_jobQueue;
+};
 
 } // namespace ptne

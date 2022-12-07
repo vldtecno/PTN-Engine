@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,13 @@
  */
 
 #include "Controller/Controller.h"
-#include "PTN_Engine/Utilities/LockWeakPtr.h"
-
 #include <iostream>
 
 using namespace std;
 
-Controller::Controller():
-	m_pPetriNet{nullptr},
-	m_messageSelected(0)
+Controller::Controller()
+	: m_petriNet(*this)
+	, m_messageSelected(0)
 {
 }
 
@@ -34,75 +32,58 @@ Controller::~Controller()
 
 void Controller::pressA()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressA();
-	}
+	m_petriNet.pressA();
 }
 
 void Controller::pressB()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressB();
-	}
+	m_petriNet.pressB();
 }
 
 void Controller::pressC()
 {
-	if(m_pPetriNet)
-	{
-		m_pPetriNet->pressC();
-	}
+	m_petriNet.pressC();
 }
 
-void Controller::initialize()
+Controller::MessageList& Controller::messageList()
 {
-	if(m_pPetriNet)
-	{
-		return;
-	}
+	return m_messageList;
+}
 
-	m_pPetriNet = PtrPetriNet(new MenuStateMachine(shared_from_this()));
+Controller::CallList& Controller::callLog()
+{
+	return m_callLog;
 }
 
 void Controller::showMainMenu()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
-	mainMenu->showMenu();
+	m_mainMenu.showMenu();
 }
 
 void Controller::selectCallsOption()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
-	mainMenu->select(0);
+	m_mainMenu.select(0);
 }
 
 void Controller::selectMessagesOption()
 {
-	shared_ptr<MainMenuView> mainMenu = lockWeakPtr(m_mainMenu);
-	mainMenu->select(1);
+	m_mainMenu.select(1);
 }
 
 void Controller::showCallsMenu()
 {
-	shared_ptr<CallList> callLog = lockWeakPtr(m_callLog);
-	shared_ptr<CallLogView> callLogView = lockWeakPtr(m_callLogView);
-	callLogView->viewCallLog(*callLog);
+	m_callLogView.viewCallLog(m_callLog);
 }
 
 void Controller::showMessageMenu()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
-	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtr(m_messagesMenu);
-	messagesMenu->showMessagesList(*messageList, m_messageSelected);
+	m_messagesMenu.showMessagesList(m_messageList, m_messageSelected);
 }
 
 void Controller::selectNextMessage()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
 	++m_messageSelected;
-	if(m_messageSelected == messageList->size())
+	if (m_messageSelected == m_messageList.size())
 	{
 		m_messageSelected = 0;
 	}
@@ -110,32 +91,15 @@ void Controller::selectNextMessage()
 
 void Controller::showMessage()
 {
-	shared_ptr<MessageList> messageList = lockWeakPtr(m_messageList);
-	shared_ptr<MessagesMenuView> messagesMenu = lockWeakPtr(m_messagesMenu);
-	messagesMenu->displayMessage(messageList->getItem(m_messageSelected));
+	m_messagesMenu.displayMessage(m_messageList.getItem(m_messageSelected));
 }
 
-void Controller::setMessageList(shared_ptr<MessageList> messageList)
+void Controller::execute()
 {
-	m_messageList = messageList;
+	m_petriNet.execute();
 }
 
-void Controller::setCallLogView(shared_ptr<CallLogView> callLogView)
+void Controller::stop()
 {
-	m_callLogView = callLogView;
-}
-
-void Controller::setMainMenuView(shared_ptr<MainMenuView> mainMenu)
-{
-	m_mainMenu = mainMenu;
-}
-
-void Controller::setMessagesMenuView(shared_ptr<MessagesMenuView> messagesMenu)
-{
-	m_messagesMenu = messagesMenu;
-}
-
-void Controller::setCallLog(shared_ptr<CallList> callLog)
-{
-	m_callLog = callLog;
+	m_petriNet.stop();
 }

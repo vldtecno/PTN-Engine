@@ -19,7 +19,7 @@ cmake_minimum_required (VERSION 3.8)
 include_directories(
 		${INCLUDE_DIR}
 		${PROJECT_SOURCE_DIR}/Tests/WhiteBoxTests 
-		${PROJECT_SOURCE_DIR}/PTN_Engine
+		${PROJECT_SOURCE_DIR}
 		${gtest_SOURCE_DIR}/include
 	)
 

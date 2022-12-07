@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,13 @@
  */
 
 #include "Mocks/Dispatcher/InhibitedPetriNet.h"
-#include "PTN_Engine/Place.h"
-
 
 using namespace ptne;
 using namespace std;
 
-Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispatcher)
-: PTN_Engine{}
+InhibitedPetriNet::InhibitedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: PTN_Engine(actionsThreadOption)
 {
-
 	// Places
 	createPlace("InputWaitPackage", 0, true);
 
@@ -61,8 +58,18 @@ Dispatcher::InhibitedPetriNet::InhibitedPetriNet(shared_ptr<Dispatcher> ptrDispa
 	);
 }
 
-void Dispatcher::InhibitedPetriNet::dispatch()
+void InhibitedPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
 	execute();
+}
+
+bool InhibitedPetriNet::stillRunning() const
+{
+	return PTN_Engine::isEventLoopRunning();
+}
+
+void InhibitedPetriNet::stop()
+{
+	PTN_Engine::stop();
 }

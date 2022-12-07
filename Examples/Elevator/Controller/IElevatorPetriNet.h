@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public:
 	virtual ~IElevatorPetriNet(){}
 
 	virtual void closeDoors() = 0;
-	
+
 	virtual void openDoors() = 0;
 
 	virtual void callButtonUp() = 0;
@@ -36,4 +36,7 @@ public:
 
 	virtual void destinationButton() = 0;
 
+	virtual void execute(const bool debug) = 0;
+
+	virtual void stop() = 0;
 };

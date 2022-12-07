@@ -40,6 +40,11 @@ XML_Exporter::~XML_Exporter()
 {
 }
 
+void XML_Exporter::exportActionsThreadOption(const std::string &actionsThreadOption)
+{
+    m_rootNode.append_attribute("actionsThreadOption").set_value(actionsThreadOption.c_str());
+}
+
 void XML_Exporter::exportPlace(const string &name,
                                const string &tokens,
                                const string &isInput,
@@ -62,7 +67,7 @@ void XML_Exporter::exportTransition(const vector<tuple<string, size_t>> &activat
     xml_node transitionNode = m_transitionsNode.append_child("Transition");
 
 	xml_node activationPlacesNode = transitionNode.append_child("ActivationPlaces");
-	for (const auto activationPlace : activationPlaces)
+	for (const auto &activationPlace : activationPlaces)
 	{
 		xml_node activationPlaceNode = activationPlacesNode.append_child("ActivationPlace");
 		activationPlaceNode.append_attribute("name").set_value(get<0>(activationPlace).c_str());
@@ -71,7 +76,7 @@ void XML_Exporter::exportTransition(const vector<tuple<string, size_t>> &activat
 	}
 
 	xml_node destinationPlacesNode = transitionNode.append_child("DestinationPlaces");
-	for (const auto destinationPlace : destinationPlaces)
+	for (const auto &destinationPlace : destinationPlaces)
 	{
 		xml_node destinationPlaceNode = destinationPlacesNode.append_child("DestinationPlace");
 		destinationPlaceNode.append_attribute("name").set_value(get<0>(destinationPlace).c_str());
@@ -80,14 +85,14 @@ void XML_Exporter::exportTransition(const vector<tuple<string, size_t>> &activat
 	}
 
 	xml_node activationConditionsNode = transitionNode.append_child("ActivationConditions");
-	for (const auto activationCondition : activationConditions)
+	for (const auto &activationCondition : activationConditions)
 	{
 		xml_node activationConditionNode = activationConditionsNode.append_child("ActivationCondition");
 		activationConditionNode.append_attribute("name").set_value(activationCondition.c_str());
 	}
 
 	xml_node inhibitorPlacesNode = transitionNode.append_child("InhibitorPlaces");
-	for (const auto inhibitorPlace : inhibitorPlaces)
+	for (const auto &inhibitorPlace : inhibitorPlaces)
 	{
 		xml_node inhibitorPlaceNode = inhibitorPlacesNode.append_child("InhibitorPlace");
 		inhibitorPlaceNode.append_attribute("name").set_value(inhibitorPlace.c_str());

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,38 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/PTN_Engine/Place.h"
+#include "PTN_Engine/Place.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include "limits.h"
+#include <future>
 #include <string>
 
 namespace ptne
 {
 using namespace std;
 
-Place::Place(const size_t initialNumberOfTokens,
-			 ActionFunction onEnterEventHandler,
-			 ActionFunction onExitEventHandler,
-			 const bool input)
-: m_onEnterAction{ onEnterEventHandler }
-, m_onExitAction{ onExitEventHandler }
-, m_numberOfTokens{ initialNumberOfTokens }
-, m_isInputPlace{ input }
+Place::Place(PTN_Engine &parent,
+             const size_t initialNumberOfTokens,
+             ActionFunction onEnterEventHandler,
+             ActionFunction onExitEventHandler,
+             const bool input)
+: m_ptnEngine(parent)
+, m_onEnterAction(onEnterEventHandler)
+, m_onExitAction(onExitEventHandler)
+, m_numberOfTokens(initialNumberOfTokens)
+, m_isInputPlace(input)
 {
 }
 
-Place::Place(const size_t initialNumberOfTokens,
-			 const string &onEnterActionName,
-			 ActionFunction onEnterAction,
-			 const string &onExitActionName,
-			 ActionFunction onExitAction,
-			 const bool input)
-: m_onEnterActionName(onEnterActionName)
+Place::Place(PTN_Engine &parent,
+             const size_t initialNumberOfTokens,
+             const string &onEnterActionName,
+             ActionFunction onEnterAction,
+             const string &onExitActionName,
+             ActionFunction onExitAction,
+             const bool input)
+: m_ptnEngine(parent)
+, m_onEnterActionName(onEnterActionName)
 , m_onEnterAction(onEnterAction)
 , m_onExitActionName(onExitActionName)
 , m_onExitAction(onExitAction)
@@ -57,19 +63,21 @@ Place::~Place()
 void Place::enterPlace(const size_t tokens)
 {
 	increaseNumberOfTokens(tokens);
-	if (m_onEnterAction != nullptr)
+	if (m_onEnterAction == nullptr)
 	{
-		m_onEnterAction();
+		return;
 	}
+	executeAction(m_onEnterAction);
 }
 
 void Place::exitPlace(const size_t tokens)
 {
 	decreaseNumberOfTokens(tokens);
-	if (m_onExitAction != nullptr)
+	if (m_onExitAction == nullptr)
 	{
-		m_onExitAction();
+		return;
 	}
+	executeAction(m_onExitAction);
 }
 
 void Place::increaseNumberOfTokens(const size_t tokens)
@@ -126,6 +134,33 @@ const string Place::getOnEnterActionName() const
 const string Place::getOnExitActionName() const
 {
 	return m_onExitActionName;
+}
+
+void Place::executeAction(const ActionFunction &action)
+{
+	switch (m_ptnEngine.getActionsThreadOption())
+	{
+	default:
+	{
+		throw std::runtime_error("Invalid configuration");
+	}
+	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
+	{
+		action();
+		break;
+	}
+	case PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE:
+	{
+		m_ptnEngine.addJob(action);
+		break;
+	}
+	case PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED:
+	{
+		auto t = std::thread(action);
+		t.detach();
+		break;
+	}
+	}
 }
 
 Place::NullTokensException::NullTokensException()

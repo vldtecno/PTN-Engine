@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
+ * Copyright (c) 2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,7 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/PTN_Engine/Transition.h"
+#include "PTN_Engine/Transition.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
@@ -32,7 +33,7 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
                        const vector<WeakPtrPlace> &destinationPlaces,
                        const vector<size_t> &destinationWeights,
                        const vector<WeakPtrPlace> &inhibitorPlaces,
-                       const vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions)
+                       const vector<pair<string, ConditionFunction>> &additionalActivationConditions)
 : m_additionalActivationConditions{ additionalActivationConditions }
 , m_inhibitorPlaces(inhibitorPlaces)
 {

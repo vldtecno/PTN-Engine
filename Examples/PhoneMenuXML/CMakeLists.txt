@@ -1,6 +1,6 @@
 # This file is part of PTN Engine
 # 
-# Copyright (c) 2019 Eduardo Valgôde
+# Copyright (c) 2019-2023 Eduardo Valgôde
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ set(PROJECT_TEST_NAME PhoneMenuXML)
 
 include_directories(
 	   ${INCLUDE_DIR}
-	   ${PROJECT_SOURCE_DIR}/ImportExport/include
+	   ${PROJECT_SOURCE_DIR}/PTN_Engine/ImportExport/include
 	   ${PROJECT_SOURCE_DIR}/Examples/PhoneMenuXML
 	)	
 

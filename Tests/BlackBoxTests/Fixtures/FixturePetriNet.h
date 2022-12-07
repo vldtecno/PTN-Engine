@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include "Mocks/Dispatcher/Dispatcher.h"
 #include "gtest/gtest.h"
+#include <chrono>
 
 //! Fixture for testing a complete PTN net.
 /*!
@@ -68,12 +69,6 @@ public:
 	 */
 	void testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces]);
 
-	//! Have multiple threads incrementing a place concurrently
-	void testThreadSafety();
-
-	//! Test additional activation conditions
-	void testAdditionalActivationConditions();
-
 	//! Controller containing the PTN Engine net.
-	std::shared_ptr<Dispatcher> m_dispatcher;
+	Dispatcher m_dispatcher;
 };

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2019 Eduardo Valgôde
+ * Copyright (c) 2019-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-#include "XML/XML_Exporter.h"
-#include <ImportExport/ExportFactory.h>
+#include "XML/XML_Importer.h"
+#include <PTN_Engine/ImportExport/ImportFactory.h>
 
 namespace ptne
 {
 using namespace std;
 
-unique_ptr<IExporter> ExportFactory::createXMLExporter()
+unique_ptr<IImporter> ImportFactory::createXMLImporter(const string &filePath)
 {
-    return make_unique<XML_Exporter>();
+    return make_unique<XML_Importer>(filePath);
 }
 
 } // namespace ptne

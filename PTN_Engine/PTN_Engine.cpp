@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/IExporter.h"
 #include "PTN_Engine/IImporter.h"
-#include "PTN_Engine/PTN_Engine/PTN_EngineImp.h"
-#include "PTN_Engine/Place.h"
+#include "PTN_Engine/PTN_EngineImp.h"
 
 namespace ptne
 {
@@ -30,8 +29,8 @@ PTN_Engine::~PTN_Engine()
 {
 }
 
-PTN_Engine::PTN_Engine()
-: m_implementation(new PTN_EngineImp())
+PTN_Engine::PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread)
+: m_implementation(new PTN_EngineImp(*this, actionsRuntimeThread))
 {
 }
 
@@ -40,7 +39,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
                                   const vector<string> &inhibitorPlaces,
-								  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<ConditionFunction> &additionalConditions)
 {
 	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 									   inhibitorPlaces, additionalConditions);
@@ -80,7 +79,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<size_t> &activationWeights,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
-								  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<ConditionFunction> &additionalConditions)
 {
 	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
 									   vector<string>{}, additionalConditions);
@@ -102,7 +101,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
-								  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<ConditionFunction> &additionalConditions)
 {
 	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
 									   vector<string>{}, additionalConditions);
@@ -111,7 +110,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const vector<string> &inhibitorPlaces,
-								  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<ConditionFunction> &additionalConditions)
 {
 	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
 									   inhibitorPlaces, additionalConditions);
@@ -180,11 +179,6 @@ void PTN_Engine::execute(const bool log, ostream &o)
 	m_implementation->execute(log, o);
 }
 
-void PTN_Engine::execute()
-{
-	m_implementation->execute(false);
-}
-
 size_t PTN_Engine::getNumberOfTokens(const string &place) const
 {
 	return m_implementation->getNumberOfTokens(place);
@@ -208,6 +202,31 @@ void PTN_Engine::export_(IExporter &exporter) const
 void PTN_Engine::import(const IImporter &importer)
 {
 	m_implementation->import(importer);
+}
+
+void PTN_Engine::setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption)
+{
+	m_implementation->setActionsThreadOption(actionsThreadOption);
+}
+
+PTN_Engine::ACTIONS_THREAD_OPTION PTN_Engine::getActionsThreadOption() const
+{
+	return m_implementation->getActionsThreadOption();
+}
+
+bool PTN_Engine::isEventLoopRunning() const
+{
+	return m_implementation->isEventLoopRunning();
+}
+
+void PTN_Engine::stop()
+{
+	m_implementation->stop();
+}
+
+void PTN_Engine::addJob(const ActionFunction &actionFunction)
+{
+	m_implementation->addJob(actionFunction);
 }
 
 } // namespace ptne

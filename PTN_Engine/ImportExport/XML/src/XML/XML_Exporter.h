@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2019 Eduardo Valgôde
+ * Copyright (c) 2019-2022 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,12 @@ public:
 	XML_Exporter();
 
 	~XML_Exporter();
+
+	/*!
+	 * \brief exportActionsThreadOption
+	 * \param actionsThreadOption
+	 */
+	void exportActionsThreadOption(const std::string &actionsThreadOption) override;
 
 	/*!
 	 * \brief exportPlace

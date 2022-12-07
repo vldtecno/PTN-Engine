@@ -31,6 +31,8 @@ class DLL_PUBLIC IImporter
 public:
 	virtual ~IImporter() = default;
 
+	virtual std::string getActionsThreadOption() const = 0;
+
 	using PlaceInfo = std::tuple<std::string, // name
 								 size_t, // number of tokens
 								 std::string, // on enter action

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 
 namespace ptne
 {
+
+class PTN_Engine;
+
 //! Implements a place of a Petri net.
 /*!
  * Implements a place of a Petri net.
@@ -40,12 +43,14 @@ public:
 	 * \param onExitAction The action to be performed when a token leaves the place.
 	 * \param input Flag that marks the place as an input place.
 	 */
-	Place(const size_t initialNumberOfTokens,
+	Place(PTN_Engine &parent,
+		  const size_t initialNumberOfTokens,
 		  ActionFunction onEnterAction,
 		  ActionFunction onExitAction,
 		  const bool input = false);
 
-	Place(const size_t initialNumberOfTokens,
+	Place(PTN_Engine &parent,
+		  const size_t initialNumberOfTokens,
 		  const std::string &onEnterActionName,
 		  ActionFunction onEnterAction,
 		  const std::string &onExitActionName,
@@ -124,6 +129,14 @@ private:
 	 * \param tokens Number of tokens to be removed. Must be at least 1.
 	 */
 	void decreaseNumberOfTokens(const size_t tokens = 1);
+
+	//!
+	//! \brief Execute the action according to the configuration.
+	//! \param action to be executed
+	//!
+	void executeAction(const ActionFunction &action);
+
+	PTN_Engine &m_ptnEngine;
 
 	//!
 	std::string m_onEnterActionName;

@@ -42,6 +42,12 @@ public:
 	~XML_Importer() override;
 
 	/*!
+	 * \brief getActionsThreadOption
+	 * \return
+	 */
+	std::string getActionsThreadOption() const override;
+
+	/*!
 	 * \brief getPlaces
 	 * \return
 	 */

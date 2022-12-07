@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018 Eduardo Valgôde
+ * Copyright (c) 2018-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
-
-#include "PTN_Engine/PTN_Engine.h"
 
 class RegisteredFunctionsPN;
 
-class Controller : public std::enable_shared_from_this<Controller>
+class Controller
 {
 	friend class F2;
 	friend class RegisteredFunctionsPN;
@@ -33,17 +32,23 @@ class Controller : public std::enable_shared_from_this<Controller>
 public:
 	Controller();
 
+	~Controller();
+
 	Controller(const Controller &) = delete;
 
 	Controller &operator=(const Controller &) = delete;
-
-	~Controller() = default;
 
 	void initialize();
 
 	void startExecution();
 
 	std::string getSomeString() const;
+
+	bool isEventLoopRunning() const;
+
+	size_t getNumberOfTokens(const std::string &placeName) const;
+
+	void stop();
 
 private:
 	std::unique_ptr<RegisteredFunctionsPN> m_petriNet;
@@ -59,4 +64,6 @@ private:
 	bool externalCondition3() const;
 
 	std::string m_someString;
+
+	static std::mutex s_mut;
 };

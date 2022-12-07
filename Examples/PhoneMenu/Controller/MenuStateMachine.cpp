@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,27 @@
  */
 
 #include "Controller/MenuStateMachine.h"
-
-#include "PTN_Engine/Place.h"
+#include "Controller/Controller.h"
 
 using namespace ptne;
 
-Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMenuController):
-	PTN_Engine{}
+MenuStateMachine::MenuStateMachine(Controller &menuController)
+	: PTN_Engine()
 {
 	using namespace std;
 
 	//Places
-	createPlace("InputA",0, true);
-	createPlace("InputB",0, true);
+	createPlace("InputA", 0, true);
+	createPlace("InputB", 0, true);
 	createPlace("InputC", 0, true);
-	createPlace("CallsMenuSelected", 1,bind(&Controller::showMainMenu,ptrMenuController));
-	createPlace("MessagesMenuSelected", 0,bind(&Controller::showMainMenu,ptrMenuController));
-	createPlace("SelectMessagesOption", 0,bind(&Controller::selectMessagesOption,ptrMenuController));
-	createPlace("SelectCallsOption", 0,bind(&Controller::selectCallsOption,ptrMenuController));
-	createPlace("CallsLog", 0,bind(&Controller::showCallsMenu,ptrMenuController));
-	createPlace("MessagesMenu", 0,bind(&Controller::showMessageMenu,ptrMenuController));
-	createPlace("NextMessage", 0,bind(&Controller::selectNextMessage,ptrMenuController));
-	createPlace("ShowMessage", 0,bind(&Controller::showMessage,ptrMenuController));
-
+	createPlace("CallsMenuSelected", 1, bind(&Controller::showMainMenu, &menuController));
+	createPlace("MessagesMenuSelected", 0, bind(&Controller::showMainMenu, &menuController));
+	createPlace("SelectMessagesOption", 0, bind(&Controller::selectMessagesOption, &menuController));
+	createPlace("SelectCallsOption", 0, bind(&Controller::selectCallsOption, &menuController));
+	createPlace("CallsLog", 0, bind(&Controller::showCallsMenu, &menuController));
+	createPlace("MessagesMenu", 0, bind(&Controller::showMessageMenu, &menuController));
+	createPlace("NextMessage", 0, bind(&Controller::selectNextMessage, &menuController));
+	createPlace("ShowMessage", 0, bind(&Controller::showMessage, &menuController));
 
 	//Transitions
 
@@ -101,24 +99,17 @@ Controller::MenuStateMachine::MenuStateMachine(std::shared_ptr<Controller> ptrMe
 		{"MessagesMenu"});
 }
 
-void Controller::MenuStateMachine::pressA()
+void MenuStateMachine::pressA()
 {
 	incrementInputPlace("InputA");
-	execute();
 }
 
-void Controller::MenuStateMachine::pressB()
+void MenuStateMachine::pressB()
 {
 	incrementInputPlace("InputB");
-	execute();
 }
 
-void Controller::MenuStateMachine::pressC()
+void MenuStateMachine::pressC()
 {
 	incrementInputPlace("InputC");
-	execute();
 }
-
-
-
-

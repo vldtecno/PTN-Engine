@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "Mocks/Controller.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Place.h"
 
 
@@ -37,6 +38,9 @@ public:
 	//! Test exiting a place with default tokens.
 	void exitPlace();
 
+	//! Test input places specifics.
+	void inputPlace();
+
 	/*!
 	 * Test entering a place with a specific number of tokens.
 	 * \param tokens Number of tokens.
@@ -49,12 +53,11 @@ public:
 	 */
 	void exitPlace(const size_t tokens);
 
-	//! Test input places specifics.
-	void inputPlace();
-
 protected:
 	//! Mock/fake controller
 	std::shared_ptr<Controller> m_controller;
+
+	ptne::PTN_Engine m_ptnEngine;
 
 	//! A PTN Engine place.
 	ptne::Place m_place;

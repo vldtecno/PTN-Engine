@@ -30,7 +30,7 @@ set(CMAKE_STATIC_LIBRARY_PREFIX lib)
 set(EXECUTABLE_STATIC_POSTFIX _s)
 
 
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 if(CMAKE_COMPILER_IS_GNUCXX)
 	#set(MULTITHREADED_BUILD 8 CACHE STRING "How many threads are used to build the project")
 	#set(CMAKE_MAKE_PROGRAM "${CMAKE_MAKE_PROGRAM} -j${MULTITHREADED_BUILD}")
@@ -39,10 +39,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	set(GCC_COVERAGE_LINK_FLAGS "-lgcov")
 	set(GCC_PTHREAD_LINK_FLAGS "-lpthread")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_PTHREAD_COMPILE_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_PTHREAD_LINK_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")	
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_PTHREAD_LINK_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+	set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake)
 endif()
 
-if(MSVC)
+	if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4251 /MP")
 endif(MSVC)
 
@@ -96,33 +97,6 @@ if(BUILD_TESTS)
 	add_subdirectory(Tests/WhiteBoxTests)
 	add_subdirectory(Tests/BlackBoxTests)
 endif(BUILD_TESTS)
-
-if(BUILD_IMPORT_EXPORT)
-	### pugixml
-
-	configure_file(cmake/pugixml.CMakeLists.txt.in pugixml-download/CMakeLists.txt)
-
-	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pugixml-download" )
-	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pugixml-download" )
-	
-	#define PUGIXML_WCHAR_MODE
-#	add_definitions(-DPUGIXML_WCHAR_MODE)
-
-#	set(pugixml_force_shared_crt ON CACHE BOOL "" FORCE)
-
-
-	add_subdirectory("${CMAKE_BINARY_DIR}/pugixml-src"
-		"${CMAKE_BINARY_DIR}/pugixml-build")
-
-
-	include_directories("${pugixml_SOURCE_DIR}/include"
-		"${pugixml_SOURCE_DIR}/include")
-
-	######
-	add_subdirectory(ImportExport)
-endif(BUILD_IMPORT_EXPORT)
 
 if(BUILD_EXAMPLES)
 	option(INSTALL_EXAMPLES "Install examples" OFF)
