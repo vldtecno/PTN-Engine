@@ -92,7 +92,7 @@ endif ()
 if(BUILD_IMPORT_EXPORT)
 	### pugixml
 
-	configure_file(cmake/pugixml.CMakeLists.txt.in pugixml-download/CMakeLists.txt)
+	configure_file(cmake/pugixml.CMakeLists.txt.in ${CMAKE_BINARY_DIR}/pugixml-download/CMakeLists.txt)
 
 	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
 		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pugixml-download" )
