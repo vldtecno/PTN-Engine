@@ -86,7 +86,6 @@ FreeChoicePetriNet::FreeChoicePetriNet(Dispatcher &dispatcher,
 void FreeChoicePetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
-	execute();
 }
 
 bool FreeChoicePetriNet::stillRunning() const
@@ -97,4 +96,9 @@ bool FreeChoicePetriNet::stillRunning() const
 void FreeChoicePetriNet::stop()
 {
 	PTN_Engine::stop();
+}
+
+void FreeChoicePetriNet::execute()
+{
+	PTN_Engine::execute();
 }

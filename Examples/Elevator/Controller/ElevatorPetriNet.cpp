@@ -24,6 +24,7 @@ using namespace std;
 
 ElevatorPetriNet::ElevatorPetriNet(ElevatorController& elevatorController)
 	: PTN_Engine(ACTIONS_THREAD_OPTION::JOB_QUEUE)
+	//: PTN_Engine(ACTIONS_THREAD_OPTION::EVENT_LOOP)
 	, m_elevatorController(elevatorController)
 {
 	//Create places
@@ -160,7 +161,7 @@ void ElevatorPetriNet::createCabineTransitions()
 
 	createTransition({ "Stopped_", "DoorsClosed_", "ProcessedLists" }, { "DoorsClosed_", "Moving" },
 		{ "OpenDoors" },
-		{ bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
+		{ bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "ArrivedDestination", "Moving_" }, { "Stopped", "OpenDoors" });
 
@@ -181,18 +182,18 @@ void ElevatorPetriNet::createSimulationTransitions()
 		vector<string>{ "ArrivedDestination" });
 
 	createTransition({ "IncreaseFloor" }, { "Ready" },
-		{ bind(&ElevatorController::isFloorNotInList, &m_elevatorController) });
+		{ bind(&ElevatorController::isFloorNotInList, &m_elevatorController) }, true);
 
 	createTransition({ "DecreaseFloor" }, { "Ready" },
-		{ bind( &ElevatorController::isFloorNotInList, &m_elevatorController) });
+		{ bind( &ElevatorController::isFloorNotInList, &m_elevatorController) }, true);
 
 	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
-		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) });
+		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) }, true);
 
 	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 
 	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
-		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) });
+		{ bind( &ElevatorController::isFloorInList, &m_elevatorController) }, true);
 
 	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" });
 }
@@ -204,39 +205,39 @@ void ElevatorPetriNet::createArrivingFloorTransitions()
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
 		{ "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "SwapGD" }, { "MergeMinGoingUp1" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeGoingUpGTCurrent" }, { "Ready", "ProcessedLists", "GoingUp" });
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergeMaxGoingDown1" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMinGoingUp1" }, { "GoingDown", "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) });
+		{ bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMinGoingUp1" }, { "MergePostponedToCurrent11" },
-		{ bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) });
+		{ bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMaxGoingDown1" }, { "MergePostponedToCurrent12" },
 		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-		  bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) });
+		  bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists", "GoingUp" },
 		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-		  bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) });
+		  bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergePostponedToCurrent11" }, { "Ready", "ProcessedLists", "GoingUp" });
 
@@ -248,39 +249,39 @@ void ElevatorPetriNet::createArrivingFloorTransitions()
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
 		{ "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
 		{ "OpenDoors", "ArrivedDestination" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
-		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "SwapGU" }, { "MergeMaxGoingDown2" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeGoingDownSTCurrent" }, { "Ready", "ProcessedLists", "GoingDown" });
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergeMinGoingUp2" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMaxGoingDown2" }, { "GoingUp", "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) });
+		{ bind( &ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMaxGoingDown2" }, { "MergePostponedToCurrent21" },
-		{ bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) });
+		{ bind( &ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists" },
-		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) });
+		{ bind( &ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMinGoingUp2" }, { "MergePostponedToCurrent22" },
 		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-		  bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) });
+		  bind( &ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists", "GoingDown" },
 		{ bind( &ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-		  bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) });
+		  bind( &ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) }, true);
 
 	createTransition({ "MergePostponedToCurrent21" }, { "Ready", "ProcessedLists", "GoingDown" });
 
@@ -291,31 +292,31 @@ void ElevatorPetriNet::createButtonPressingTransitions()
 {
 	createTransition({ "DestinationButton", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "DestinationButton", "GoingUp_", "Ready" }, { "D1", "GoingUp_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "DestinationButton", "GoingDown_", "Ready" }, { "D2", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D1" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D1" }, { "AddToNextTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D2" }, { "AddToNextTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D2" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D3" }, { "GoingUp", "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D3" }, { "GoingDown", "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "AddToNextTravel" }, { "Ready" });
 
@@ -328,18 +329,18 @@ void ElevatorPetriNet::createCallingButtonTransitions()
 
 	createTransition({ "CallButtonUp", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "CallButtonUp", "GoingUp_", "Ready" }, { "D4", "GoingUp_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "CallButtonUp", "GoingDown_", "Ready" }, { "WaitToGoUp", "GoingDown_" });
 
 	createTransition({ "D4" }, { "WaitToGoUp" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D4" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "WaitToGoUp" }, { "Ready" });
 
@@ -348,18 +349,18 @@ void ElevatorPetriNet::createCallingButtonTransitions()
 
 	createTransition({ "CallButtonDown", "Ready" }, { "D3" },
 		vector<string>{ "GoingUp_", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "CallButtonDown", "GoingDown_", "Ready" }, { "D5", "GoingDown_" },
-		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "CallButtonDown", "GoingUp_", "Ready" }, { "WaitToGoDown", "GoingUp_" });
 
 	createTransition({ "D5" }, { "AddToTravel" },
-		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "D5" }, { "WaitToGoDown" },
-		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) });
+		{ bind( &ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) }, true);
 
 	createTransition({ "WaitToGoDown" }, { "Ready" });
 }

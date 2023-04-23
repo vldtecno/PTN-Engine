@@ -45,7 +45,6 @@ WeightedPetriNet::WeightedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsThre
 void WeightedPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
-	execute();
 }
 
 bool WeightedPetriNet::stillRunning() const
@@ -56,4 +55,9 @@ bool WeightedPetriNet::stillRunning() const
 void WeightedPetriNet::stop()
 {
 	PTN_Engine::stop();
+}
+
+void WeightedPetriNet::execute()
+{
+	PTN_Engine::execute();
 }

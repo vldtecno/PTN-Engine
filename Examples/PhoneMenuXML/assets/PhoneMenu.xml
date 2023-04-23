@@ -22,7 +22,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="SelectMessagesOption" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -30,7 +31,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="MessagesMenuSelected" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -39,7 +41,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="SelectCallsOption" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -47,7 +50,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="CallsMenuSelected" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -56,7 +60,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="CallsLog" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -65,7 +70,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="CallsMenuSelected" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -74,7 +80,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="MessagesMenu" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -83,7 +90,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="MessagesMenuSelected" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -92,7 +100,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="NextMessage" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -100,7 +109,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="MessagesMenu" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -109,7 +119,8 @@
 			</ActivationPlaces>
 			<DestinationPlaces>
 				<DestinationPlace name="ShowMessage" />
-			</DestinationPlaces>			
+			</DestinationPlaces>
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		<Transition>
 			<ActivationPlaces>
@@ -119,6 +130,7 @@
 			<DestinationPlaces>
 				<DestinationPlace name="MessagesMenu" />
 			</DestinationPlaces>			
+			<RequireNoActionsInExecution value="false" />
 		</Transition>
 		
 	</Transitions>

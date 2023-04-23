@@ -23,10 +23,13 @@
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <thread>
 
 namespace ptne
 {
-
+/*!
+ * \brief Manages a thread that accepts tasks to be executed in sequence.
+ */
 class JobQueue
 {
 public:
@@ -58,7 +61,7 @@ public:
 	/*!
 	 * \brief Run the job queue. Should be executed in its own thread.
 	 */
-	void run();
+	void run(std::stop_token stopToken);
 
 private:
 	/*!
@@ -72,14 +75,14 @@ private:
 	//! Whether the job queue is running or not.
 	std::atomic<bool> m_isJobQueueRunning = false;
 
-	//! Flag to order the abort of the processing of the job queue.
-	std::atomic<bool> m_abortJobQueue = false;
-
 	//! The collection of jobs to be executed.
 	std::deque<ActionFunction> m_jobQueue;
 
 	//! Mutex to synchronize the job queue operations.
 	std::mutex m_jobQueueMutex;
+
+	//! Thread where the jobs are executed.
+	std::jthread m_workerThread;
 };
 
 } // namespace ptne

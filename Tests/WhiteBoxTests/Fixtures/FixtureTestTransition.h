@@ -20,6 +20,7 @@
 
 #include "Mocks/Controller.h"
 #include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Transition.h"
 #include "gtest/gtest.h"
@@ -94,5 +95,5 @@ protected:
 	//!
 	std::shared_ptr<Controller> m_controller;
 
-	ptne::PTN_Engine m_ptnEngine;
+	ptne::PTN_EngineImp m_ptnEngine;
 };

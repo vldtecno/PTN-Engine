@@ -62,9 +62,10 @@ void XML_Exporter::exportPlace(const string &name,
 void XML_Exporter::exportTransition(const vector<tuple<string, size_t>> &activationPlaces,
                                     const vector<tuple<string, size_t>> &destinationPlaces,
                                     const vector<string> &activationConditions,
-                                    const vector<string> &inhibitorPlaces)
+                                    const vector<string> &inhibitorPlaces,
+                                    const bool requireNoActionInExecution)
 {
-    xml_node transitionNode = m_transitionsNode.append_child("Transition");
+	xml_node transitionNode = m_transitionsNode.append_child("Transition");
 
 	xml_node activationPlacesNode = transitionNode.append_child("ActivationPlaces");
 	for (const auto &activationPlace : activationPlaces)
@@ -97,6 +98,9 @@ void XML_Exporter::exportTransition(const vector<tuple<string, size_t>> &activat
 		xml_node inhibitorPlaceNode = inhibitorPlacesNode.append_child("InhibitorPlace");
 		inhibitorPlaceNode.append_attribute("name").set_value(inhibitorPlace.c_str());
 	}
+
+	xml_node requireNoActionsInExecution = transitionNode.append_child("RequireNoActionsInExecution");
+	requireNoActionsInExecution.append_attribute("value").set_value(requireNoActionInExecution);
 }
 
 void XML_Exporter::saveFile(const string &filePath) const

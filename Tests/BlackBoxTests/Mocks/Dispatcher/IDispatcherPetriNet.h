@@ -36,4 +36,6 @@ public:
 	virtual bool stillRunning() const = 0;
 
 	virtual void stop() = 0;
+
+	virtual void execute() = 0;
 };

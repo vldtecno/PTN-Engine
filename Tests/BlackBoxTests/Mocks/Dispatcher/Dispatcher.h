@@ -130,6 +130,8 @@ public:
 	//! Select inhibited Petri net.
 	void setInhibitedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION);
 
+	void execute();
+
 	bool stillRunning() const;
 
 	void stop();

@@ -21,6 +21,7 @@
 
 namespace ptne
 {
+using namespace std;
 
 void JobQueue::activate()
 {
@@ -38,7 +39,10 @@ void JobQueue::inactivate()
 	{
 		return;
 	}
-	m_abortJobQueue = true;
+	if (m_workerThread.get_stop_token().stop_possible())
+	{
+		m_workerThread.request_stop();
+	}
 	m_isJobQueueActive = false;
 }
 
@@ -49,20 +53,18 @@ bool JobQueue::isActive() const
 
 void JobQueue::launch()
 {
-	std::lock_guard<std::mutex> l(m_jobQueueMutex);
+	lock_guard<mutex> l(m_jobQueueMutex);
 	if (!m_isJobQueueRunning && !m_jobQueue.empty() && m_isJobQueueActive)
 	{
-		auto t = std::thread(&JobQueue::run, this);
-		t.detach();
+		m_isJobQueueRunning = true;
+		m_workerThread = jthread(&JobQueue::run, this);
 	}
 }
 
-void JobQueue::run()
+void JobQueue::run(stop_token stopToken)
 {
-	m_isJobQueueRunning = true;
-	m_abortJobQueue = false;
-	std::unique_lock<std::mutex> l(m_jobQueueMutex);
-	while (!m_jobQueue.empty() && !m_abortJobQueue)
+	unique_lock<mutex> l(m_jobQueueMutex);
+	while (!m_jobQueue.empty() && !stopToken.stop_requested())
 	{
 		ActionFunction job = m_jobQueue.back();
 		m_jobQueue.pop_back();
@@ -71,13 +73,12 @@ void JobQueue::run()
 		l.lock();
 	}
 	m_isJobQueueRunning = false;
-	m_abortJobQueue = false;
 }
 
 void JobQueue::addJob(const ActionFunction &actionFunction)
 {
 	{
-		std::lock_guard<std::mutex> l(m_jobQueueMutex);
+		lock_guard<mutex> l(m_jobQueueMutex);
 		m_jobQueue.push_front(actionFunction);
 	}
 	launch();

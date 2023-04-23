@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <unordered_set>
+#include <shared_mutex>
 
 class IElevatorPetriNet;
 
@@ -50,12 +51,15 @@ public:
 	//! Command to press a floor button in the elevator.
 	bool setDestinationFloor(const int floor);
 
+	//! Stop the petri net.
 	void stop();
 
 	static const int s_bottomFloor = 0;
 	static const int s_topFloor = 10;
 
 private:
+
+	mutable std::shared_mutex m_mutex;
 
 	//! Base (nested) class for a Petri net based state machine.
 	class IControllerPetriNet;
@@ -69,10 +73,10 @@ private:
 	PtrPetriNet m_pPetriNet;
 
 	//! Floor where the elevator currently is.
-	int m_currentFloor;
+	int m_currentFloor = 0;
 
 	//! Floor pressed in the button.
-	int m_toAddToDestination;
+	int m_toAddToDestination = 0;
 
 	//! List of destinations in the current travel.
 	std::unordered_set<int> m_destinations;

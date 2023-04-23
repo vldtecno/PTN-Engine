@@ -24,7 +24,8 @@ using namespace ptne;
 using namespace std;
 
 FixtureTestTransition::FixtureTestTransition()
-: m_controller{ make_shared<Controller>() }
+: m_controller(make_shared<Controller>())
+, m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
 {
 }
 
@@ -43,12 +44,12 @@ void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
 
 	for (size_t i : outputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(m_ptnEngine, i, nullptr, nullptr));
+		shared_ptr<Place> newPlace(new Place(m_ptnEngine, "", i, nullptr, nullptr));
 		outputPlaces.push_back(newPlace);
 		wOutputPlaces.push_back(newPlace);
 	}
 
-	Transition transition(wInputPlaces, {}, wOutputPlaces, {}, {}, conditions);
+	Transition transition(wInputPlaces, {}, wOutputPlaces, {}, {}, conditions, false);
 
 	EXPECT_EQ(expectedFireResult, transition.execute());
 
@@ -91,7 +92,7 @@ void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> inp
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	// Create transition
-	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, {}, conditions);
+	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, {}, conditions, false);
 
 	// Test transition
 	EXPECT_EQ(expectedFireResult, transition.execute());
@@ -117,7 +118,7 @@ vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_
 	vector<shared_ptr<Place>> inputPlaces;
 	for (size_t i : inputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(m_ptnEngine, i, nullptr, nullptr));
+		shared_ptr<Place> newPlace(new Place(m_ptnEngine, "", i, nullptr, nullptr));
 		inputPlaces.push_back(newPlace);
 	}
 	return inputPlaces;

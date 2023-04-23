@@ -17,9 +17,7 @@
  */
 
 #include "PTN_Engine/PTN_Engine.h"
-#include "PTN_Engine/IExporter.h"
-#include "PTN_Engine/IImporter.h"
-#include "PTN_Engine/PTN_EngineImp.h"
+#include "PTN_Engine/PTN_EngineImpProxy.h"
 
 namespace ptne
 {
@@ -30,8 +28,19 @@ PTN_Engine::~PTN_Engine()
 }
 
 PTN_Engine::PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread)
-: m_implementation(new PTN_EngineImp(*this, actionsRuntimeThread))
+: m_impProxy(new PTN_EngineImpProxy(actionsRuntimeThread))
 {
+}
+
+
+void PTN_Engine::setEventLoopSleepDuration(const EventLoopSleepDuration sleepDuration)
+{
+	m_impProxy->setEventLoopSleepDuration(sleepDuration);
+}
+
+PTN_Engine::EventLoopSleepDuration PTN_Engine::getEventLoopSleepDuration() const
+{
+    return m_impProxy->getEventLoopSleepDuration();
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
@@ -39,10 +48,11 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
                                   const vector<string> &inhibitorPlaces,
-                                  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<ConditionFunction> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-									   inhibitorPlaces, additionalConditions);
+	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+	                             inhibitorPlaces, additionalConditions, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
@@ -50,79 +60,90 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
                                   const vector<string> &inhibitorPlaces,
-                                  const vector<string> &additionalConditions)
+                                  const vector<string> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-									   inhibitorPlaces, additionalConditions);
-}
-
-void PTN_Engine::createTransition(const vector<string> &activationPlaces,
-                                  const vector<size_t> &activationWeights,
-                                  const vector<string> &destinationPlaces,
-                                  const vector<size_t> &destinationWeights)
-{
-	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-									   vector<string>{}, vector<ConditionFunction>{});
+	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+								 inhibitorPlaces, additionalConditions, 
+        requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<size_t> &activationWeights,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
-                                  const vector<string> &inhibitorPlaces)
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-									   inhibitorPlaces, vector<ConditionFunction>{});
+	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+								 vector<string>{}, vector<ConditionFunction>{}, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<size_t> &activationWeights,
                                   const vector<string> &destinationPlaces,
                                   const vector<size_t> &destinationWeights,
-                                  const vector<ConditionFunction> &additionalConditions)
+                                  const vector<string> &inhibitorPlaces,
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-									   vector<string>{}, additionalConditions);
-}
-
-void PTN_Engine::createTransition(const vector<string> &activationPlaces, const vector<string> &destinationPlaces)
-{
-	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
-									   vector<string>{}, vector<ConditionFunction>{});
+	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+								 inhibitorPlaces, vector<ConditionFunction>{}, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
+                                  const vector<size_t> &activationWeights,
                                   const vector<string> &destinationPlaces,
-                                  const vector<string> &inhibitorPlaces)
+                                  const vector<size_t> &destinationWeights,
+                                  const vector<ConditionFunction> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
-									   inhibitorPlaces, vector<ConditionFunction>{});
+	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
+								 vector<string>{}, additionalConditions, requireNoActionsInExecution);
 }
 
-void PTN_Engine::createTransition(const vector<string> &activationPlaces,
+void PTN_Engine::createTransition(const vector<string> &activationPlaces, 
                                   const vector<string> &destinationPlaces,
-                                  const vector<ConditionFunction> &additionalConditions)
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
-									   vector<string>{}, additionalConditions);
+	m_impProxy->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
+								 vector<string>{}, vector<ConditionFunction>{}, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const vector<string> &inhibitorPlaces,
-                                  const vector<ConditionFunction> &additionalConditions)
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
-									   inhibitorPlaces, additionalConditions);
+	m_impProxy->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
+								 inhibitorPlaces, vector<ConditionFunction>{}, requireNoActionsInExecution);
+}
+
+void PTN_Engine::createTransition(const vector<string> &activationPlaces,
+                                  const vector<string> &destinationPlaces,
+                                  const vector<ConditionFunction> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
+{
+	m_impProxy->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
+								 vector<string>{}, additionalConditions, requireNoActionsInExecution);
+}
+
+void PTN_Engine::createTransition(const vector<string> &activationPlaces,
+                                  const vector<string> &destinationPlaces,
+                                  const vector<string> &inhibitorPlaces,
+                                  const vector<ConditionFunction> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
+{
+	m_impProxy->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
+								 inhibitorPlaces, additionalConditions, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const std::vector<std::string> &activationPlaces,
                                   const std::vector<std::string> &destinationPlaces,
                                   const std::vector<std::string> &inhibitorPlaces,
-                                  const std::vector<std::string> &additionalConditions)
+                                  const std::vector<std::string> &additionalConditions,
+                                  const bool requireNoActionsInExecution)
 {
-	m_implementation->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
-									   inhibitorPlaces, additionalConditions);
+	m_impProxy->createTransition(activationPlaces, vector<size_t>{}, destinationPlaces, vector<size_t>{},
+								 inhibitorPlaces, additionalConditions, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createPlace(const string &name,
@@ -131,7 +152,7 @@ void PTN_Engine::createPlace(const string &name,
                              ActionFunction onExitAction,
                              const bool input)
 {
-	m_implementation->createPlace(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+    m_impProxy->createPlace(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::createPlace(const string &name,
@@ -140,12 +161,12 @@ void PTN_Engine::createPlace(const string &name,
                              const string &onExitAction,
                              const bool input)
 {
-	m_implementation->createPlaceStr(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
+    m_impProxy->createPlaceStr(name, initialNumberOfTokens, onEnterAction, onExitAction, input);
 }
 
 void PTN_Engine::createPlace(const string &name, const size_t initialNumberOfTokens, const bool input)
 {
-	m_implementation->createPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
+    m_impProxy->createPlace(name, initialNumberOfTokens, nullptr, nullptr, input);
 }
 
 void PTN_Engine::createPlace(const string &name,
@@ -153,7 +174,7 @@ void PTN_Engine::createPlace(const string &name,
                              ActionFunction onEnterAction,
                              const bool input)
 {
-	m_implementation->createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
+    m_impProxy->createPlace(name, initialNumberOfTokens, onEnterAction, nullptr, input);
 }
 
 void PTN_Engine::createPlace(const string &name,
@@ -161,72 +182,67 @@ void PTN_Engine::createPlace(const string &name,
                              const string &onEnterAction,
                              const bool input)
 {
-	m_implementation->createPlaceStr(name, initialNumberOfTokens, onEnterAction, "", input);
+    m_impProxy->createPlaceStr(name, initialNumberOfTokens, onEnterAction, "", input);
 }
 
 void PTN_Engine::registerAction(const string &name, ActionFunction action)
 {
-	m_implementation->registerAction(name, action);
+    m_impProxy->registerAction(name, action);
 }
 
 void PTN_Engine::registerCondition(const string &name, ConditionFunction condition)
 {
-	m_implementation->registerCondition(name, condition);
+    m_impProxy->registerCondition(name, condition);
 }
 
 void PTN_Engine::execute(const bool log, ostream &o)
 {
-	m_implementation->execute(log, o);
+    m_impProxy->execute(log, o);
 }
 
 size_t PTN_Engine::getNumberOfTokens(const string &place) const
 {
-	return m_implementation->getNumberOfTokens(place);
+    return m_impProxy->getNumberOfTokens(place);
 }
 
 void PTN_Engine::incrementInputPlace(const string &place)
 {
-	m_implementation->incrementInputPlace(place);
+    m_impProxy->incrementInputPlace(place);
 }
 
 void PTN_Engine::printState(ostream &o) const
 {
-	m_implementation->printState(o);
+    m_impProxy->printState(o);
 }
 
 void PTN_Engine::export_(IExporter &exporter) const
 {
-	m_implementation->export_(exporter);
+    m_impProxy->export_(exporter);
 }
 
 void PTN_Engine::import(const IImporter &importer)
 {
-	m_implementation->import(importer);
+    m_impProxy->import(importer);
 }
 
 void PTN_Engine::setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption)
 {
-	m_implementation->setActionsThreadOption(actionsThreadOption);
+    m_impProxy->setActionsThreadOption(actionsThreadOption);
 }
 
 PTN_Engine::ACTIONS_THREAD_OPTION PTN_Engine::getActionsThreadOption() const
 {
-	return m_implementation->getActionsThreadOption();
+    return m_impProxy->getActionsThreadOption();
 }
 
 bool PTN_Engine::isEventLoopRunning() const
 {
-	return m_implementation->isEventLoopRunning();
+    return m_impProxy->isEventLoopRunning();
 }
 
 void PTN_Engine::stop()
 {
-	m_implementation->stop();
-}
-
-void PTN_Engine::addJob(const ActionFunction &actionFunction)
-{
-	m_implementation->addJob(actionFunction);
+    m_impProxy->stop();
 }
 
 } // namespace ptne

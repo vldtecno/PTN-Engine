@@ -23,6 +23,7 @@
 #include "gtest/gtest.h"
 #include <chrono>
 #include <thread>
+#include <latch>
 
 
 using namespace std::chrono;
@@ -252,6 +253,23 @@ TEST_F(FixturePetriNet, Weights_1_detached)
 	m_dispatcher.stop();
 }
 
+TEST_F(FixturePetriNet, Inhibited_SingleThread)
+{
+	m_dispatcher.setResetCounter(true);
+	m_dispatcher.setInhibitedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
+
+	m_dispatcher.dispatch();
+	m_dispatcher.execute();
+	size_t expectedState[6] = { 0, 0, 0, 0, 1, 1 };
+	testInhibitedState(expectedState);
+
+	m_dispatcher.dispatch();
+	m_dispatcher.execute();
+	size_t expectedState_[6] = { 0, 1, 1, 1, 0, 0 };
+	testInhibitedState(expectedState_);
+	m_dispatcher.stop();
+}
+
 TEST_F(FixturePetriNet, Inhibited_1)
 {
 	m_dispatcher.setResetCounter(true);
@@ -331,67 +349,190 @@ TEST(Registered, AlreadyRegisteredMethods)
 
 TEST(Conditions, AdditionalActivationConditions)
 {
-	using std::make_unique;
-	using std::unique_ptr;
 	using std::vector;
-	class Controller
+
+	size_t m_callCount = 0;
+	bool m_hasConnectionToServer = true;
+
+	ptne::PTN_Engine pn;
+	pn.createPlace("P1", 0, true);
+	pn.createPlace("P2", 0);
+
+	pn.createTransition({ "P1" }, { "P2" },
+						vector<ptne::ConditionFunction>{ [&m_callCount, &m_hasConnectionToServer]()
+														 {
+															 ++m_callCount;
+															 return m_hasConnectionToServer;
+														 } });
+
+
+	EXPECT_EQ(0, m_callCount);
+	pn.execute();
+	pn.incrementInputPlace("P1");
+	std::this_thread::sleep_for(10ms);
+	pn.stop();
+	EXPECT_EQ(1, m_callCount);
+	vector<size_t> numberOfTokens;
+	numberOfTokens.emplace_back(pn.getNumberOfTokens("P1"));
+	numberOfTokens.emplace_back(pn.getNumberOfTokens("P2"));
+	EXPECT_EQ(vector<size_t>({ 0, 1 }), numberOfTokens);
+}
+
+TEST(ActionsThreadOption, Ordering)
+{
+	using std::vector;
+	using namespace ptne;
+
+	std::string str;
+	std::mutex mut;
+
+	ActionFunction action1 = [&str, &mut]()
 	{
-		class PetriNet : public ptne::PTN_Engine
-		{
-			friend class FixturePetriNet;
-
-		public:
-			explicit PetriNet(Controller &controller)
-			: ptne::PTN_Engine(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
-			{
-				createPlace("P1", 0, true);
-				createPlace("P2", 0);
-
-				createTransition({ "P1" }, { "P2" },
-								 vector<ptne::ConditionFunction>{ [&controller]()
-																  {
-																	  ++controller.m_callCount;
-																	  return controller.m_hasConnectionToServer;
-																  } });
-			}
-		};
-
-	public:
-		Controller()
-		: m_petriNet(nullptr)
-		, m_callCount(0)
-		, m_hasConnectionToServer(true){};
-
-		void initialize()
-		{
-			m_petriNet = make_unique<Controller::PetriNet>(*this);
-		}
-
-		void execute()
-		{
-			m_petriNet->incrementInputPlace("P1");
-			m_petriNet->execute();
-		}
-
-		vector<size_t> getNumberOfTokens()
-		{
-			vector<size_t> numberOfTokens;
-			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P1"));
-			numberOfTokens.emplace_back(m_petriNet->getNumberOfTokens("P2"));
-			return numberOfTokens;
-		}
-
-		unique_ptr<PetriNet> m_petriNet;
-		size_t m_callCount = 0;
-		bool m_hasConnectionToServer = false;
+		std::lock_guard<std::mutex> lg(mut);
+		str.append("a");
+	};
+	ActionFunction action2 = [&str, &mut]()
+	{
+		std::lock_guard<std::mutex> lg(mut);
+		str.append("b");
 	};
 
-	Controller controller;
-	controller.initialize();
-	EXPECT_EQ(0, controller.m_callCount);
-	controller.execute();
-	std::this_thread::sleep_for(10ms);
-	EXPECT_EQ(1, controller.m_callCount);
-	EXPECT_EQ(vector<size_t>({ 0, 1 }), controller.getNumberOfTokens());
-	controller.m_petriNet->stop();
+	PTN_Engine pn_singleThread(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
+	pn_singleThread.createPlace("P1", 0, action1, true);
+	pn_singleThread.createPlace("Counter", 100000);
+	pn_singleThread.createPlace("P2", 0, action2);
+	pn_singleThread.createTransition({ "P1", "Counter" }, { "P2" });
+	pn_singleThread.createTransition({ "P2" }, { "P1" });
+	pn_singleThread.incrementInputPlace("P1");
+	pn_singleThread.execute();
+	EXPECT_EQ(0, pn_singleThread.getNumberOfTokens("P2"));
+	EXPECT_FALSE(str.find("aa") != std::string::npos);
+	EXPECT_FALSE(str.find("bb") != std::string::npos);
+	str.clear();
+
+	std::atomic<bool> finished = false;
+	ActionFunction action3 = [&finished]() { 
+		finished = true; 
+	};
+
+	PTN_Engine pn_jobQueue(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
+	pn_jobQueue.createPlace("P1", 0, action1, true);
+	pn_jobQueue.createPlace("Counter", 100000);
+	pn_jobQueue.createPlace("P2", 0, action2);
+	pn_jobQueue.createPlace("P3", 0, action3);
+	pn_jobQueue.createTransition({ "P1", "Counter" }, { "P2" });
+	pn_jobQueue.createTransition({ "P2" }, { "P1" });
+	pn_jobQueue.createTransition({ "P1" }, { "P3" }, vector<std::string>{ "Counter" });
+	pn_jobQueue.execute();
+	pn_jobQueue.incrementInputPlace("P1");
+	while (!finished)
+	{
+		std::this_thread::sleep_for(100ms);
+	}
+	pn_jobQueue.stop();
+	EXPECT_EQ(0, pn_jobQueue.getNumberOfTokens("P2"));
+	{
+		std::lock_guard<std::mutex> lg(mut);
+		EXPECT_FALSE(str.find("aa") != std::string::npos);
+		EXPECT_FALSE(str.find("bb") != std::string::npos);
+		str.clear();
+	}
+
+	finished = false;
+	PTN_Engine pn_eventloop(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
+	pn_eventloop.createPlace("P1", 0, action1, true);
+	pn_eventloop.createPlace("Counter", 100000);
+	pn_eventloop.createPlace("P2", 0, action2);
+	pn_eventloop.createPlace("P3", 0, action3);
+	pn_eventloop.createTransition({ "P1", "Counter" }, { "P2" });
+	pn_eventloop.createTransition({ "P2" }, { "P1" });
+	pn_eventloop.createTransition({ "P1" }, { "P3" }, vector<std::string>{ "Counter" });
+	pn_eventloop.execute();
+	pn_eventloop.incrementInputPlace("P1");
+	while (!finished)
+	{
+		std::this_thread::sleep_for(100ms);
+	}
+	pn_eventloop.stop();
+	EXPECT_EQ(0, pn_eventloop.getNumberOfTokens("P2"));
+	{
+		std::lock_guard<std::mutex> lg(mut);
+		EXPECT_FALSE(str.find("aa") != std::string::npos);
+		EXPECT_FALSE(str.find("bb") != std::string::npos);
+		str.clear();
+	}
+
+	finished = false;
+	PTN_Engine pn_detached(PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED);
+	pn_detached.createPlace("P1", 0, action1, true);
+	pn_detached.createPlace("Counter", 100000);
+	pn_detached.createPlace("P2", 0, action2);
+	pn_detached.createPlace("P3", 0, action3);
+	pn_detached.createTransition({ "P1", "Counter" }, { "P2" });
+	pn_detached.createTransition({ "P2" }, { "P1" });
+	pn_detached.createTransition({ "P1" }, { "P3" }, vector<std::string>{ "Counter" });
+	pn_detached.execute();
+	pn_detached.incrementInputPlace("P1");
+	while (!finished)
+	{
+		std::this_thread::sleep_for(100ms);
+	}
+	pn_detached.stop();
+	EXPECT_EQ(0, pn_detached.getNumberOfTokens("P2"));
+	{
+		std::lock_guard<std::mutex> lg(mut);
+		EXPECT_TRUE(str.find("aa") != std::string::npos);
+		EXPECT_TRUE(str.find("bb") != std::string::npos);
+	}
+}
+
+TEST(Concurrency, ThreadSafety_1)
+{
+	using namespace ptne;
+	PTN_Engine pn;
+
+	pn.createPlace("P1", 0, true);
+	pn.createPlace("Counter", 5);
+	pn.createPlace("P2", 0);
+	std::atomic<bool> finished = false;
+	ActionFunction flagFinish = [&finished]() { finished = true; };
+	pn.createPlace("P3", 0, flagFinish);
+	pn.createTransition({ "P1", "Counter" }, { "P2" });
+	pn.createTransition({}, { "P3" }, std::vector<std::string>{ "Counter", "P3" });
+	pn.execute();
+
+	const size_t totalThreads = 16;
+	std::latch _latch(totalThreads);
+	auto f = [&pn, &_latch, &finished]()
+	{
+		_latch.wait();
+		for (size_t i = 0; i < 10; ++i)
+		{
+			pn.incrementInputPlace("P1");
+		}
+
+		while (!finished)
+		{
+			std::this_thread::sleep_for(10ms);
+		}
+		pn.stop();
+	};
+
+	std::vector<std::thread> threads;
+
+	for (size_t i = 0; i < totalThreads; ++i)
+	{
+		threads.emplace_back(std::thread(f));
+		_latch.count_down();
+	}
+
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+	
+	EXPECT_EQ(0, pn.getNumberOfTokens("Counter"));
+	EXPECT_EQ(155, pn.getNumberOfTokens("P1"));
+	EXPECT_EQ(5, pn.getNumberOfTokens("P2"));
+	EXPECT_EQ(1, pn.getNumberOfTokens("P3"));	
 }

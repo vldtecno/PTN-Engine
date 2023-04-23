@@ -19,11 +19,11 @@
 #pragma once
 
 #include "PTN_Engine/Utilities/Explicit.h"
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
 
 namespace ptne
@@ -45,13 +45,21 @@ class DLL_PUBLIC PTN_Engine
 public:
 	enum class ACTIONS_THREAD_OPTION
 	{
+		SINGLE_THREAD,
 		EVENT_LOOP,
 		DETACHED,
 		JOB_QUEUE
 	};
 
+	using EventLoopSleepDuration = std::chrono::duration<long, std::ratio<1, 1000>>;
+
 	virtual ~PTN_Engine();
 
+	PTN_Engine(const PTN_Engine &) = delete;
+	PTN_Engine(PTN_Engine &&) = delete;
+	PTN_Engine &operator=(const PTN_Engine &) = delete;
+	PTN_Engine &operator=(PTN_Engine &&) = delete;
+
 	/*!
 	 * Create a new transition
 	 * \param activationPlaces A vector with the names of the activation places.
@@ -66,7 +74,8 @@ public:
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -82,7 +91,8 @@ public:
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<std::string> &additionalConditions);
+						  const std::vector<std::string> &additionalConditions,
+						  const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -94,7 +104,8 @@ public:
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights);
+						  const std::vector<size_t> &destinationWeights,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -108,7 +119,8 @@ public:
 						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces);
+						  const std::vector<std::string> &inhibitorPlaces,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -122,7 +134,8 @@ public:
 						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<ConditionFunction> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions,
+						  const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -130,7 +143,8 @@ public:
 	 * \param destinationPlaces A vector with the names of the destination places.
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces);
+						  const std::vector<std::string> &destinationPlaces,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -140,7 +154,8 @@ public:
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<std::string> &inhibitorPlaces);
+						  const std::vector<std::string> &inhibitorPlaces,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -150,7 +165,8 @@ public:
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -162,7 +178,8 @@ public:
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions);
+						  const std::vector<ConditionFunction> &additionalConditions,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new transition
@@ -174,7 +191,8 @@ public:
 	void createTransition(const std::vector<std::string> &activationPlaces,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<std::string> &additionalConditions);
+						  const std::vector<std::string> &additionalConditions,
+	                      const bool requireNoActionsInExecution = false);
 
 	/*!
 	 * Create a new place in the net.
@@ -291,7 +309,7 @@ public:
 	void import(const IImporter &importer);
 
 	//! Constructor
-	explicit PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread = ACTIONS_THREAD_OPTION::DETACHED);
+	explicit PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread = ACTIONS_THREAD_OPTION::JOB_QUEUE);
 
 	//! Specify the thread where the actions should be run.
 	void setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption);
@@ -311,16 +329,22 @@ public:
 	void stop();
 
 	/*!
-	 * \brief Add job to job queue.
-	 * \param Function to be executed in the job queue.
+	 * \brief setEventLoopSleepDuration
+	 * \param sleepDuration
 	 */
-	void addJob(const ActionFunction &actionFunction);
+	void setEventLoopSleepDuration(const EventLoopSleepDuration sleepDuration);
+
+	/*!
+	 * \brief getEventLoopSleepDuration
+	 * \return
+	 */
+	EventLoopSleepDuration getEventLoopSleepDuration() const;
 
 private:
-	class PTN_EngineImp;
+	class PTN_EngineImpProxy;
 
 	//! Pointer to implementation of the PTN_Engine.
-	std::unique_ptr<PTN_EngineImp> m_implementation;
+	std::unique_ptr<PTN_EngineImpProxy> m_impProxy;
 };
 
 } // namespace ptne

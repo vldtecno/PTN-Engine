@@ -42,4 +42,6 @@ public:
 	bool stillRunning() const override;
 
 	void stop() override;
+
+	void execute() override;
 };

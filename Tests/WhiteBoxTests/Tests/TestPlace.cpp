@@ -60,7 +60,7 @@ TEST_F(FixtureTestPlace, Overflow)
 {
 	enterPlace(UINT_MAX);
 
-	ASSERT_THROW(m_place.enterPlace(1), ptne::Place::OverflowException);
+	ASSERT_THROW(m_place.enterPlace(1), ptne::OverflowException);
 }
 
 TEST_F(FixtureTestPlace, NullTokens)
@@ -72,5 +72,5 @@ TEST_F(FixtureTestPlace, NullTokens)
 
 TEST_F(FixtureTestPlace, NotEnoughTokens)
 {
-	ASSERT_THROW(m_place.exitPlace(1), ptne::Place::NotEnoughTokensException);
+	ASSERT_THROW(m_place.exitPlace(1), ptne::NotEnoughTokensException);
 }

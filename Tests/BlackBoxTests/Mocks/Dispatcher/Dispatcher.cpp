@@ -123,21 +123,30 @@ void Dispatcher::dispatch()
 void Dispatcher::setRoundRobinMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
 	m_pPetriNet = make_unique<RoundRobinPetriNet>(*this, actionsThreadOption);
+	m_pPetriNet->execute();
 }
 
 void Dispatcher::setFreeChoiceMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
 	m_pPetriNet = make_unique<FreeChoicePetriNet>(*this, actionsThreadOption);
+	m_pPetriNet->execute();
 }
 
 void Dispatcher::setWeightedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
 	m_pPetriNet = make_unique<WeightedPetriNet>(actionsThreadOption);
+	m_pPetriNet->execute();
 }
 
 void Dispatcher::setInhibitedPN(ptne::PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
 	m_pPetriNet = make_unique<InhibitedPetriNet>(actionsThreadOption);
+	m_pPetriNet->execute();
+}
+
+void Dispatcher::execute()
+{
+	m_pPetriNet->execute();
 }
 
 void Dispatcher::stop()

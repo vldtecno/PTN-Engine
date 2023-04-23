@@ -104,6 +104,7 @@ vector<XML_Importer::TransitionInfo> XML_Importer::getTransitions() const
 		get<3>(transitionInfo) = destinationArcs.second;
 		get<4>(transitionInfo) = inhibitorPlaces;
 		get<5>(transitionInfo) = activationConditions;
+		get<6>(transitionInfo) = getRequireNoActionsInExecution(transition);
 
 		transitionInfoCollection.emplace_back(transitionInfo);
 	}
@@ -148,5 +149,21 @@ XML_Importer::collectArcAttributes(const xml_node &transition, const string &att
 	return pair<vector<string>, vector<size_t>>{ places, weights };
 }
 
+bool XML_Importer::getRequireNoActionsInExecution(const xml_node& transition) const
+{
+	const string v = transition.child("RequireNoActionsInExecution").attribute("value").value();
+	if (v == "true")
+	{
+		return true;
+	}
+	else if (v == "false")
+	{
+		return false;
+	}
+	else
+	{
+		throw runtime_error("Invalid value for RequireNoActionsInExecution: " + v);
+	}
+}
 
 } // namespace ptne

@@ -20,16 +20,17 @@
 
 #pragma once
 
+#include "PTN_Engine/EventLoop.h"
+#include "PTN_Engine/IPTN_EngineEL.h"
+#include "PTN_Engine/IPTN_EnginePlace.h"
+#include "PTN_Engine/ManagedContainer.h"
 #include "PTN_Engine/PTN_Engine.h"
-#include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/Place.h"
+#include "PTN_Engine/PlacesManagedContainer.h"
+#include "PTN_Engine/TransitionsManagedContainer.h"
 #include <atomic>
-#include <condition_variable>
-#include <iostream>
-#include <memory>
 #include <shared_mutex>
 #include <thread>
-#include <unordered_map>
-#include <vector>
 
 namespace ptne
 {
@@ -44,51 +45,34 @@ class Transition;
 using SharedPtrPlace = std::shared_ptr<Place>;
 using WeakPtrPlace = std::weak_ptr<Place>;
 
+
 //! Implements the Petri net logic.
 /*!
  * Implements the Petri net logic.
  * Used by the PTN_Engine class.
  * \sa PTN_Engine
  */
-class PTN_Engine::PTN_EngineImp final
+class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
 {
 public:
 	//! Constructor.
-	PTN_EngineImp(PTN_Engine &parent, ACTIONS_THREAD_OPTION actionsRuntimeThread);
+	PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsRuntimeThread);
 
 	~PTN_EngineImp();
+	PTN_EngineImp(const PTN_EngineImp &) = delete;
+	PTN_EngineImp(PTN_EngineImp &&) = delete;
+	PTN_EngineImp &operator=(const PTN_EngineImp &) = delete;
+	PTN_EngineImp &operator=(PTN_EngineImp &&) = delete;
 
 	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with functions that return bool.
+	 * Clear the token counter from all input places.
 	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions);
+	void clearInputPlaces();
 
 	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with names to additional conditions.
+	 * \brief clearNet
 	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<std::string> &additionalConditions);
+	void clearNet();
 
 	/*!
 	 * Create a new place in the net.
@@ -119,6 +103,51 @@ public:
 						const bool input = false);
 
 	/*!
+	 * Create a new transition
+	 * \param activationPlaces A vector with the names of the activation places.
+	 * \param activationWeights A vector with the weights of each activation place.
+	 * \param destinationPlaces A vector with the names of the destination places.
+	 * \param destinationWeights A vector with the weights of each destination place.
+	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+	 * \param additionalConditions A vector with additionalConditions.
+	 */
+	void createTransition(const std::vector<std::string> &activationPlaces,
+						  const std::vector<size_t> &acPTN_EngineInternaltivationWeights,
+						  const std::vector<std::string> &destinationPlaces,
+						  const std::vector<size_t> &destinationWeights,
+						  const std::vector<std::string> &inhibitorPlaces,
+						  const std::vector<ConditionFunction> &additionalConditions,
+						  const bool requireNoActionsInExecution);
+
+	/*!
+	 * Create a new transition
+	 * \param activationPlaces A vector with the names of the activation places.
+	 * \param activationWeights A vector with the weights of each activation place.
+	 * \param destinationPlaces A vector with the names of the destination places.
+	 * \param destinationWeights A vector with the weights of each destination place.
+	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
+	 * \param additionalConditions A vector with a pairs of a name and a function that returns bool.
+	 */
+	void createTransition(const std::vector<std::string> &activationPlaces,
+						  const std::vector<size_t> &activationWeights,
+						  const std::vector<std::string> &destinationPlaces,
+						  const std::vector<size_t> &destinationWeights,
+						  const std::vector<std::string> &inhibitorPlaces,
+						  const std::vector<std::string> &additionalConditions,
+						  const bool requireNoActionsInExecution);
+
+	/*!
+	 * \brief Imports the Petri net using the provided importer.
+	 * \param importer Object containing all necessary information to create a new Petri net.
+	 */
+	bool isEventLoopRunning() const;
+
+	/*!
+	 * \brief Stop the execution loop.
+	 */
+	void stop() noexcept;
+
+	/*!
 	 * Register an action to be called by the Petri net.
 	 * \param name The name of the place.
 	 * \param action The function to be called once a token enters the place.
@@ -131,18 +160,6 @@ public:
 	 * \param conditions A function pointer to a condition.
 	 */
 	void registerCondition(const std::string &name, ConditionFunction condition);
-
-	/*!
-	 * Start the petri net event loop.
-	 * \param log Flag logging the state of the net on or off.
-	 * \param o Log output stream.
-	 */
-	void execute(const bool log = false, std::ostream &o = std::cout);
-
-	/*!
-	 * \brief Stop the execution loop.
-	 */
-	void stop();
 
 	/*!
 	 * Return the number of tokens in a given place.
@@ -158,12 +175,6 @@ public:
 	void incrementInputPlace(const std::string &place);
 
 	/*!
-	 * Print the petri net places and number of tokens.
-	 * \param o Output stream.
-	 */
-	void printState(std::ostream &o) const;
-
-	/*!
 	 * \brief export_
 	 * \param exporter
 	 */
@@ -175,11 +186,29 @@ public:
 	 */
 	void import(const IImporter &importer);
 
+	//! Specify the thread where the actions should be run.
+	void setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
+
 	/*!
-	 * \brief Imports the Petri net using the provided importer.
-	 * \param importer Object containing all necessary information to create a new Petri net.
+	 * \brief getActionsThreadOption
+	 * \return
 	 */
-	bool isEventLoopRunning() const;
+	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const;
+
+	/*!
+	 * Start the petri net event loop.
+	 * \param log Flag logging the state of the net on or off.
+	 * \param o Log output stream.
+	 */
+	void execute(const bool log = false, std::ostream &o = std::cout);
+
+	/*!
+	 * \brief executeInt
+	 * \param log
+	 * \param o
+	 * \return
+	 */
+	bool executeInt(const bool log = false, std::ostream &o = std::cout);
 
 	/*!
 	 * \brief Add job to job queue.
@@ -187,198 +216,43 @@ public:
 	 */
 	void addJob(const ActionFunction &actionFunction);
 
-	//! Specify the thread where the actions should be run.
-	void setActionsThreadOption(const ACTIONS_THREAD_OPTION actionsThreadOption);
-
-	//! Get the information on which thread the actions are run.
-	ACTIONS_THREAD_OPTION getActionsThreadOption();
+	/*!
+	 * \brief Indicates if there are new tokens in any input places.
+	 * \return True of there is a new token in an input place.
+	 */
+	bool getNewInputReceived() const;
 
 	/*!
-	 * Exception to be thrown when trying to use a place with a wrong name.
+	 * \brief Flags or clears flag of new tokens in input places.
+	 * \param flag - The new value for the new input received flag.
 	 */
-	class InvalidNameException : public PTN_Exception
-	{
-	public:
-		InvalidNameException(const std::string &name);
-	};
+	void setNewInputReceived(const bool flag);
 
 	/*!
-	 * Exception to be thrown if names of places to construct a transition are repeated.
+	 * \brief Gets the transitions that are currently enabled.
+	 * \return Weak pointers to the transitions that are enabled.
 	 */
-	class RepeatedPlaceNamesException : public PTN_Exception
-	{
-	public:
-		RepeatedPlaceNamesException();
-	};
+	std::vector<std::weak_ptr<Transition>> enabledTransitions() const;
 
 	/*!
-	 * Exception to be thrown if the user tries to increment the number of tokens of a non input place.
+	 * Print the petri net places and number of tokens.
+	 * \param o Output stream.
 	 */
-	class NotInputPlaceException : public PTN_Exception
-	{
-	public:
-		NotInputPlaceException(const std::string &name);
-	};
+	void printState(std::ostream &o) const;
 
 	/*!
-	 * Exception to be thrown if the user tries to add a Place to the net that with the name of an already
-	 * existing one.
+	 * \brief Set the sleep duration of the event loop.
+	 * \param sleepDuration - Time the event loop takes until it checks for new inputs.
 	 */
-	class RepeatedPlaceException : public PTN_Exception
-	{
-	public:
-		RepeatedPlaceException(const std::string &name);
-	};
+	void setEventLoopSleepDuration(const PTN_Engine::EventLoopSleepDuration sleepDuration);
 
 	/*!
-	 * Exception to be thrown if the user tries to add a Condition to the net that with the name of an already
-	 * existing one.
+	 * \brief Gets the current sleep time set in the event loop.
+	 * \return The sleep time of the event loop.
 	 */
-	class RepeatedActionException : public PTN_Exception
-	{
-	public:
-		RepeatedActionException(const std::string &name);
-	};
-
-	/*!
-	 * Exception to be thrown if the user tries to add an Action to the net that with the name of an already
-	 * existing one.
-	 */
-	class RepeatedConditionException : public PTN_Exception
-	{
-	public:
-		RepeatedConditionException(const std::string &name);
-	};
-
-	/*!
-	 * Exception to be thrown if the user tries to use an invalid function name
-	 */
-	class InvalidFunctionNameException : public PTN_Exception
-	{
-	public:
-		InvalidFunctionNameException(const std::string &name);
-	};
+	PTN_Engine::EventLoopSleepDuration getEventLoopSleepDuration() const;
 
 private:
-	static bool
-	ACTIONS_THREAD_OPTION_fromString(const std::string &actionsThreadOptionStr, ACTIONS_THREAD_OPTION &out);
-
-	static bool ACTIONS_THREAD_OPTION_toString(const ACTIONS_THREAD_OPTION actionsThreadOption, std::string &out);
-
-	/*!
-	 * Shared mutex to synchronize API calls, allowing simultaneous reads (readers-writer lock).
-	 */
-	mutable std::shared_timed_mutex m_mutex;
-
-	/*!
-	 * Shared mutex to synchronize the event loop thread (readers-writer lock).
-	 */
-	mutable std::shared_timed_mutex m_eventLoopMutex;
-
-	/*!
-	 * Clear the token counter from all input places.
-	 */
-	void clearInputPlaces();
-
-	/*!
-	 * Get the registered action function pointer identified by name.
-	 * \param name The function name or identifier
-	 * \return The functions pointer of the registered function
-	 */
-	ActionFunction getActionFunction(const std::string &name) const;
-
-	/*!
-	 * Get the registered condition function pointers identified by
-	 * their names.
-	 * \param names Vector of names
-	 * \return Vector of conditions
-	 */
-	std::vector<std::pair<std::string, ConditionFunction>>
-	getConditionFunctions(const std::vector<std::string> &names) const;
-
-	/*!
-	 * Collects and randomizes the order of all enabled transitions.
-	 * \return Vector of unique pointers to enabled transitions.
-	 */
-	std::vector<Transition *> collectEnabledTransitionsRandomly();
-
-	/*!
-	 *
-	 */
-	template <class PtrType, class ContainerType>
-	std::string findName(const PtrType &ptr, const ContainerType &container) const
-	{
-		std::string name;
-		auto itFound =
-		find_if(container.cbegin(), container.cend(), [&](const auto &it) { return it.second == ptr; });
-		if (itFound != container.cend())
-		{
-			name = itFound->first;
-		}
-		return name;
-	}
-
-	/*!
-	 * \brief exportPlaces
-	 * \param exporter
-	 */
-	void exportPlaces(IExporter &exporter) const;
-
-	/*!
-	 * \brief exportTransitions
-	 * \param exporter
-	 */
-	void exportTransitions(IExporter &exporter) const;
-
-	/*!
-	 * \brief clearNet
-	 */
-	void clearNet();
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The function to be called once a token enters the place.
-	 * \param onExitAction The function to be called once a token leaves the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlaceImp(const std::string &name,
-						const size_t initialNumberOfTokens,
-						ActionFunction onEnterAction,
-						ActionFunction onExitAction,
-						const bool input = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param onExitAction Name of the function to be called once a token leaves the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlaceStrImp(const std::string &name,
-						   const size_t initialNumberOfTokens,
-						   const std::string &onEnterAction,
-						   const std::string &onExitAction,
-						   const bool input = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with a pairs of a name and a function that returns bool.
-	 */
-	void createTransitionImp(const std::vector<std::string> &activationPlaces,
-							 const std::vector<size_t> &activationWeights,
-							 const std::vector<std::string> &destinationPlaces,
-							 const std::vector<size_t> &destinationWeights,
-							 const std::vector<std::string> &inhibitorPlaces,
-							 const std::vector<std::pair<std::string, ConditionFunction>> &additionalConditions);
-
 	/*!
 	 * Create a new transition
 	 * \param activationPlaces A vector with the names of the activation places.
@@ -388,13 +262,19 @@ private:
 	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
 	 * \param additionalConditions A vector with names to additional conditions.
 	 */
-	void createTransitionImp(const std::vector<std::string> &activationPlaces,
-							 const std::vector<size_t> &activationWeights,
-							 const std::vector<std::string> &destinationPlaces,
-							 const std::vector<size_t> &destinationWeights,
-							 const std::vector<std::string> &inhibitorPlaces,
-							 const std::vector<std::string> &additionalConditions);
+	void createTransition(const std::vector<std::string> &activationPlaces,
+						  const std::vector<size_t> &activationWeights,
+						  const std::vector<std::string> &destinationPlaces,
+						  const std::vector<size_t> &destinationWeights,
+						  const std::vector<std::string> &inhibitorPlaces,
+						  const std::vector<std::pair<std::string, ConditionFunction>> &additionalConditions,
+						  const bool requireNoActionsInExecution);
 
+	/*!
+	 * \brief exportPlaces
+	 * \param exporter
+	 */
+	void exportPlaces(IExporter &exporter) const;
 
 	/*!
 	 * \brief createAnonymousConditions
@@ -404,61 +284,50 @@ private:
 	const std::vector<std::pair<std::string, ConditionFunction>>
 	createAnonymousConditions(const std::vector<ConditionFunction> &conditions) const;
 
-	//! Reference to parent containing this implementation.
-	PTN_Engine &m_ptnEngine;
-
-	//! Vector with the transitions.
 	/*!
-	 * Insertions on construction. Otherwise (should remain) unchanged.
+	 * \brief ACTIONS_THREAD_OPTION_fromString
+	 * \param actionsThreadOptionStr
+	 * \param out - Output value
+	 * \return true if successful.
 	 */
-	std::vector<Transition> m_transitions;
+	static bool ACTIONS_THREAD_OPTION_fromString(const std::string &actionsThreadOptionStr,
+												 PTN_Engine::ACTIONS_THREAD_OPTION &out);
 
-	//! Vector with the input places.
 	/*!
-	 * Insertions on construction. Otherwise (should remain) unchanged.
+	 * \brief ACTIONS_THREAD_OPTION_toString
+	 * \param actionsThreadOption
+	 * \param out - Output value
+	 * \return true if successful
 	 */
-	std::vector<WeakPtrPlace> m_inputPlaces;
+	static bool
+	ACTIONS_THREAD_OPTION_toString(const PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption, std::string &out);
 
-	//! Map of places.
-	/*!
-	 * Insertion is only performed on construction and there are no removals during the lifetime of the net.
-	 * On the other hand many access operations are expected.
-	 */
-	std::unordered_map<std::string, SharedPtrPlace> m_places;
+	//! Container with all the transitions in the Petri net.
+	TransitionsManagedContainer m_transitions;
 
-	//! Actions that can be called by the Petri net.
-	std::unordered_map<std::string, ActionFunction> m_actions;
+	//! Container with all the places in the Petri net.
+	PlacesManagedContainer m_places;
+
+	//! Container with all the actions available to this Petri net.
+	ManagedContainer<ActionFunction> m_actions;
 
 	//! Conditions that can be used by the Petri net.
-	std::unordered_map<std::string, ConditionFunction> m_conditions;
-
-	//! Translates a vector of names of places to a vector of weak pointers to those places.
-	/*!
-	 * \param names Names of the places.
-	 * \return Vector of weakt_ptr for each place given in "names".
-	 */
-	std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string> &names) const;
-
-	//! Flag to stop the execution of the net.
-	std::atomic<bool> m_stop;
-
-	//! Event loop thread.
-	std::unique_ptr<std::thread> m_eventLoopThread;
-
-	//! Mutex to synchronize the event notifier condition variable m_eventNotifier.
-	std::mutex m_eventNotifierMutex;
-
-	//! Condition variable to wake up the event loop thread when some event happens.
-	std::condition_variable m_eventNotifier;
+	ManagedContainer<ConditionFunction> m_conditions;
 
 	//! Flag reporting a new input event.
-	bool m_newInputReceived = false;
+	std::atomic<bool> m_newInputReceived = false;
+
+	//! Mutex to synchronize m_actionsThreadOption.
+	mutable std::shared_mutex m_actionsThreadOptionMutex;
 
 	//! Determines how the actions will be executed.
-	ACTIONS_THREAD_OPTION m_actionsThreadOption;
+	PTN_Engine::ACTIONS_THREAD_OPTION m_actionsThreadOption;
 
 	//! Job queue to dispatch actions.
 	std::unique_ptr<JobQueue> m_jobQueue;
+
+	//! Loop that processes events and executes the Petri net.
+	EventLoop m_eventLoop;
 };
 
 } // namespace ptne

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2019 Eduardo Valgôde
+ * Copyright (c) 2019-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ public:
 	virtual void exportTransition(const std::vector<std::tuple<std::string, size_t>> &activationPlaces,
 								  const std::vector<std::tuple<std::string, size_t>> &destinationPlaces,
 								  const std::vector<std::string> &activationConditions,
-								  const std::vector<std::string> &inhibitorPlaces) = 0;
+								  const std::vector<std::string> &inhibitorPlaces,
+								  const bool requireNoActionsInExecution) = 0;
 
 	virtual void saveFile(const std::string &filePath) const = 0;
 };

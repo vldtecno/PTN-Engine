@@ -17,7 +17,9 @@
  */
 
 #include "PTN_Engine/Place.h"
-#include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/IExporter.h"
+#include "PTN_Engine/IPTN_EnginePlace.h"
+#include "PTN_Engine/PTN_Exception.h"
 #include "limits.h"
 #include <future>
 #include <string>
@@ -26,12 +28,14 @@ namespace ptne
 {
 using namespace std;
 
-Place::Place(PTN_Engine &parent,
+Place::Place(IPTN_EnginePlace &parent,
+             std::string name,
              const size_t initialNumberOfTokens,
              ActionFunction onEnterEventHandler,
              ActionFunction onExitEventHandler,
              const bool input)
 : m_ptnEngine(parent)
+, m_name(name)
 , m_onEnterAction(onEnterEventHandler)
 , m_onExitAction(onExitEventHandler)
 , m_numberOfTokens(initialNumberOfTokens)
@@ -39,7 +43,8 @@ Place::Place(PTN_Engine &parent,
 {
 }
 
-Place::Place(PTN_Engine &parent,
+Place::Place(IPTN_EnginePlace &parent,
+             std::string name,
              const size_t initialNumberOfTokens,
              const string &onEnterActionName,
              ActionFunction onEnterAction,
@@ -47,6 +52,7 @@ Place::Place(PTN_Engine &parent,
              ActionFunction onExitAction,
              const bool input)
 : m_ptnEngine(parent)
+, m_name(name)
 , m_onEnterActionName(onEnterActionName)
 , m_onEnterAction(onEnterAction)
 , m_onExitActionName(onExitActionName)
@@ -56,28 +62,38 @@ Place::Place(PTN_Engine &parent,
 {
 }
 
-Place::~Place()
+string Place::getName() const
 {
+	return m_name;
 }
 
 void Place::enterPlace(const size_t tokens)
 {
+	unique_lock<shared_mutex> guard(m_mutex);
 	increaseNumberOfTokens(tokens);
 	if (m_onEnterAction == nullptr)
 	{
 		return;
 	}
-	executeAction(m_onEnterAction);
+	while (m_blockStartingOnEnterActions)
+	{
+		// TODO make this wait period configurable
+		// add a max wait time after which an exception
+		// is thrown.
+		std::this_thread::sleep_for(100ms);
+	}
+	executeAction(m_onEnterAction, m_onEnterActionInExecution);
 }
 
 void Place::exitPlace(const size_t tokens)
 {
+	unique_lock<shared_mutex> guard(m_mutex);
 	decreaseNumberOfTokens(tokens);
 	if (m_onExitAction == nullptr)
 	{
 		return;
 	}
-	executeAction(m_onExitAction);
+	executeAction(m_onExitAction, m_onExitActionInExecution);
 }
 
 void Place::increaseNumberOfTokens(const size_t tokens)
@@ -113,30 +129,35 @@ void Place::decreaseNumberOfTokens(const size_t tokens)
 
 void Place::setNumberOfTokens(const size_t tokens)
 {
+	unique_lock<shared_mutex> guard(m_mutex);
 	m_numberOfTokens = tokens;
 }
 
 size_t Place::getNumberOfTokens() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_numberOfTokens;
 }
 
 bool Place::isInputPlace() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_isInputPlace;
 }
 
 const string Place::getOnEnterActionName() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_onEnterActionName;
 }
 
 const string Place::getOnExitActionName() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_onExitActionName;
 }
 
-void Place::executeAction(const ActionFunction &action)
+void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &actionInExecution)
 {
 	switch (m_ptnEngine.getActionsThreadOption())
 	{
@@ -144,38 +165,54 @@ void Place::executeAction(const ActionFunction &action)
 	{
 		throw std::runtime_error("Invalid configuration");
 	}
+	case PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD:
 	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
 	{
+		actionInExecution = true;
 		action();
+		actionInExecution = false;
 		break;
 	}
 	case PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE:
 	{
-		m_ptnEngine.addJob(action);
+		++actionInExecution;
+		auto f = [&actionInExecution, &action]()
+		{
+			action();
+			--actionInExecution;
+		};
+		m_ptnEngine.addJob(f);
 		break;
 	}
 	case PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED:
 	{
-		auto t = std::thread(action);
+		++actionInExecution;
+		auto f = [&actionInExecution, &action]()
+		{
+			action();
+			--actionInExecution;
+		};
+		auto t = std::thread(f);
 		t.detach();
 		break;
 	}
 	}
 }
 
-Place::NullTokensException::NullTokensException()
-: PTN_Exception("Number of tokens must greater than 0")
+bool Place::isOnEnterActionInExecution() const
 {
+	return m_onEnterActionInExecution > 0;
 }
 
-Place::OverflowException::OverflowException(const size_t tooBig)
-: PTN_Exception("Cannot add " + to_string(tooBig) + " tokens to place without overflowing.")
+void Place::blockStartingOnEnterActions(const bool value)
 {
+	m_blockStartingOnEnterActions = value;
 }
 
-Place::NotEnoughTokensException::NotEnoughTokensException()
-: PTN_Exception("Not enough tokens in the place.")
+void Place::export_(IExporter &exporter) const
 {
+	exporter.exportPlace(m_name, to_string(m_numberOfTokens), m_isInputPlace ? "true" : "false",
+						 m_onEnterActionName, m_onExitActionName);
 }
 
 } // namespace ptne

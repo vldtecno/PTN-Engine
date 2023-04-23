@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 
 #include "Mocks/Controller.h"
-#include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
 
 
@@ -57,7 +57,7 @@ protected:
 	//! Mock/fake controller
 	std::shared_ptr<Controller> m_controller;
 
-	ptne::PTN_Engine m_ptnEngine;
+	ptne::PTN_EngineImp m_ptnEngine;
 
 	//! A PTN Engine place.
 	ptne::Place m_place;

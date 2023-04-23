@@ -33,7 +33,6 @@ SimplePetriNet::SimplePetriNet(SimpleController &controller)
 void SimplePetriNet::addExecuteP1()
 {
 	incrementInputPlace("P1");
-	execute();
 }
 
 size_t SimplePetriNet::getNumberOfTokens(const std::string &placeName) const

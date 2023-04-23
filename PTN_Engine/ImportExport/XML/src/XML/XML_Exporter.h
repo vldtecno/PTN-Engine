@@ -62,11 +62,13 @@ public:
 	 * \param destinationPlaces
 	 * \param activationConditions
 	 * \param inhibitorPlaces
+	 * \param requireNoActionInExecution
 	 */
 	void exportTransition(const std::vector<std::tuple<std::string, size_t>> &activationPlaces,
 						  const std::vector<std::tuple<std::string, size_t>> &destinationPlaces,
 						  const std::vector<std::string> &activationConditions,
-						  const std::vector<std::string> &inhibitorPlaces);
+						  const std::vector<std::string> &inhibitorPlaces,
+						  const bool requireNoActionInExecution);
 
 	/*!
 	 * \brief saveFile

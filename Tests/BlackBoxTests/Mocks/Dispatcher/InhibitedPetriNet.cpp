@@ -43,25 +43,27 @@ InhibitedPetriNet::InhibitedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsTh
 
 	createTransition({ "P2" }, // activation
 					 { "P5" }, // destination
-					 { "P3" } // inhibitor arc
+					 { "P3" }, // inhibitor arc
+					 false // require no actions in execution
 	);
 
 
 	createTransition({ "InputWaitPackage", "P4" }, // activation
-					 { "P1", "P3" } // destination
+					 { "P1", "P3" }, // destination
+	                 false // require no actions in execution
 	);
 
 
 	createTransition({ "P5" }, // activation
 					 { "P2" }, // destination
-					 { "P4" } // inhibitor arc
+					 { "P4" }, // inhibitor arc
+	                 false // require no actions in execution
 	);
 }
 
 void InhibitedPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
-	execute();
 }
 
 bool InhibitedPetriNet::stillRunning() const
@@ -72,4 +74,9 @@ bool InhibitedPetriNet::stillRunning() const
 void InhibitedPetriNet::stop()
 {
 	PTN_Engine::stop();
+}
+
+void InhibitedPetriNet::execute()
+{
+	PTN_Engine::execute();
 }

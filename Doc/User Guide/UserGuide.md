@@ -26,143 +26,60 @@ include the directory "PTN_Engine/include".
 **Note**: You should use the same compiler and compiler settings for the
 *PTN Engine* and for your application to guarantee binary compatibility.
 
-### 2. Create a class you wish to control with a Petri net.
+### 2. Create your own *PTN Engine* instance.
 
-The intention behind the engine is to control some process with a Petri net.
-The object to be controlled should have its own class.
-
-For this example let's assume the class to be controlled is called Controller.
+Create a PTN_Engine and select on of the ACTIONS_THREAD_OPTION options available.
+object. Example:
 
 ```c++
+using namespace ptne;
+PTN_Engine pn(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
 
-class Controller
-{
-  public:
+```
 
-    // Contains public methods that can be invoked by PTN Engine
-    // These are of two types:
-    //      void Action();
-    //          and
-    //      bool Condition() const;
+### 3. Create the action functions 
 
-    //Example of some action methods
-
-    void onEnterAction2();
-    void onExitAction2();
-
-    //Example of some additional activation condition methods
-
-    bool isCondition1() const;
-    bool isCondition2() const;
-
-        . . .
+These are the functions you want to invoke when a token enters or exits a given
+place.
+Example:
+```c++
+ActionFunction compute = [&x, &result](){
+	result *= x;
+	if (x > 0)
+	{
+		--x;
+	}
 };
-
 ```
 
-### 3. Create your own *PTN Engine* derived class.
+These can be any kind of functions as long as they return void, take no arguments
+and are accessible to the PTN_Engine object.
 
-Create a class that inherits privately from PTN_Engine and that accepts a shared
-pointer to a class whose methods are to be invoked by the net.
+### 4. Create the condition functions
 
+This is optional. If you want to add some additional conditions to the
+transition's activation, now is the moment to do it.
+Example:
 ```c++
-
-#include "PTN_Engine/PTN_Engine.h"
-
-class MyPetriNet: private ptne::PTN_Engine
-{
-public:
-    MyPetriNet(std::shared_ptr<Controller> ptrController);
-
-    . . .
-
+ConditionFunction finished = [&x](){return x <= 1;};
 ```
+These can be any kind of functions as long as they return bool, take no arguments
+and are accessible to the PTN_Engine object.
 
-### 4. Implement the Petri net
+#### 5 Create the Petri net's places
 
-In the constructor of the class that inherits from PTN_Engine (MyPetriNet in
-this example) is where the Petri net is defined.
-
-#### 4.1 Create the Petri net places
-
-The first step is to create *all* the places in the net.
-
+Create *all* places in the Petri net.
+Example:
 ```c++
-MyPetriNet::MyPetriNet(std::shared_ptr<Controller> ptrMenuController):
-    PTN_Engine()
-{
-	//Example of an input place without actions associated
-	addPlace(
-	    "Place1",   //Place name
-	    0,          //Initial number of tokens
-	    nullptr,    //No on enter actions
-	    nullptr,    //No on exit actions
-	    true        //Marked as input place
-	    );
-
-	//Example of a place with on enter and on exit actions
-	addPlace(
-	    "Place2",   //Place name
-	    1,          //Initial number of tokens
-	    std::bind(&Controller::onEnterAction2, ptrController), //on enter action
-	    std::bind(&Controller::onExitAction2, ptrController),  //on exit action
-	    );
-
-
+pn.createPlace("Compute", 0, compute, true);
+pn.createPlace("Finished", 0);
 ```
 
-#### 4.2 Create the Petri net transitions
+#### 7 Create the Petri net's transitions
 
 The last step is to create *all* transitions in the net.
-
+Example:
 ```c++
-
-//Example of a transition without additional conditions
-createTransition(
-        {"Place1", "Place2"},   //Activation places
-        {"Place3"},             //Destination places
-        {}                    //Additional conditions
-        );
-
-//Example of a transition with additional conditions
-createTransition(
-        {"InputC", "ShowMessage"},     //Activation places          
-        {"MessagesMenu"},              //Destination places   
-        //Vector of addditional conditions      
-        {
-            std::bind(&Controller::isCondition1, ptrController),
-            std::bind(&Controller::isCondition2, ptrController),           
-        }
-        );                                 
-
-	. . .
-
-```
-
-### 5 - Create access to input places
-
-To control the PTN Engine net, you need to provide access to it via public 
-methods in your new class.
-
-
-```c++
-
-#include "PTN_Engine/PTN_Engine.h"
-
-class MyPetriNet: private ptne::PTN_Engine
-{
-public:
-
-	MyPetriNet(std::shared_ptr<Controller> ptrController);
-
-		. . .
-
-	void someTrigger()
-	{
-		incrementInputPlace("someInputPlace");
-		execute();
-	}
-
-		. . .
-
+pn.createTransition({"Compute"}, {"Finished"}, {finished});
+pn.createTransition({"Compute"}, {"Compute"}, {notFinished});
 ```

@@ -19,10 +19,12 @@
  */
 
 #include "PTN_Engine/Transition.h"
+#include "PTN_Engine/IExporter.h"
+#include "PTN_Engine/PTN_Exception.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
-
+#include <mutex>
 
 namespace ptne
 {
@@ -33,16 +35,18 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
                        const vector<WeakPtrPlace> &destinationPlaces,
                        const vector<size_t> &destinationWeights,
                        const vector<WeakPtrPlace> &inhibitorPlaces,
-                       const vector<pair<string, ConditionFunction>> &additionalActivationConditions)
+                       const vector<pair<string, ConditionFunction>> &additionalActivationConditions,
+                       const bool requireNoActionsInExecution)
 : m_additionalActivationConditions{ additionalActivationConditions }
 , m_inhibitorPlaces(inhibitorPlaces)
+, m_requireNoActionsInExecution(requireNoActionsInExecution)
 {
-	if (activationPlaces.size() != activationWeights.size() && activationWeights.size() != 0)
+	if (activationPlaces.size() != activationWeights.size() && !activationWeights.empty())
 	{
 		throw ActivationWeightDimensionException();
 	}
 
-	if (destinationPlaces.size() != destinationWeights.size() && destinationWeights.size() != 0)
+	if (destinationPlaces.size() != destinationWeights.size() && !destinationWeights.empty())
 	{
 		throw DestinationWeightDimensionException();
 	}
@@ -51,7 +55,7 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
 
 	utility::detectRepeated<Place, DestinationPlaceRepetitionException>(destinationPlaces);
 
-	if (activationWeights.size() != 0)
+	if (!activationWeights.empty())
 	{
 		for (size_t i = 0; i < activationPlaces.size(); ++i)
 		{
@@ -66,7 +70,7 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
 		}
 	}
 
-	if (destinationWeights.size() != 0)
+	if (!destinationWeights.empty())
 	{
 		for (size_t i = 0; i < destinationPlaces.size(); ++i)
 		{
@@ -87,19 +91,41 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
 	}
 }
 
+Transition::Transition(Transition &&transition) noexcept
+{
+	unique_lock<shared_mutex> guard(m_mutex);
+	moveMembers(transition);
+}
+
 bool Transition::execute()
 {
+	unique_lock<shared_mutex> guard(m_mutex);
+	bool result = false;
+
+	blockStartingOnEnterActions(true);
+
 	if (!isActive())
 	{
-		return false;
+		result = false;
+	}
+	else
+	{
+		performTransit();
+		result = true;
 	}
 
-	performTransit();
+	blockStartingOnEnterActions(false);
 
-	return true;
+	return result;
 }
 
 bool Transition::isEnabled() const
+{
+	shared_lock<shared_mutex> guard(m_mutex);
+	return isEnabledInternal();
+}
+
+bool Transition::isEnabledInternal() const
 {
 	if (!checkInhibitorPlaces())
 	{
@@ -116,27 +142,95 @@ bool Transition::isEnabled() const
 
 bool Transition::isActive() const
 {
-	return isEnabled() && checkAdditionalConditions();
+	return isEnabledInternal() &&
+		   (!m_requireNoActionsInExecution || (m_requireNoActionsInExecution && noActionsInExecution())) &&
+		   checkAdditionalConditions();
 }
 
 vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getActivationPlaces() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_activationPlaces;
 }
 
 vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getDestinationPlaces() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_destinationPlaces;
 }
 
 vector<std::pair<std::string, ConditionFunction>> Transition::getAdditionalActivationConditions() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_additionalActivationConditions;
 }
 
 std::vector<Transition::WeakPtrPlace> Transition::getInhibitorPlaces() const
 {
+	shared_lock<shared_mutex> guard(m_mutex);
 	return m_inhibitorPlaces;
+}
+
+void Transition::export_(IExporter &exporter) const
+{
+	vector<tuple<string, size_t>> activationPlacesExport;
+	for (const auto &activationPlace : m_activationPlaces)
+	{
+		tuple<string, size_t> activationPlaceExport;
+		if (auto activationPlaceShPtr = get<0>(activationPlace).lock())
+		{
+			get<0>(activationPlaceExport) = activationPlaceShPtr->getName();
+			get<1>(activationPlaceExport) = get<1>(activationPlace);
+			activationPlacesExport.emplace_back(activationPlaceExport);
+		}
+		else
+		{
+			throw PTN_Exception("Could not lock activation place weak pointer");
+		}
+	}
+
+	vector<tuple<string, size_t>> destinationPlacesExport;
+	for (const auto &destinationPlace : m_destinationPlaces)
+	{
+		tuple<string, size_t> destinationPlaceExport;
+		if (auto destinationPlaceShPtr = get<0>(destinationPlace).lock())
+		{
+			get<0>(destinationPlaceExport) = destinationPlaceShPtr->getName();
+			get<1>(destinationPlaceExport) = get<1>(destinationPlace);
+			destinationPlacesExport.emplace_back(destinationPlaceExport);
+		}
+		else
+		{
+			throw PTN_Exception("Could not lock destination place weak pointer");
+		}
+	}
+
+	vector<string> activationConditionsNames;
+	for (const auto &activationCondition : m_additionalActivationConditions)
+	{
+		activationConditionsNames.emplace_back(activationCondition.first);
+	}
+
+	vector<string> inhibitorPlacesNames;
+	for (const auto &inhibitorPlace : m_inhibitorPlaces)
+	{
+		if (auto inhibitorPlaceShPtr = inhibitorPlace.lock())
+		{
+			inhibitorPlacesNames.emplace_back(inhibitorPlaceShPtr->getName());
+		}
+		else
+		{
+			throw PTN_Exception("Could not lock inhibitor place weak pointer");
+		}
+	}
+
+	exporter.exportTransition(activationPlacesExport, destinationPlacesExport, activationConditionsNames,
+							  inhibitorPlacesNames, requireNoActionsInExecution());
+}
+
+bool Transition::requireNoActionsInExecution() const
+{
+	return m_requireNoActionsInExecution;
 }
 
 bool Transition::checkInhibitorPlaces() const
@@ -177,7 +271,7 @@ bool Transition::checkAdditionalConditions() const
 		const ConditionFunction &activationCondition = p.second;
 		if (!activationCondition)
 		{
-			return false;
+			throw PTN_Exception("Invalid activation condition " + p.first);
 		}
 		else
 		{
@@ -185,6 +279,22 @@ bool Transition::checkAdditionalConditions() const
 			{
 				return false;
 			}
+		}
+	}
+	return true;
+}
+
+bool Transition::noActionsInExecution() const
+{
+	for (const tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	{
+		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+
+		SharedPtrPlace spPlace = lockWeakPtr(activationPlace);
+
+		if (spPlace->isOnEnterActionInExecution())
+		{
+			return false;
 		}
 	}
 	return true;
@@ -224,29 +334,28 @@ void Transition::enterDestinationPlaces()
 	}
 }
 
-Transition::ActivationWeightDimensionException::ActivationWeightDimensionException()
-: PTN_Exception("The number of activation weights must be the same as the number of activation places.")
+void Transition::moveMembers(Transition &transition)
 {
+	m_activationPlaces = std::move(transition.m_activationPlaces);
+	m_destinationPlaces = std::move(transition.m_destinationPlaces);
+	m_additionalActivationConditions = std::move(transition.m_additionalActivationConditions);
+	m_inhibitorPlaces = std::move(transition.m_inhibitorPlaces);
 }
 
-Transition::DestinationWeightDimensionException::DestinationWeightDimensionException()
-: PTN_Exception("The number of destination weights must be the same as the number of destination places.")
+void Transition::blockStartingOnEnterActions(const bool value)
 {
-}
+	if (!m_requireNoActionsInExecution)
+	{
+		return;
+	}
 
-Transition::ZeroValueWeightException::ZeroValueWeightException()
-: PTN_Exception("Weights cannot be 0.")
-{
+	for (tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	{
+		WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+		if (SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
+		{
+			spPlace->blockStartingOnEnterActions(value);
+		}
+	}
 }
-
-Transition::ActivationPlaceRepetitionException::ActivationPlaceRepetitionException()
-: PTN_Exception("Repetition of activation places is not permitted.")
-{
-}
-
-Transition::DestinationPlaceRepetitionException::DestinationPlaceRepetitionException()
-: PTN_Exception("Repetition of destination places is not permitted.")
-{
-}
-
 } // namespace ptne

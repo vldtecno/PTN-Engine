@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
+ * Copyright (c) 2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +20,22 @@
 
 #pragma once
 
-#include "PTN_Engine/PTN_Exception.h"
 #include <functional>
 #include <memory>
+#include <shared_mutex>
 #include <tuple>
 #include <vector>
 
 namespace ptne
 {
+class IExporter;
 class Place;
 
 //! Shared pointer to member functions of the controller.
 using ConditionFunction = std::function<bool(void)>;
 
-//! Implements a Petri net transition.
 /*!
- * Implements a Petri net transition.
+ * \brief Implements a Petri net transition.
  */
 class Transition final
 {
@@ -60,97 +61,99 @@ public:
 			   const std::vector<WeakPtrPlace> &destinationPlaces,
 			   const std::vector<size_t> &destinationWeights,
 			   const std::vector<WeakPtrPlace> &inhibitorPlaces,
-			   const std::vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions);
+			   const std::vector<std::pair<std::string, ConditionFunction>> &additionalActivationConditions,
+	           const bool requireNoActionsInExecution);
+
+	~Transition() = default;
+	Transition(const Transition &) = delete;
+	Transition(Transition &&transition) noexcept;
+	Transition &operator=(Transition &) = delete;
+	Transition &operator=(Transition &&) = delete;
 
 	/*!
 	 * Evaluate the activation places and transit the tokens if possible.
-	 * \return True if token transit was performed, false if not.
+	 * \return true if token transit was performed, false if not.
 	 */
 	bool execute();
 
 	/*!
-	 * Evaluates if the transition can be fired.
-	 * \return True if can be fired, false if it cannot.
-	 */
-	bool isActive() const;
-
-	/*!
 	 * Evaluates if the transition can attempt to be fired.
-	 * \return True if can attepmted to be fired, false if it cannot.
+	 * \return true if can attepmted to be fired, false if it cannot.
 	 */
 	bool isEnabled() const;
 
+	/*!
+	 * \brief getActivationPlaces Gets the activation places of the transition.
+	 * \return A vector of tuples with the activation places and their weights.
+	 */
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getActivationPlaces() const;
 
+	/*!
+	 * \brief getDestinationPlaces
+	 * \return A vector of tuples with the destination places and their weights.
+	 */
 	std::vector<std::tuple<WeakPtrPlace, size_t>> getDestinationPlaces() const;
 
+	/*!
+	 * \brief getAdditionalActivationConditions
+	 * \return
+	 */
 	std::vector<std::pair<std::string, ConditionFunction>> getAdditionalActivationConditions() const;
 
+	/*!
+	 * \brief getInhibitorPlaces
+	 * \return
+	 */
 	std::vector<WeakPtrPlace> getInhibitorPlaces() const;
 
 	/*!
-	 * Exception to be thrown when the dimension of the vector containing the activation weights does not match
-	 * the dimension of the vector containing the names of the activation places.
+	 * \brief Export a transition.
+	 * \param exporter - Object that can export a transition.
 	 */
-	class ActivationWeightDimensionException : public PTN_Exception
-	{
-	public:
-		ActivationWeightDimensionException();
-	};
+	void export_(IExporter &exporter) const;
 
 	/*!
-	 * Exception to be thrown when the dimension of the vector containing the destination weights does not match
-	 * the dimension of the vector containing the names of the destination places.
+	 * \brief requireNoActionsInExecution
+	 * \return true if it is required that the activation places have no ongoing on enter actions.
 	 */
-	class DestinationWeightDimensionException : public PTN_Exception
-	{
-	public:
-		DestinationWeightDimensionException();
-	};
-
-	//! Exception to be thrown when the weight value is 0.
-	class ZeroValueWeightException : public PTN_Exception
-	{
-	public:
-		ZeroValueWeightException();
-	};
-
-	/*!
-	 * Exception to be thrown when activation places in the constructor are repeated.
-	 */
-	class ActivationPlaceRepetitionException : public PTN_Exception
-	{
-	public:
-		ActivationPlaceRepetitionException();
-	};
-
-	/*!
-	 * Exception to be thrown when activation places in the constructor are repeated.
-	 */
-	class DestinationPlaceRepetitionException : public PTN_Exception
-	{
-	public:
-		DestinationPlaceRepetitionException();
-	};
+	bool requireNoActionsInExecution() const;
 
 private:
 	/*!
-	 * Checks if all inhibitor places are empty.
+	 * \brief Checks if all inhibitor places are empty.
 	 * \return True if yes, false if not.
 	 */
 	bool checkInhibitorPlaces() const;
 
 	/*!
-	 * Checks if all activation places have enough tokens.
+	 * \brief Checks if all activation places have enough tokens.
 	 * \return True if yes, false if not.
 	 */
 	bool checkActivationPlaces() const;
 
 	/*!
-	 * Checks if all additional conditions allow firing.
+	 * \brief Checks if all additional conditions allow firing.
 	 * \return True if yes, false if not.
 	 */
 	bool checkAdditionalConditions() const;
+
+	/*!
+	 * \brief If there are no actions being currently executed in the activation places.
+	 * \return true if there are no actions being currently executed in the activation places.
+	 */
+	bool noActionsInExecution() const;
+
+	/*!
+	 * \brief Evaluates if the transition can be fired.
+	 * \return true if can be fired, false if it cannot.
+	 */
+	bool isActive() const;
+
+	/*!
+	 * \brief Evaluates if the transition can attempt to be fired.
+	 * \return True if can attepmted to be fired, false if it cannot.
+	 */
+	bool isEnabledInternal() const;
 
 	//! Moves the tokens from the inputs to the outputs.
 	void performTransit();
@@ -160,6 +163,12 @@ private:
 
 	//! Inserts tokens in the destination places.
 	void enterDestinationPlaces();
+
+	//! Move members of the class into the transition passed as argument.
+	void moveMembers(Transition &transition);
+
+	//! Block/unblock activation places from starting any on enter actions.
+	void blockStartingOnEnterActions(const bool value);
 
 	//! Pointers to the activations places from the net.
 	std::vector<std::tuple<WeakPtrPlace, size_t>> m_activationPlaces;
@@ -172,5 +181,12 @@ private:
 
 	//! Inhibitor arcs
 	std::vector<WeakPtrPlace> m_inhibitorPlaces;
+
+	//! Shared mutex to synchronize calls, allowing simultaneous reads (readers-writer lock).
+	mutable std::shared_mutex m_mutex;
+
+	//! If on, the transition will only be activated if, besides all other oncditions,
+	//! the activation places have no on enter actions in execution.
+	bool m_requireNoActionsInExecution = false;
 };
 } // namespace ptne

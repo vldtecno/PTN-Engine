@@ -77,7 +77,6 @@ RoundRobinPetriNet::RoundRobinPetriNet(Dispatcher &dispatcher,
 void RoundRobinPetriNet::dispatch()
 {
 	incrementInputPlace("InputWaitPackage");
-	execute();
 }
 
 bool RoundRobinPetriNet::stillRunning() const
@@ -88,4 +87,9 @@ bool RoundRobinPetriNet::stillRunning() const
 void RoundRobinPetriNet::stop()
 {
 	PTN_Engine::stop();
+}
+
+void RoundRobinPetriNet::execute()
+{
+	PTN_Engine::execute();
 }

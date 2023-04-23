@@ -18,18 +18,19 @@
 
 #pragma once
 
-#include "PTN_Engine/PTN_Exception.h"
+#include <atomic>
 #include <functional>
 #include <memory>
+#include <shared_mutex>
 
 namespace ptne
 {
 
-class PTN_Engine;
+class IExporter;
+class IPTN_EnginePlace;
 
-//! Implements a place of a Petri net.
 /*!
- * Implements a place of a Petri net.
+ * \brief Implements a place of a Petri net.
  */
 class Place final
 {
@@ -43,13 +44,26 @@ public:
 	 * \param onExitAction The action to be performed when a token leaves the place.
 	 * \param input Flag that marks the place as an input place.
 	 */
-	Place(PTN_Engine &parent,
+	Place(IPTN_EnginePlace &parent,
+		  std::string name,
 		  const size_t initialNumberOfTokens,
 		  ActionFunction onEnterAction,
 		  ActionFunction onExitAction,
 		  const bool input = false);
 
-	Place(PTN_Engine &parent,
+	/*!
+	 * \brief Place
+	 * \param parent
+	 * \param name
+	 * \param initialNumberOfTokens
+	 * \param onEnterActionName
+	 * \param onEnterAction
+	 * \param onExitActionName
+	 * \param onExitAction
+	 * \param input
+	 */
+	Place(IPTN_EnginePlace &parent,
+		  std::string name,
 		  const size_t initialNumberOfTokens,
 		  const std::string &onEnterActionName,
 		  ActionFunction onEnterAction,
@@ -57,13 +71,28 @@ public:
 		  ActionFunction onExitAction,
 		  const bool input = false);
 
-	~Place();
+	~Place() = default;
+	Place(const Place &) = delete;
+	Place(Place &&) = delete;
+	Place &operator=(Place &) = delete;
+	Place &operator=(Place &&) = delete;
 
+	/*!
+	 * \brief getName
+	 * \return place name
+	 */
+	std::string getName() const;
 
-	//! Increase number of tokens and call on enter action.
+	/*!
+	 * \brief Increase number of tokens and call on enter action.
+	 * \param tokens - number of tokens to increase.
+	 */
 	void enterPlace(const size_t tokens = 1);
 
-	//! Decrease number of tokens and call on exit action.
+	/*!
+	 * \brief Decrease number of tokens and call on exit action.
+	 * \param tokens - number of tokens to decrease.
+	 */
 	void exitPlace(const size_t tokens = 1);
 
 	/*!
@@ -86,36 +115,33 @@ public:
 
 	/*!
 	 * \brief getOnEnterActionName
-	 * \return
+	 * \return The label name of the on enter action.
 	 */
 	const std::string getOnEnterActionName() const;
 
 	/*!
 	 * \brief getOnExitActionName
-	 * \return
+	 * \return the label name of the on exit action.
 	 */
 	const std::string getOnExitActionName() const;
 
-	//! Exception thrown if attempted to remove 0 tokens from a place.
-	class NullTokensException : public PTN_Exception
-	{
-	public:
-		NullTokensException();
-	};
+	/*!
+	 * \brief Tells if an "onEnter" action, belonging to the place, is being executed.
+	 * \return true if an "onEnter" action being executed.
+	 */
+	bool isOnEnterActionInExecution() const;
 
-	//! Exception thrown if attempted to remove more tokens than available.
-	class NotEnoughTokensException : public PTN_Exception
-	{
-	public:
-		NotEnoughTokensException();
-	};
+	/*!
+	 * \brief Whether an on enter action can be triggered or not.
+	 * \param value
+	 */
+	void blockStartingOnEnterActions(const bool value);
 
-	//! Exception thrown if attempted to surpass the maximum possible number of tokens.
-	class OverflowException : public PTN_Exception
-	{
-	public:
-		explicit OverflowException(const size_t tooBig);
-	};
+	/*!
+	 * \brief Export a place.
+	 * \param exporter - Object that can export a place.
+	 */
+	void export_(IExporter &exporter) const;
 
 private:
 	/*!
@@ -130,21 +156,25 @@ private:
 	 */
 	void decreaseNumberOfTokens(const size_t tokens = 1);
 
-	//!
-	//! \brief Execute the action according to the configuration.
-	//! \param action to be executed
-	//!
-	void executeAction(const ActionFunction &action);
+	/*!
+	 * \brief Execute the action according to the configuration.
+	 * \param action to be executed
+	 */
+	void executeAction(const ActionFunction &action, std::atomic<size_t> &);
 
-	PTN_Engine &m_ptnEngine;
+	//! Reference to the PTN Engine instance, to which the place belongs.
+	IPTN_EnginePlace &m_ptnEngine;
 
-	//!
+	//! Name of the place used to identify it.
+	std::string m_name;
+
+	//! A label for the on enter action.
 	std::string m_onEnterActionName;
 
 	//! Function to be called when a token enters the place.
 	const ActionFunction m_onEnterAction;
 
-	//!
+	//! A label for the on exite action.
 	std::string m_onExitActionName;
 
 	//! Function to be called when a token leaves the place.
@@ -155,6 +185,18 @@ private:
 
 	//! Flag that determines if the place can be added tokens from outside the net.
 	bool m_isInputPlace;
+
+	//! Shared mutex to synchronize calls, allowing simultaneous reads (readers-writer lock).
+	mutable std::shared_mutex m_mutex;
+
+	//! Counter of on enter functions being executed.
+	std::atomic<size_t> m_onEnterActionInExecution = 0;
+
+	//! Counter of on exit functions being executed.
+	std::atomic<size_t> m_onExitActionInExecution = 0;
+
+	//! Flag to block triggering on enter actions.
+	std::atomic<bool> m_blockStartingOnEnterActions = false;
 };
 
 } // namespace ptne

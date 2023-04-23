@@ -88,6 +88,8 @@ private:
 	std::pair<std::vector<std::string>, std::vector<size_t>>
 	collectArcAttributes(const pugi::xml_node &transition, const std::string &attribute) const;
 
+	bool getRequireNoActionsInExecution(const pugi::xml_node& transition) const;
+
 	/*!
 	 * \brief m_document
 	 */
