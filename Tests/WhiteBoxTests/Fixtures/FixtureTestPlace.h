@@ -54,8 +54,7 @@ public:
 	void exitPlace(const size_t tokens);
 
 protected:
-	//! Mock/fake controller
-	std::shared_ptr<Controller> m_controller;
+	Controller m_controller;
 
 	ptne::PTN_EngineImp m_ptnEngine;
 

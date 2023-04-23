@@ -18,11 +18,9 @@
 
 #pragma once
 
-#include <memory>
 #include <mutex>
 #include <string>
-
-class RegisteredFunctionsPN;
+#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 
 class Controller
 {
@@ -51,7 +49,7 @@ public:
 	void stop();
 
 private:
-	std::unique_ptr<RegisteredFunctionsPN> m_petriNet;
+	RegisteredFunctionsPN m_petriNet;
 
 	void actionPlace1();
 

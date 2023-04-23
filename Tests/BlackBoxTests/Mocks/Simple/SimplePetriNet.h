@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include "Mocks/Simple/SimpleController.h"
 #include "PTN_Engine/PTN_Engine.h"
 
+
+class SimpleController;
 
 class SimplePetriNet : public ptne::PTN_Engine
 {

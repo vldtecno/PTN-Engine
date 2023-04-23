@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
-#include "Mocks/Simple/SimplePetriNet.h"
+#include "Mocks/Simple/SimpleController.h"
 #include <thread>
 
 using namespace std;
 
 SimpleController::SimpleController()
-: m_petriNet(nullptr)
+: m_petriNet(*this)
 {
-	m_petriNet = make_unique<SimplePetriNet>(*this);
 }
 
 SimpleController::~SimpleController()
@@ -39,7 +38,7 @@ void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 		this_thread::sleep_for(chrono::milliseconds(5));
 		for (int i = 0; i < 10; ++i)
 		{
-			m_petriNet->addExecuteP1();
+			m_petriNet.addExecuteP1();
 		}
 	};
 
@@ -67,10 +66,10 @@ void SimpleController::collectThreadId()
 
 size_t SimpleController::getNumberOfTokens(const std::string &placeName) const
 {
-	return m_petriNet->getNumberOfTokens(placeName);
+	return m_petriNet.getNumberOfTokens(placeName);
 }
 
 void SimpleController::stop()
 {
-	m_petriNet->stop();
+	m_petriNet.stop();
 }

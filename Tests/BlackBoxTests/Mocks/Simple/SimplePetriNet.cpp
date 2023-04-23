@@ -17,6 +17,7 @@
  */
 
 #include "Mocks/Simple/SimplePetriNet.h"
+#include "Mocks/Simple/SimpleController.h"
 
 using namespace std;
 

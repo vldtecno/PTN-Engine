@@ -26,9 +26,7 @@ class IDispatcherPetriNet
 	friend class FixturePetriNet;
 
 public:
-	virtual ~IDispatcherPetriNet()
-	{
-	}
+	virtual ~IDispatcherPetriNet() = default;
 
 	//! Trigger a dispatch process.
 	virtual void dispatch() = 0;

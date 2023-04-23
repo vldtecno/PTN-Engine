@@ -57,7 +57,7 @@ void JobQueue::launch()
 	if (!m_isJobQueueRunning && !m_jobQueue.empty() && m_isJobQueueActive)
 	{
 		m_isJobQueueRunning = true;
-		m_workerThread = jthread(&JobQueue::run, this);
+		m_workerThread = jthread(bind_front(&JobQueue::run, this));
 	}
 }
 

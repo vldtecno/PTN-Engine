@@ -19,11 +19,9 @@
 #pragma once
 
 #include <future>
-#include <memory>
 #include <ostream>
 #include <set>
-
-class SimplePetriNet;
+#include "Mocks/Simple/SimplePetriNet.h"
 
 //! A very simple controller with a very simple petri net.
 class SimpleController
@@ -51,7 +49,7 @@ public:
 private:
 	void collectThreadId();
 
-	std::unique_ptr<SimplePetriNet> m_petriNet;
+	SimplePetriNet m_petriNet;
 
 	std::set<std::thread::id> m_collectedThreadIds;
 };

@@ -23,13 +23,12 @@ using namespace ptne;
 using std::bind;
 
 FixtureTestPlace::FixtureTestPlace()
-: m_controller(std::make_shared<Controller>())
-, m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
+: m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
 , m_place(m_ptnEngine,
           "",
           size_t(0),
-          bind(&Controller::onEnter, m_controller),
-          bind(&Controller::onExit, m_controller))
+          bind(&Controller::onEnter, &m_controller),
+          bind(&Controller::onExit, &m_controller))
 {
 	m_ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
@@ -37,18 +36,18 @@ FixtureTestPlace::FixtureTestPlace()
 void FixtureTestPlace::enterPlace()
 {
 	size_t numberOfTokens = m_place.getNumberOfTokens();
-	size_t enterCounter = m_controller->getEnterCounter();
+	size_t enterCounter = m_controller.getEnterCounter();
 
 	m_place.enterPlace();
 
 	EXPECT_EQ(numberOfTokens + 1, m_place.getNumberOfTokens());
-	EXPECT_EQ(enterCounter + 1, m_controller->getEnterCounter());
+	EXPECT_EQ(enterCounter + 1, m_controller.getEnterCounter());
 }
 
 void FixtureTestPlace::exitPlace()
 {
 	size_t numberOfTokens = m_place.getNumberOfTokens();
-	size_t exitCounter = m_controller->getExitCounter();
+	size_t exitCounter = m_controller.getExitCounter();
 	bool shouldFire = numberOfTokens > 0;
 
 	size_t expectedNumberOfTokens = numberOfTokens;
@@ -66,7 +65,7 @@ void FixtureTestPlace::exitPlace()
 	}
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
-	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
+	EXPECT_EQ(expectedExitCounter, m_controller.getExitCounter());
 }
 
 void FixtureTestPlace::inputPlace()
@@ -79,18 +78,18 @@ void FixtureTestPlace::inputPlace()
 void FixtureTestPlace::enterPlace(const size_t tokens)
 {
 	size_t numberOfTokens = m_place.getNumberOfTokens();
-	size_t enterCounter = m_controller->getEnterCounter();
+	size_t enterCounter = m_controller.getEnterCounter();
 
 	m_place.enterPlace(tokens);
 
 	EXPECT_EQ(numberOfTokens + tokens, m_place.getNumberOfTokens());
-	EXPECT_EQ(enterCounter + 1, m_controller->getEnterCounter());
+	EXPECT_EQ(enterCounter + 1, m_controller.getEnterCounter());
 }
 
 void FixtureTestPlace::exitPlace(const size_t tokens)
 {
 	size_t numberOfTokens = m_place.getNumberOfTokens();
-	size_t exitCounter = m_controller->getExitCounter();
+	size_t exitCounter = m_controller.getExitCounter();
 	bool shouldFire = numberOfTokens >= tokens;
 
 	size_t expectedNumberOfTokens = numberOfTokens;
@@ -108,5 +107,5 @@ void FixtureTestPlace::exitPlace(const size_t tokens)
 	}
 
 	EXPECT_EQ(expectedNumberOfTokens, m_place.getNumberOfTokens());
-	EXPECT_EQ(expectedExitCounter, m_controller->getExitCounter());
+	EXPECT_EQ(expectedExitCounter, m_controller.getExitCounter());
 }

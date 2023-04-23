@@ -24,8 +24,7 @@ using namespace ptne;
 using namespace std;
 
 FixtureTestTransition::FixtureTestTransition()
-: m_controller(make_shared<Controller>())
-, m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
+: m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
 {
 }
 

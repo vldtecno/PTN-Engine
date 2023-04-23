@@ -64,7 +64,7 @@ void EventLoop::start(const bool log, ostream &o)
 	else
 	{
 		m_eventLoopThreadRunning = true;
-		m_eventLoopThread = jthread(&EventLoop::run, this, log, ref(o));
+		m_eventLoopThread = jthread(bind_front(&EventLoop::run, this), log, ref(o));
 	}
 }
 

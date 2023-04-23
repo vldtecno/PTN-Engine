@@ -37,15 +37,16 @@ void PlacesManagedContainer::clearInputPlaces()
 	}
 }
 
-void PlacesManagedContainer::insert(const string &name, shared_ptr<Place> place)
+void PlacesManagedContainer::insert(shared_ptr<Place> place)
 {
 	unique_lock<shared_mutex> transitionsGuard(m_placesMutex);
-	if (m_places.find(name) != m_places.end())
+	const auto& placeName = place->getName();
+	if (m_places.find(placeName) != m_places.end())
 	{
-		throw RepeatedPlaceException(name);
+		throw RepeatedPlaceException(placeName);
 	}
 
-	m_places[name] = place;
+	m_places[placeName] = place;
 	if (place->isInputPlace())
 	{
 		m_inputPlaces.push_back(place);

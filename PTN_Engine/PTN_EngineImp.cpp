@@ -65,7 +65,7 @@ void PTN_EngineImp::createPlace(const string &name,
                                 const bool input)
 {
 	auto place = make_shared<Place>(*this, name, initialNumberOfTokens, onEnterAction, onExitAction, input);
-	m_places.insert(name, place);
+	m_places.insert(place);
 }
 
 void PTN_EngineImp::createPlaceStr(const string &name,
@@ -88,7 +88,7 @@ void PTN_EngineImp::createPlaceStr(const string &name,
 
 	auto place = make_shared<Place>(*this, name, initialNumberOfTokens, onEnterActionName, onEnterAction,
 									onExitActionName, onExitAction, input);
-	m_places.insert(name, place);
+	m_places.insert(place);
 }
 
 void PTN_EngineImp::createTransition(const vector<string> &activationPlaces,

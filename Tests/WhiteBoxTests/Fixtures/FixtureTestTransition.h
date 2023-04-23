@@ -24,7 +24,6 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Transition.h"
 #include "gtest/gtest.h"
-#include <memory>
 
 //! Fixture to test transitions.
 class FixtureTestTransition : public ::testing::Test
@@ -92,8 +91,7 @@ public:
 	createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> places);
 
 protected:
-	//!
-	std::shared_ptr<Controller> m_controller;
+	Controller m_controller;
 
 	ptne::PTN_EngineImp m_ptnEngine;
 };

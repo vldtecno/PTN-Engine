@@ -17,7 +17,6 @@
  */
 
 #include "Mocks/RegisteredFunctions/Controller.h"
-#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include <thread>
 
 using namespace std;
@@ -25,7 +24,7 @@ using namespace std;
 std::mutex Controller::s_mut;
 
 Controller::Controller()
-: m_petriNet(nullptr)
+: m_petriNet(*this)
 {
 }
 
@@ -35,17 +34,13 @@ Controller::~Controller()
 
 void Controller::initialize()
 {
-	if (!m_petriNet)
-	{
-		m_petriNet = make_unique<RegisteredFunctionsPN>(*this);
-	}
-	m_petriNet->registerCallbacks();
-	m_petriNet->createPetriNetStructure();
+	m_petriNet.registerCallbacks();
+	m_petriNet.createPetriNetStructure();
 }
 
 void Controller::startExecution()
 {
-	m_petriNet->addExecuteP0();
+	m_petriNet.addExecuteP0();
 }
 
 string Controller::getSomeString() const
@@ -83,15 +78,15 @@ bool Controller::externalCondition3() const
 
 bool Controller::isEventLoopRunning() const
 {
-	return m_petriNet->isEventLoopRunning();
+	return m_petriNet.isEventLoopRunning();
 }
 
 size_t Controller::getNumberOfTokens(const std::string &placeName) const
 {
-	return m_petriNet->getNumberOfTokens(placeName);
+	return m_petriNet.getNumberOfTokens(placeName);
 }
 
 void Controller::stop()
 {
-	m_petriNet->stop();
+	m_petriNet.stop();
 }

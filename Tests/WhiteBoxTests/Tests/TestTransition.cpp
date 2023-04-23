@@ -28,12 +28,12 @@ TEST_F(FixtureTestTransition, T1)
 	vector<size_t> expectedInputTokens{ 0, 0, 0 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 1, 1, 1 };
-	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, &m_controller) } };
 	bool expectedFireResult = true;
 
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions,
 					 expectedFireResult);
-	EXPECT_EQ(1, m_controller->activationConditionCallCounter());
+	EXPECT_EQ(1, m_controller.activationConditionCallCounter());
 }
 
 TEST_F(FixtureTestTransition, T2)
@@ -42,13 +42,13 @@ TEST_F(FixtureTestTransition, T2)
 	vector<size_t> expectedInputTokens{ 1, 0, 1 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 0, 0, 0 };
-	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, &m_controller) } };
 	bool expectedFireResult = false;
 
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions,
 					 expectedFireResult);
 
-	EXPECT_EQ(0, m_controller->activationConditionCallCounter());
+	EXPECT_EQ(0, m_controller.activationConditionCallCounter());
 }
 
 TEST_F(FixtureTestTransition, T3)
@@ -57,14 +57,14 @@ TEST_F(FixtureTestTransition, T3)
 	vector<size_t> expectedInputTokens{ 1, 1, 1 };
 	vector<size_t> outputTokens{ 0, 0, 0 };
 	vector<size_t> expectedOutputTokens{ 0, 0, 0 };
-	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, m_controller) } };
+	VectorOfConditions conditions{ { "", bind(&Controller::activationCondition, &m_controller) } };
 	bool expectedFireResult = false;
-	m_controller->setFireCondition(false);
+	m_controller.setFireCondition(false);
 
 	createTransition(inputTokens, outputTokens, expectedInputTokens, expectedOutputTokens, conditions,
 					 expectedFireResult);
 
-	EXPECT_EQ(1, m_controller->activationConditionCallCounter());
+	EXPECT_EQ(1, m_controller.activationConditionCallCounter());
 }
 
 TEST_F(FixtureTestTransition, T_Weights)

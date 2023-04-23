@@ -50,7 +50,7 @@ public:
 	 * \param name - Indetifier of the place
 	 * \param place - Shared pointer to a place.
 	 */
-	void insert(const std::string &name, std::shared_ptr<Place> place);
+	void insert(std::shared_ptr<Place> place);
 
 	/*!
 	 * \brief Removes all places from the container.
