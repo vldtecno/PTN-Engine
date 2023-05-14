@@ -23,13 +23,11 @@
 class Call
 {
 public:
-
 	//!
-	Call(const std::string& date, const std::string number):
-		m_date(date),
-		m_number(number)
+	Call(const std::string &date, const std::string &number)
+	: m_date(date)
+	, m_number(number)
 	{
-
 	}
 
 	//!
@@ -37,6 +35,4 @@ public:
 
 	//!
 	std::string m_number;
-
 };
-

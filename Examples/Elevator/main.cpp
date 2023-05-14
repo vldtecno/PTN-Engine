@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <iostream>
 #include "Controller/ElevatorController.h"
+#include <iostream>
+#include <string>
 
 using namespace std;
 
-void callElevatorUpMenu(ElevatorController& controller)
+void callElevatorUpMenu(ElevatorController &controller)
 {
 	bool exit = false;
 	do
@@ -53,7 +53,7 @@ void callElevatorUpMenu(ElevatorController& controller)
 					cout << "Invalid floor" << endl;
 				}
 			}
-			catch (const invalid_argument&)
+			catch (const invalid_argument &)
 			{
 				cout << "Invalid input" << endl;
 			}
@@ -62,7 +62,7 @@ void callElevatorUpMenu(ElevatorController& controller)
 	} while (!exit);
 }
 
-void callElevatorDownMenu(ElevatorController& controller)
+void callElevatorDownMenu(ElevatorController &controller)
 {
 	bool exit = false;
 	do
@@ -86,25 +86,23 @@ void callElevatorDownMenu(ElevatorController& controller)
 
 				if (controller.callElevatorDown(callerFloor))
 				{
-					exit = true;					
+					exit = true;
 				}
 				else
 				{
 					cout << "Invalid floor number" << endl;
 				}
 			}
-			catch (const invalid_argument&)
+			catch (const invalid_argument &)
 			{
-				cout << "Invalid input" << endl;				
+				cout << "Invalid input" << endl;
 			}
-
 		}
 
 	} while (!exit);
-	
 }
 
-void setDestinationMenu(ElevatorController& controller)
+void setDestinationMenu(ElevatorController &controller)
 {
 	bool exit = false;
 	do
@@ -135,7 +133,7 @@ void setDestinationMenu(ElevatorController& controller)
 					cout << "Invalid floor number" << endl;
 				}
 			}
-			catch (const invalid_argument&)
+			catch (const invalid_argument &)
 			{
 				cout << "Invalid input" << endl;
 			}
@@ -144,8 +142,8 @@ void setDestinationMenu(ElevatorController& controller)
 	} while (!exit);
 }
 
-void programLoop(ElevatorController& controller)
-{	
+void programLoop(ElevatorController &controller)
+{
 	bool exit = false;
 	do
 	{
@@ -195,9 +193,9 @@ void programLoop(ElevatorController& controller)
 	} while (!exit);
 }
 
-int main(int , char** )
+int main(int, char **)
 {
-	//Set up controller
+	// Set up controller
 	ElevatorController controller;
 
 	cout << "This program is part of the PTN Engine distribution." << endl;

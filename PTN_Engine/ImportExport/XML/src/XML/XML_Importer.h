@@ -37,7 +37,7 @@ public:
 	 * \brief XML_Importer
 	 * \param filePath
 	 */
-	XML_Importer(const std::string &filePath);
+	explicit XML_Importer(const std::string &filePath);
 
 	~XML_Importer() override;
 
@@ -88,7 +88,7 @@ private:
 	std::pair<std::vector<std::string>, std::vector<size_t>>
 	collectArcAttributes(const pugi::xml_node &transition, const std::string &attribute) const;
 
-	bool getRequireNoActionsInExecution(const pugi::xml_node& transition) const;
+	bool getRequireNoActionsInExecution(const pugi::xml_node &transition) const;
 
 	/*!
 	 * \brief m_document

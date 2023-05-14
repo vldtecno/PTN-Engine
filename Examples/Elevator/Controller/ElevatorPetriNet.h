@@ -28,26 +28,23 @@ class ElevatorController;
 /*!
  * The behaviour is defined in the constructor.
  */
-class ElevatorPetriNet:
-		public IElevatorPetriNet,
-		private ptne::PTN_Engine
+class ElevatorPetriNet : public IElevatorPetriNet, private ptne::PTN_Engine
 {
 public:
-
 	/*!
 	 * Constructor.
 	 * \param ptrDispatcher Shared pointer to the controller.
 	 */
-	ElevatorPetriNet(ElevatorController& elevatorController);
+	explicit ElevatorPetriNet(ElevatorController &elevatorController);
 
-	//Events
+	// Events
 
 	void closeDoors() override;
 
 	void openDoors() override;
 
 	void callButtonUp() override;
-	
+
 	void callButtonDown() override;
 
 	void destinationButton() override;
@@ -57,7 +54,6 @@ public:
 	void stop() override;
 
 private:
-
 	void createInputPlaces();
 	void createCabinePlaces();
 	void createArrivalPlaces();
@@ -70,7 +66,7 @@ private:
 	void createButtonPressingTransitions();
 	void createCallingButtonTransitions();
 
-	void incrementInput(const std::string& inputPlace, const bool debug = false);
+	void incrementInput(const std::string &inputPlace, const bool debug = false);
 
-	ElevatorController& m_elevatorController;
+	ElevatorController &m_elevatorController;
 };

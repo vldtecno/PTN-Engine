@@ -24,7 +24,7 @@ class Call
 {
 public:
 	//!
-	Call(const std::string &date, const std::string number)
+	Call(const std::string &date, const std::string &number)
 	: m_date(date)
 	, m_number(number)
 	{

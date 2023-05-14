@@ -19,12 +19,13 @@
 #pragma once
 
 
-//!Base class for a PTN Engine net that controls the ElevatorController.
+//! Base class for a PTN Engine net that controls the ElevatorController.
 class IElevatorPetriNet
 {
 public:
-
-	virtual ~IElevatorPetriNet(){}
+	virtual ~IElevatorPetriNet()
+	{
+	}
 
 	virtual void closeDoors() = 0;
 

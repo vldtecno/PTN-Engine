@@ -56,7 +56,7 @@ class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
 {
 public:
 	//! Constructor.
-	PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsRuntimeThread);
+	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsRuntimeThread);
 
 	~PTN_EngineImp();
 	PTN_EngineImp(const PTN_EngineImp &) = delete;

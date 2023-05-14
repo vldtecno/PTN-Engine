@@ -28,11 +28,11 @@ FixtureTestTransition::FixtureTestTransition()
 {
 }
 
-void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
-                                             const vector<size_t> outputTokens,
-                                             const vector<size_t> expectedInputTokens,
-                                             const vector<size_t> expectedOutputTokens,
-                                             VectorOfConditions conditions,
+void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
+                                             const vector<size_t> &outputTokens,
+                                             const vector<size_t> &expectedInputTokens,
+                                             const vector<size_t> &expectedOutputTokens,
+                                             VectorOfConditions &conditions,
                                              const bool expectedFireResult)
 {
 	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
@@ -68,13 +68,13 @@ void FixtureTestTransition::createTransition(const vector<size_t> inputTokens,
 }
 
 
-void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> inputTokens,
-                                                        const vector<size_t> inputWeights,
-                                                        const vector<size_t> outputTokens,
-                                                        const vector<size_t> ouptutWeights,
-                                                        const vector<size_t> expectedInputTokens,
-                                                        const vector<size_t> expectedOutputTokens,
-                                                        VectorOfConditions conditions,
+void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> &inputTokens,
+                                                        const vector<size_t> &inputWeights,
+                                                        const vector<size_t> &outputTokens,
+                                                        const vector<size_t> &ouptutWeights,
+                                                        const vector<size_t> &expectedInputTokens,
+                                                        const vector<size_t> &expectedOutputTokens,
+                                                        VectorOfConditions &conditions,
                                                         const bool expectedFireResult)
 {
 	EXPECT_EQ(inputTokens.size(), inputWeights.size());
@@ -111,7 +111,7 @@ void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> inp
 	}
 }
 
-vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_t> inputTokens)
+vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_t> &inputTokens)
 {
 	// Create input places
 	vector<shared_ptr<Place>> inputPlaces;
@@ -123,7 +123,7 @@ vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_
 	return inputPlaces;
 }
 
-vector<weak_ptr<Place>> FixtureTestTransition::createPlaceWPtrs(const vector<shared_ptr<Place>> places)
+vector<weak_ptr<Place>> FixtureTestTransition::createPlaceWPtrs(const vector<shared_ptr<Place>> &places)
 {
 	// Create input places
 	vector<weak_ptr<Place>> wPtrPlaces;

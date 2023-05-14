@@ -40,7 +40,7 @@ void PlacesManagedContainer::clearInputPlaces()
 void PlacesManagedContainer::insert(shared_ptr<Place> place)
 {
 	unique_lock<shared_mutex> transitionsGuard(m_placesMutex);
-	const auto& placeName = place->getName();
+	const auto &placeName = place->getName();
 	if (m_places.find(placeName) != m_places.end())
 	{
 		throw RepeatedPlaceException(placeName);

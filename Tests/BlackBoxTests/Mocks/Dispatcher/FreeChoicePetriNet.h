@@ -32,7 +32,7 @@ class FreeChoicePetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 	friend class FixturePetriNet;
 
 public:
-	FreeChoicePetriNet(
+	explicit FreeChoicePetriNet(
 	Dispatcher &dispatcher,
 	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 

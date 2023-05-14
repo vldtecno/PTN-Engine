@@ -22,11 +22,11 @@
 using namespace ptne;
 
 MenuStateMachine::MenuStateMachine(Controller &menuController)
-	: PTN_Engine()
+: PTN_Engine()
 {
 	using namespace std;
 
-	//Places
+	// Places
 	createPlace("InputA", 0, true);
 	createPlace("InputB", 0, true);
 	createPlace("InputC", 0, true);
@@ -39,64 +39,40 @@ MenuStateMachine::MenuStateMachine(Controller &menuController)
 	createPlace("NextMessage", 0, bind(&Controller::selectNextMessage, &menuController));
 	createPlace("ShowMessage", 0, bind(&Controller::showMessage, &menuController));
 
-	//Transitions
+	// Transitions
 
-	//Switch menu
-	createTransition(
-		{"InputA", "CallsMenuSelected"},
-		{"SelectMessagesOption"});
+	// Switch menu
+	createTransition({ "InputA", "CallsMenuSelected" }, { "SelectMessagesOption" });
 
-	createTransition(
-		{"SelectMessagesOption"},
-		{"MessagesMenuSelected"});
+	createTransition({ "SelectMessagesOption" }, { "MessagesMenuSelected" });
 
-	//Switch menu
-	createTransition(
-		{"InputA", "MessagesMenuSelected"},
-		{"SelectCallsOption"});
+	// Switch menu
+	createTransition({ "InputA", "MessagesMenuSelected" }, { "SelectCallsOption" });
 
-	createTransition(
-		{"SelectCallsOption"},
-		{"CallsMenuSelected"});
+	createTransition({ "SelectCallsOption" }, { "CallsMenuSelected" });
 
-	//Select calls log
-	createTransition(
-		{"InputB", "CallsMenuSelected"},
-		{"CallsLog"});
+	// Select calls log
+	createTransition({ "InputB", "CallsMenuSelected" }, { "CallsLog" });
 
-	//Leave calls log
-	createTransition(
-		{"InputC", "CallsLog"},
-		{"CallsMenuSelected"});
+	// Leave calls log
+	createTransition({ "InputC", "CallsLog" }, { "CallsMenuSelected" });
 
-	//Select messages menu
-	createTransition(
-		{"InputB", "MessagesMenuSelected"},
-		{"MessagesMenu"});
+	// Select messages menu
+	createTransition({ "InputB", "MessagesMenuSelected" }, { "MessagesMenu" });
 
-	//Leave messages menu
-	createTransition(
-		{"InputC", "MessagesMenu"},
-		{"MessagesMenuSelected"});
+	// Leave messages menu
+	createTransition({ "InputC", "MessagesMenu" }, { "MessagesMenuSelected" });
 
-	//Select next message
-	createTransition(
-		{"InputA", "MessagesMenu"},
-		{"NextMessage"});
+	// Select next message
+	createTransition({ "InputA", "MessagesMenu" }, { "NextMessage" });
 
-	createTransition(
-		{"NextMessage"},
-		{"MessagesMenu"});
+	createTransition({ "NextMessage" }, { "MessagesMenu" });
 
-	//Show message
-	createTransition(
-		{"InputB", "MessagesMenu"},
-		{"ShowMessage"});
+	// Show message
+	createTransition({ "InputB", "MessagesMenu" }, { "ShowMessage" });
 
-	//Leave show message
-	createTransition(
-		{"InputC", "ShowMessage"},
-		{"MessagesMenu"});
+	// Leave show message
+	createTransition({ "InputC", "ShowMessage" }, { "MessagesMenu" });
 }
 
 void MenuStateMachine::pressA()

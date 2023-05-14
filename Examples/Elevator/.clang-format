@@ -12,7 +12,6 @@ BreakBeforeBinaryOperators: false
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: true
-#BreakInheritanceList: true
 ColumnLimit: 115
 CommentPragmas: ''
 ConstructorInitializerAllOnOneLineOrOnePerLine: false

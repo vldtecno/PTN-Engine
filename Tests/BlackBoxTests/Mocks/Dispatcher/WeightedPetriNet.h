@@ -32,7 +32,7 @@ class WeightedPetriNet : public IDispatcherPetriNet, public ptne::PTN_Engine
 	friend class FixturePetriNet;
 
 public:
-	WeightedPetriNet(
+	explicit WeightedPetriNet(
 	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 
 	//! Trigger the dispatch process.

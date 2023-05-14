@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
 #include "Fixtures/FixtureTestTransition.h"
+#include "gtest/gtest.h"
 
 using namespace std;
 using namespace ptne;

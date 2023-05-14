@@ -27,7 +27,7 @@ class RegisteredFunctionsPN : public ptne::PTN_Engine
 	friend class F2;
 
 public:
-	RegisteredFunctionsPN(
+	explicit RegisteredFunctionsPN(
 	Controller &controller,
 	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 

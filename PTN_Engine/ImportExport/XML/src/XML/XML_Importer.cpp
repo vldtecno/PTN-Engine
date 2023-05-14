@@ -149,7 +149,7 @@ XML_Importer::collectArcAttributes(const xml_node &transition, const string &att
 	return pair<vector<string>, vector<size_t>>{ places, weights };
 }
 
-bool XML_Importer::getRequireNoActionsInExecution(const xml_node& transition) const
+bool XML_Importer::getRequireNoActionsInExecution(const xml_node &transition) const
 {
 	const string v = transition.child("RequireNoActionsInExecution").attribute("value").value();
 	if (v == "true")

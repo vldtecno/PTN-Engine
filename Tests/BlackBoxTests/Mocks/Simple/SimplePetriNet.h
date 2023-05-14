@@ -28,7 +28,7 @@ class SimplePetriNet : public ptne::PTN_Engine
 	friend class FixturePetriNet;
 
 public:
-	SimplePetriNet(SimpleController &controller);
+	explicit SimplePetriNet(SimpleController &controller);
 
 	void addExecuteP1();
 

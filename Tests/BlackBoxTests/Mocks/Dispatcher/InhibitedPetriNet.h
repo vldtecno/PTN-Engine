@@ -32,7 +32,7 @@ class InhibitedPetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 	friend class FixturePetriNet;
 
 public:
-	InhibitedPetriNet(
+	explicit InhibitedPetriNet(
 	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 
 	//! Trigger the dispatch process.

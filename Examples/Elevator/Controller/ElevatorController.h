@@ -19,8 +19,8 @@
 #pragma once
 
 #include <memory>
-#include <unordered_set>
 #include <shared_mutex>
+#include <unordered_set>
 
 class IElevatorPetriNet;
 
@@ -30,7 +30,6 @@ class ElevatorController
 	friend class ElevatorPetriNet;
 
 public:
-
 	//! Constructor.
 	ElevatorController();
 
@@ -58,7 +57,6 @@ public:
 	static const int s_topFloor = 10;
 
 private:
-
 	mutable std::shared_mutex m_mutex;
 
 	//! Base (nested) class for a Petri net based state machine.
@@ -80,7 +78,7 @@ private:
 
 	//! List of destinations in the current travel.
 	std::unordered_set<int> m_destinations;
-	
+
 	//! List of destinations for the next travel.
 	std::unordered_set<int> m_nextTravelDestinations;
 
@@ -91,7 +89,7 @@ private:
 	std::unordered_set<int> m_floorsWaitingToGoDown;
 
 	//! Merge set to m_destinations and delete the merged items.
-	void mergeToDestinations(std::unordered_set<int>& toAdd, const bool lessThan);
+	void mergeToDestinations(std::unordered_set<int> &toAdd, const bool lessThan);
 
 	//! Remove current floor from m_floorsWaitingToGoDown
 	void removeCurrentFromWaitingToGoDown();
@@ -102,19 +100,19 @@ private:
 	//! Check if pointer to PTN is valid.
 	void checkPetriNetPointer() const;
 
-	//Information
+	// Information
 	void printCurrentFloor() const;
 	void printDestinations() const;
 	void printNextDestinations() const;
 	void printWaitingGoDown() const;
 	void printWaitingGoUp() const;
-	void printFloorList(const std::unordered_set<int>& floors) const;
+	void printFloorList(const std::unordered_set<int> &floors) const;
 	void printSchedule() const;
-	
+
 	////////////////////
-	//Methods used by the petri net
-	
-	//Actions
+	// Methods used by the petri net
+
+	// Actions
 	void removeDestinationGU();
 	void removeDestinationGD();
 	void removeDestination();
@@ -129,7 +127,7 @@ private:
 	void mergeMinGoingUp();
 	void mergeMaxGoingDown();
 	void mergePostponedToCurrent();
-	void mergeGoingDownSTCurrent();	
+	void mergeGoingDownSTCurrent();
 	void processedLists();
 	void elevatorStopped();
 	void elevatorMoving();
@@ -138,7 +136,7 @@ private:
 	void goingUp();
 	void goingDown();
 
-	//Conditions
+	// Conditions
 	bool isFloorNotInList() const;
 	bool isFloorInList() const;
 	bool isDestinationListNotEmpty() const;
@@ -150,6 +148,4 @@ private:
 	bool isMinGreaterThanCurrent() const;
 	bool isMaxSmallerThanCurrent() const;
 	bool isMaxGreaterThanCurrent() const;
-
 };
-

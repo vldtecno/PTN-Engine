@@ -23,16 +23,16 @@
 class Message
 {
 public:
-
 	/*!
 	 * Message constructor.
 	 * \param title Title of the message.
 	 * \param message Body of the message.
 	 */
-	Message(const std::string& title, const std::string& message):
-		m_title(title),
-		m_body(message)
-	{}
+	Message(const std::string &title, const std::string &message)
+	: m_title(title)
+	, m_body(message)
+	{
+	}
 
 	//! Message title.
 	std::string m_title;

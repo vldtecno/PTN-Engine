@@ -22,13 +22,14 @@
 using namespace std;
 
 Controller::Controller()
-	: m_petriNet(*this)
-	, m_messageSelected(0)
+: m_petriNet(*this)
+, m_messageSelected(0)
 {
 }
 
 Controller::~Controller()
-{}
+{
+}
 
 void Controller::pressA()
 {
@@ -45,12 +46,12 @@ void Controller::pressC()
 	m_petriNet.pressC();
 }
 
-Controller::MessageList& Controller::messageList()
+Controller::MessageList &Controller::messageList()
 {
 	return m_messageList;
 }
 
-Controller::CallList& Controller::callLog()
+Controller::CallList &Controller::callLog()
 {
 	return m_callLog;
 }

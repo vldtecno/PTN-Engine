@@ -19,27 +19,28 @@
 #include "Controller/ElevatorController.h"
 #include "Controller/ElevatorPetriNet.h"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <mutex>
 
 using namespace std;
 
 ElevatorController::ElevatorController()
-	: m_pPetriNet(nullptr)
-	, m_currentFloor(s_bottomFloor)
-	, m_toAddToDestination(s_bottomFloor)
-	, m_destinations()
-	, m_nextTravelDestinations()
-	, m_floorsWaitingToGoUp()
-	, m_floorsWaitingToGoDown()
+: m_pPetriNet(nullptr)
+, m_currentFloor(s_bottomFloor)
+, m_toAddToDestination(s_bottomFloor)
+, m_destinations()
+, m_nextTravelDestinations()
+, m_floorsWaitingToGoUp()
+, m_floorsWaitingToGoDown()
 {
 	m_pPetriNet = make_unique<ElevatorPetriNet>(*this);
 	m_pPetriNet->execute(false);
 }
 
 ElevatorController::~ElevatorController()
-{}
+{
+}
 
 void ElevatorController::checkPetriNetPointer() const
 {
@@ -106,7 +107,7 @@ void ElevatorController::stop()
 	m_pPetriNet->stop();
 }
 
-//Actions
+// Actions
 void ElevatorController::addDestination1()
 {
 	unique_lock<shared_mutex> l(m_mutex);
@@ -126,7 +127,7 @@ void ElevatorController::addDestination2()
 	m_floorsWaitingToGoUp.erase(m_toAddToDestination);
 
 	m_nextTravelDestinations.insert(m_toAddToDestination);
-	
+
 	printNextDestinations();
 }
 
@@ -190,7 +191,7 @@ void ElevatorController::removeCurrentFromWaitingToGoUp()
 void ElevatorController::rotateLists()
 {
 	unique_lock<shared_mutex> l(m_mutex);
-	swap(m_destinations, m_nextTravelDestinations);	
+	swap(m_destinations, m_nextTravelDestinations);
 	m_destinations.erase(m_currentFloor);
 }
 
@@ -229,7 +230,6 @@ void ElevatorController::mergeMinGoingUp()
 
 	m_nextTravelDestinations.insert(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
 	m_floorsWaitingToGoUp.clear();
-
 }
 
 void ElevatorController::mergeMaxGoingDown()
@@ -245,7 +245,6 @@ void ElevatorController::mergeMaxGoingDown()
 
 	m_nextTravelDestinations.insert(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
 	m_floorsWaitingToGoDown.clear();
-
 }
 
 void ElevatorController::mergePostponedToCurrent()
@@ -263,18 +262,19 @@ void ElevatorController::mergeGoingDownSTCurrent()
 	mergeToDestinations(m_floorsWaitingToGoDown, true);
 }
 
-void ElevatorController::mergeToDestinations(unordered_set<int>& toAdd, const bool lessThan)
+void ElevatorController::mergeToDestinations(unordered_set<int> &toAdd, const bool lessThan)
 {
 	bool deleted = false;
 	do
 	{
 		deleted = false;
-		auto floorIt = std::find_if(toAdd.cbegin(), toAdd.cend(), [this, &lessThan](const int floor) {
-						return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor);
-					 });
+		auto floorIt =
+		std::find_if(toAdd.cbegin(), toAdd.cend(),
+					 [this, &lessThan](const int floor)
+					 { return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor); });
 		if (floorIt != toAdd.cend())
 		{
-			auto& floor = *floorIt;
+			auto &floor = *floorIt;
 			m_destinations.insert(floor);
 			toAdd.erase(floor);
 			deleted = true;
@@ -374,7 +374,7 @@ bool ElevatorController::isMaxGreaterThanCurrent() const
 }
 
 
-//Info
+// Info
 
 void ElevatorController::elevatorStopped()
 {
@@ -440,14 +440,14 @@ void ElevatorController::printWaitingGoUp() const
 	printFloorList(m_floorsWaitingToGoUp);
 }
 
-void ElevatorController::printFloorList(const unordered_set<int>& floors) const
+void ElevatorController::printFloorList(const unordered_set<int> &floors) const
 {
 	if (floors.empty())
 	{
 		cout << "Empty" << endl;
 		return;
 	}
-	for (const auto& d : floors)
+	for (const auto &d : floors)
 	{
 		cout << d << " ";
 	}

@@ -18,14 +18,13 @@
 
 #pragma once
 
+#include "Controller/MenuStateMachine.h"
 #include "Model/Call.h"
 #include "Model/List.h"
 #include "Model/Message.h"
 #include "View/CallLogView.h"
 #include "View/MainMenuView.h"
 #include "View/MessagesMenuView.h"
-#include "View/MainMenuView.h"
-#include "Controller/MenuStateMachine.h"
 
 //! Example of a controller class
 /*!
@@ -48,7 +47,7 @@ public:
 
 	void stop();
 
-	//Actions
+	// Actions
 
 	//! Triggers an event indicating key "A" was pressed.
 	void pressA();
@@ -59,9 +58,9 @@ public:
 	//! Triggers an event indicating key "C" was pressed.
 	void pressC();
 
-	MessageList& messageList();
+	MessageList &messageList();
 
-	CallList& callLog();
+	CallList &callLog();
 
 	//! Show the main menu on screen.
 	void showMainMenu();
@@ -85,11 +84,10 @@ public:
 	void showMessage();
 
 private:
-
 	//! The state machine of the controller.
 	MenuStateMachine m_petriNet;
 
-	//Views
+	// Views
 
 	//! A view of the main menu.
 	MainMenuView m_mainMenu;
@@ -101,7 +99,7 @@ private:
 	CallLogView m_callLogView;
 
 
-	//Data sources
+	// Data sources
 
 	//! The message data.
 	MessageList m_messageList;
@@ -110,7 +108,7 @@ private:
 	CallList m_callLog;
 
 
-	//Internals
+	// Internals
 
 	//! Index of the selected message.
 	size_t m_messageSelected;

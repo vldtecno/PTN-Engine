@@ -26,10 +26,9 @@ class Controller;
 /*!
  * The behaviour is defined in the constructor.
  */
-class MenuStateMachine: public ptne::PTN_Engine
+class MenuStateMachine : public ptne::PTN_Engine
 {
 public:
-
 	/*!
 	 * Constructor.
 	 * \param ptrDispatcher Shared pointer to the controller.

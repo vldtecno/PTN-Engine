@@ -64,8 +64,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const bool requireNoActionsInExecution)
 {
 	m_impProxy->createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights,
-								 inhibitorPlaces, additionalConditions, 
-        requireNoActionsInExecution);
+								 inhibitorPlaces, additionalConditions, requireNoActionsInExecution);
 }
 
 void PTN_Engine::createTransition(const vector<string> &activationPlaces,
@@ -100,7 +99,7 @@ void PTN_Engine::createTransition(const vector<string> &activationPlaces,
 								 vector<string>{}, additionalConditions, requireNoActionsInExecution);
 }
 
-void PTN_Engine::createTransition(const vector<string> &activationPlaces, 
+void PTN_Engine::createTransition(const vector<string> &activationPlaces,
                                   const vector<string> &destinationPlaces,
                                   const bool requireNoActionsInExecution)
 {

@@ -157,7 +157,6 @@ void PTN_EngineImp::export_(IExporter &exporter) const
 	string actionsThreadOptionStr;
 	if (!ACTIONS_THREAD_OPTION_toString(m_actionsThreadOption, actionsThreadOptionStr))
 	{
-		std::unique_ptr<std::thread> m_eventLoopThread;
 		throw PTN_Exception("Invalid ACTIONS_THREAD_OPTION");
 	}
 	exporter.exportActionsThreadOption(actionsThreadOptionStr);

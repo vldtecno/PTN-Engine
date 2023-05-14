@@ -22,7 +22,7 @@
 
 using namespace std;
 
-int main(int, char**)
+int main(int, char **)
 {
 	using namespace ptne;
 	PTN_Engine pn(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
@@ -30,7 +30,8 @@ int main(int, char**)
 	size_t x = 0;
 	size_t result = 1;
 
-	ActionFunction compute = [&x, &result](){
+	ActionFunction compute = [&x, &result]()
+	{
 		result *= x;
 		if (x > 0)
 		{
@@ -38,15 +39,15 @@ int main(int, char**)
 		}
 	};
 
-	ConditionFunction finished = [&x](){return x <= 1;};
-	ConditionFunction notFinished = [&finished](){return !finished();};
+	ConditionFunction finished = [&x]() { return x <= 1; };
+	ConditionFunction notFinished = [&finished]() { return !finished(); };
 
 	pn.createPlace("Compute", 0, compute, true);
 	pn.createPlace("Finished", 0);
-	pn.createTransition({"Compute"}, {"Compute"}, {notFinished});
-	pn.createTransition({"Compute"}, {"Finished"}, {finished});
+	pn.createTransition({ "Compute" }, { "Compute" }, { notFinished });
+	pn.createTransition({ "Compute" }, { "Finished" }, { finished });
 
-	for (size_t i : {0, 1, 2, 3, 6, 10})
+	for (size_t i : { 0, 1, 2, 3, 6, 10 })
 	{
 		x = i;
 		result = 1;

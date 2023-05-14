@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include <mutex>
 #include <string>
-#include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 
 class Controller
 {

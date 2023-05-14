@@ -45,11 +45,11 @@ public:
 	 * \param conditions Additional conditions from the controller.
 	 * \param expectedFireResult If it is expected that the condition fires.
 	 */
-	void createTransition(const std::vector<size_t> inputTokens,
-						  const std::vector<size_t> outputTokens,
-						  const std::vector<size_t> expectedInputTokens,
-						  const std::vector<size_t> expectedOutputTokens,
-						  VectorOfConditions conditions,
+	void createTransition(const std::vector<size_t> &inputTokens,
+						  const std::vector<size_t> &outputTokens,
+						  const std::vector<size_t> &expectedInputTokens,
+						  const std::vector<size_t> &expectedOutputTokens,
+						  VectorOfConditions &conditions,
 						  const bool expectedFireResult);
 
 
@@ -64,13 +64,13 @@ public:
 	 * \param conditions Additional conditions from the controller.
 	 * \param expectedFireResult If it is expected that the condition fires.
 	 */
-	void createTransitionWithWeights(const std::vector<size_t> inputTokens,
-									 const std::vector<size_t> inputWeights,
-									 const std::vector<size_t> outputTokens,
-									 const std::vector<size_t> outputWeights,
-									 const std::vector<size_t> expectedInputTokens,
-									 const std::vector<size_t> expectedOutputTokens,
-									 VectorOfConditions conditions,
+	void createTransitionWithWeights(const std::vector<size_t> &inputTokens,
+									 const std::vector<size_t> &inputWeights,
+									 const std::vector<size_t> &outputTokens,
+									 const std::vector<size_t> &outputWeights,
+									 const std::vector<size_t> &expectedInputTokens,
+									 const std::vector<size_t> &expectedOutputTokens,
+									 VectorOfConditions &conditions,
 									 const bool expectedFireResult);
 
 	/*!
@@ -79,7 +79,7 @@ public:
 	 * \param tokens Vector with initial tokens.
 	 * \return Vector of shared pointers to places with the tokens given in the input.
 	 */
-	std::vector<std::shared_ptr<ptne::Place>> createPlaces(const std::vector<size_t> tokens);
+	std::vector<std::shared_ptr<ptne::Place>> createPlaces(const std::vector<size_t> &tokens);
 
 	/*!
 	 * Utility function. Create a vector with weak pointers of the shared pointers of the
@@ -88,7 +88,7 @@ public:
 	 * \return Vector of weak pointers to vector of shared pointers.
 	 */
 	std::vector<std::weak_ptr<ptne::Place>>
-	createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> places);
+	createPlaceWPtrs(const std::vector<std::shared_ptr<ptne::Place>> &places);
 
 protected:
 	Controller m_controller;
