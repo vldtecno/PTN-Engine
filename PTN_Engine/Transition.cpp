@@ -142,8 +142,7 @@ bool Transition::isEnabledInternal() const
 
 bool Transition::isActive() const
 {
-	return isEnabledInternal() &&
-		   (!m_requireNoActionsInExecution || (m_requireNoActionsInExecution && noActionsInExecution())) &&
+	return isEnabledInternal() && (!m_requireNoActionsInExecution || noActionsInExecution()) &&
 		   checkAdditionalConditions();
 }
 

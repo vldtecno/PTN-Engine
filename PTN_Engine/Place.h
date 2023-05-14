@@ -190,10 +190,10 @@ private:
 	mutable std::shared_mutex m_mutex;
 
 	//! Counter of on enter functions being executed.
-	std::atomic<size_t> m_onEnterActionInExecution = 0;
+	std::atomic<size_t> m_onEnterActionsInExecution = 0;
 
 	//! Counter of on exit functions being executed.
-	std::atomic<size_t> m_onExitActionInExecution = 0;
+	std::atomic<size_t> m_onExitActionsInExecution = 0;
 
 	//! Flag to block triggering on enter actions.
 	std::atomic<bool> m_blockStartingOnEnterActions = false;

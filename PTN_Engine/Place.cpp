@@ -82,7 +82,7 @@ void Place::enterPlace(const size_t tokens)
 		// is thrown.
 		std::this_thread::sleep_for(100ms);
 	}
-	executeAction(m_onEnterAction, m_onEnterActionInExecution);
+	executeAction(m_onEnterAction, m_onEnterActionsInExecution);
 }
 
 void Place::exitPlace(const size_t tokens)
@@ -93,7 +93,7 @@ void Place::exitPlace(const size_t tokens)
 	{
 		return;
 	}
-	executeAction(m_onExitAction, m_onExitActionInExecution);
+	executeAction(m_onExitAction, m_onExitActionsInExecution);
 }
 
 void Place::increaseNumberOfTokens(const size_t tokens)
@@ -157,7 +157,7 @@ const string Place::getOnExitActionName() const
 	return m_onExitActionName;
 }
 
-void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &actionInExecution)
+void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &actionsInExecution)
 {
 	switch (m_ptnEngine.getActionsThreadOption())
 	{
@@ -168,31 +168,31 @@ void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &act
 	case PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD:
 	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
 	{
-		actionInExecution = true;
+		++actionsInExecution;
 		action();
-		actionInExecution = false;
+		--actionsInExecution;
 		break;
 	}
 	case PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE:
 	{
-		++actionInExecution;
-		auto f = [&actionInExecution, &action]()
+		++actionsInExecution;
+		auto f = [&actionsInExecution, &action]()
 		{
 			action();
-			--actionInExecution;
+			--actionsInExecution;
 		};
 		m_ptnEngine.addJob(f);
 		break;
 	}
 	case PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED:
 	{
-		++actionInExecution;
-		auto f = [&actionInExecution, &action]()
+		++actionsInExecution;
+		auto job = [&actionsInExecution, &action]()
 		{
 			action();
-			--actionInExecution;
+			--actionsInExecution;
 		};
-		auto t = std::thread(f);
+		auto t = std::thread(job);
 		t.detach();
 		break;
 	}
@@ -201,7 +201,7 @@ void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &act
 
 bool Place::isOnEnterActionInExecution() const
 {
-	return m_onEnterActionInExecution > 0;
+	return m_onEnterActionsInExecution > 0;
 }
 
 void Place::blockStartingOnEnterActions(const bool value)
