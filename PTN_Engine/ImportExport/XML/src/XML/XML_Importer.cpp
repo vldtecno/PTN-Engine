@@ -18,12 +18,68 @@
 
 #include "XML/XML_Importer.h"
 #include <PTN_Engine/PTN_Engine.h>
+#include <iterator>
 
-namespace ptne
-{
 using namespace pugi;
 using namespace std;
 
+namespace
+{
+string getAttributeValue(const xml_node &node, const string &attrName)
+{
+	return node.attribute(attrName.c_str()).value();
+}
+
+vector<string> collectTransitionAttributes(const xml_node &transition, const string &attribute)
+{
+	vector<string> activationConditions;
+	const auto &childAttributes = transition.child(attribute.c_str());
+	transform(begin(childAttributes), end(childAttributes), back_inserter(activationConditions),
+			  [](const auto &activationCondition) { return activationCondition.attribute("name").value(); });
+	return activationConditions;
+}
+
+pair<vector<string>, vector<size_t>> collectArcAttributes(const xml_node &transition, const string &attribute)
+{
+	vector<string> places;
+	vector<size_t> weights;
+	for (xml_node activationCondition : transition.child(attribute.c_str()))
+	{
+		places.emplace_back(activationCondition.attribute("name").value());
+
+		size_t weight = 1;
+		string weightStr = activationCondition.attribute("weight").value();
+		if (!weightStr.empty())
+		{
+			weight = static_cast<size_t>(std::atol(weightStr.c_str()));
+		}
+
+		weights.emplace_back(weight);
+	}
+
+	return pair<vector<string>, vector<size_t>>{ places, weights };
+}
+
+bool getRequireNoActionsInExecution(const xml_node &transition)
+{
+	const string v = transition.child("RequireNoActionsInExecution").attribute("value").value();
+	if (v == "true")
+	{
+		return true;
+	}
+	else if (v == "false")
+	{
+		return false;
+	}
+	else
+	{
+		throw runtime_error("Invalid value for RequireNoActionsInExecution: " + v);
+	}
+}
+} // namespace
+
+namespace ptne
+{
 XML_Importer::XML_Importer(const string &filePath)
 {
 	xml_parse_result result = m_document.load_file(filePath.c_str());
@@ -111,59 +167,5 @@ vector<XML_Importer::TransitionInfo> XML_Importer::getTransitions() const
 	return transitionInfoCollection;
 }
 
-string XML_Importer::getAttributeValue(const xml_node &node, const string &attrName) const
-{
-	return node.attribute(attrName.c_str()).value();
-}
-
-vector<string> XML_Importer::collectTransitionAttributes(const xml_node &transition, const string &attribute) const
-{
-	vector<string> activationConditions;
-	for (xml_node activationCondition : transition.child(attribute.c_str()))
-	{
-		activationConditions.emplace_back(activationCondition.attribute("name").value());
-	}
-
-	return activationConditions;
-}
-
-pair<vector<string>, vector<size_t>>
-XML_Importer::collectArcAttributes(const xml_node &transition, const string &attribute) const
-{
-	vector<string> places;
-	vector<size_t> weights;
-	for (xml_node activationCondition : transition.child(attribute.c_str()))
-	{
-		places.emplace_back(activationCondition.attribute("name").value());
-
-		size_t weight = 1;
-		string weightStr = activationCondition.attribute("weight").value();
-		if (!weightStr.empty())
-		{
-			weight = static_cast<size_t>(std::atol(weightStr.c_str()));
-		}
-
-		weights.emplace_back(weight);
-	}
-
-	return pair<vector<string>, vector<size_t>>{ places, weights };
-}
-
-bool XML_Importer::getRequireNoActionsInExecution(const xml_node &transition) const
-{
-	const string v = transition.child("RequireNoActionsInExecution").attribute("value").value();
-	if (v == "true")
-	{
-		return true;
-	}
-	else if (v == "false")
-	{
-		return false;
-	}
-	else
-	{
-		throw runtime_error("Invalid value for RequireNoActionsInExecution: " + v);
-	}
-}
 
 } // namespace ptne

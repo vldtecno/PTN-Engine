@@ -106,7 +106,6 @@ private:
 	void printNextDestinations() const;
 	void printWaitingGoDown() const;
 	void printWaitingGoUp() const;
-	void printFloorList(const std::unordered_set<int> &floors) const;
 	void printSchedule() const;
 
 	////////////////////
@@ -128,13 +127,13 @@ private:
 	void mergeMaxGoingDown();
 	void mergePostponedToCurrent();
 	void mergeGoingDownSTCurrent();
-	void processedLists();
-	void elevatorStopped();
-	void elevatorMoving();
-	void doorsAreOpen();
-	void doorsAreClosed();
-	void goingUp();
-	void goingDown();
+	void processedLists() const;
+	void elevatorStopped() const;
+	void elevatorMoving() const;
+	void doorsAreOpen() const;
+	void doorsAreClosed() const;
+	void goingUp() const;
+	void goingDown() const;
 
 	// Conditions
 	bool isFloorNotInList() const;

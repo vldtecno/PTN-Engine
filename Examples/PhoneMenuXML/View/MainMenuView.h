@@ -32,9 +32,9 @@ public:
 
 	/*!
 	 * Select an option.
-	 * \param i Number of the option.
+	 * \param option Number of the option.
 	 */
-	void select(const int i);
+	void select(const int option);
 
 private:
 	//! Selected option.

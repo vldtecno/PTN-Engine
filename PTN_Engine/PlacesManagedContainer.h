@@ -43,7 +43,7 @@ public:
 	/*!
 	 * \brief clearInputPlaces
 	 */
-	void clearInputPlaces();
+	void clearInputPlaces() const;
 
 	/*!
 	 * \brief Inserts a shared pointer of a place in the container.

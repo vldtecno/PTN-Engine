@@ -27,7 +27,7 @@ namespace ptne
 {
 using namespace std;
 
-void PlacesManagedContainer::clearInputPlaces()
+void PlacesManagedContainer::clearInputPlaces() const
 {
 	unique_lock<shared_mutex> transitionsGuard(m_placesMutex);
 	for (const WeakPtrPlace &place : m_inputPlaces)

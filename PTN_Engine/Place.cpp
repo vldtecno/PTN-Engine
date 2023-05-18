@@ -29,22 +29,22 @@ namespace ptne
 using namespace std;
 
 Place::Place(IPTN_EnginePlace &parent,
-             std::string name,
+             const std::string &name,
              const size_t initialNumberOfTokens,
-             ActionFunction onEnterEventHandler,
-             ActionFunction onExitEventHandler,
+             ActionFunction onEnterAction,
+             ActionFunction onExitAction,
              const bool input)
 : m_ptnEngine(parent)
 , m_name(name)
-, m_onEnterAction(onEnterEventHandler)
-, m_onExitAction(onExitEventHandler)
+, m_onEnterAction(onEnterAction)
+, m_onExitAction(onExitAction)
 , m_numberOfTokens(initialNumberOfTokens)
 , m_isInputPlace(input)
 {
 }
 
 Place::Place(IPTN_EnginePlace &parent,
-             std::string name,
+             const std::string &name,
              const size_t initialNumberOfTokens,
              const string &onEnterActionName,
              ActionFunction onEnterAction,

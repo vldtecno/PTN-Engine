@@ -56,7 +56,7 @@ Controller::CallList &Controller::callLog()
 	return m_callLog;
 }
 
-void Controller::showMainMenu()
+void Controller::showMainMenu() const
 {
 	m_mainMenu.showMenu();
 }

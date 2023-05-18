@@ -56,7 +56,7 @@ class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
 {
 public:
 	//! Constructor.
-	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsRuntimeThread);
+	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
 
 	~PTN_EngineImp();
 	PTN_EngineImp(const PTN_EngineImp &) = delete;
@@ -92,14 +92,14 @@ public:
 	 * Create a new place in the net.
 	 * \param name The name of the place.
 	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param onExitAction Name of the function to be called once a token leaves the place.
+	 * \param onEnterActionName Name of the function to be called once a token enters the place.
+	 * \param onExitActionName Name of the function to be called once a token leaves the place.
 	 * \param input A flag determining if this place can have tokens added manually.
 	 */
 	void createPlaceStr(const std::string &name,
 						const size_t initialNumberOfTokens,
-						const std::string &onEnterAction,
-						const std::string &onExitAction,
+						const std::string &onEnterActionName,
+						const std::string &onExitActionName,
 						const bool input = false);
 
 	/*!
@@ -112,7 +112,7 @@ public:
 	 * \param additionalConditions A vector with additionalConditions.
 	 */
 	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &acPTN_EngineInternaltivationWeights,
+						  const std::vector<size_t> &activationWeights,
 						  const std::vector<std::string> &destinationPlaces,
 						  const std::vector<size_t> &destinationWeights,
 						  const std::vector<std::string> &inhibitorPlaces,
@@ -193,7 +193,7 @@ public:
 	 * \brief getActionsThreadOption
 	 * \return
 	 */
-	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const;
+	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const override;
 
 	/*!
 	 * Start the petri net event loop.
@@ -208,25 +208,25 @@ public:
 	 * \param o
 	 * \return
 	 */
-	bool executeInt(const bool log = false, std::ostream &o = std::cout);
+	bool executeInt(const bool log = false, std::ostream &o = std::cout) override;
 
 	/*!
 	 * \brief Add job to job queue.
 	 * \param Function to be executed in the job queue.
 	 */
-	void addJob(const ActionFunction &actionFunction);
+	void addJob(const ActionFunction &actionFunction) override;
 
 	/*!
 	 * \brief Indicates if there are new tokens in any input places.
 	 * \return True of there is a new token in an input place.
 	 */
-	bool getNewInputReceived() const;
+	bool getNewInputReceived() const override;
 
 	/*!
 	 * \brief Flags or clears flag of new tokens in input places.
-	 * \param flag - The new value for the new input received flag.
+	 * \param newInputReceived - The new value for the new input received flag.
 	 */
-	void setNewInputReceived(const bool flag);
+	void setNewInputReceived(const bool newInputReceived);
 
 	/*!
 	 * \brief Gets the transitions that are currently enabled.

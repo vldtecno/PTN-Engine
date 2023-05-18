@@ -60,36 +60,6 @@ public:
 	std::vector<TransitionInfo> getTransitions() const override;
 
 private:
-	// void collectDocumentInformation(const pugi::xml_document &doc) const;
-
-	/*!
-	 * \brief getAttributeValue
-	 * \param node
-	 * \param attrName
-	 * \return
-	 */
-	std::string getAttributeValue(const pugi::xml_node &node, const std::string &attrName) const;
-
-	/*!
-	 * \brief collectTransitionAttributes
-	 * \param transition
-	 * \param attribute
-	 * \return
-	 */
-	std::vector<std::string>
-	collectTransitionAttributes(const pugi::xml_node &transition, const std::string &attribute) const;
-
-	/*!
-	 * \brief collectArcAttributes
-	 * \param transition
-	 * \param attribute
-	 * \return
-	 */
-	std::pair<std::vector<std::string>, std::vector<size_t>>
-	collectArcAttributes(const pugi::xml_node &transition, const std::string &attribute) const;
-
-	bool getRequireNoActionsInExecution(const pugi::xml_node &transition) const;
-
 	/*!
 	 * \brief m_document
 	 */

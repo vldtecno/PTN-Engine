@@ -31,14 +31,10 @@ using namespace std;
 vector<weak_ptr<Transition>> TransitionsManagedContainer::collectEnabledTransitionsRandomly() const
 {
 	shared_lock<shared_mutex> transitionsGuard(m_transitionsMutex);
+
 	vector<weak_ptr<Transition>> enabledTransitions;
-	for (const auto &transition : m_transitions)
-	{
-		if (transition->isEnabled())
-		{
-			enabledTransitions.push_back(transition);
-		}
-	}
+	copy_if(m_transitions.cbegin(), m_transitions.cend(), back_inserter(enabledTransitions),
+			[](const auto &transition) { return transition->isEnabled(); });
 
 	// TODO check performance
 	random_device randomDevice;

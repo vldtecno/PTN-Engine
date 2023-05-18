@@ -49,7 +49,7 @@ public:
 						  const std::vector<size_t> &outputTokens,
 						  const std::vector<size_t> &expectedInputTokens,
 						  const std::vector<size_t> &expectedOutputTokens,
-						  VectorOfConditions &conditions,
+						  const VectorOfConditions &conditions,
 						  const bool expectedFireResult);
 
 
@@ -70,7 +70,7 @@ public:
 									 const std::vector<size_t> &outputWeights,
 									 const std::vector<size_t> &expectedInputTokens,
 									 const std::vector<size_t> &expectedOutputTokens,
-									 VectorOfConditions &conditions,
+									 const VectorOfConditions &conditions,
 									 const bool expectedFireResult);
 
 	/*!
@@ -79,7 +79,7 @@ public:
 	 * \param tokens Vector with initial tokens.
 	 * \return Vector of shared pointers to places with the tokens given in the input.
 	 */
-	std::vector<std::shared_ptr<ptne::Place>> createPlaces(const std::vector<size_t> &tokens);
+	std::vector<std::shared_ptr<ptne::Place>> createPlaces(const std::vector<size_t> &inputTokens);
 
 	/*!
 	 * Utility function. Create a vector with weak pointers of the shared pointers of the

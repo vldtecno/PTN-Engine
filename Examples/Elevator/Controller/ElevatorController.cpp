@@ -25,6 +25,23 @@
 
 using namespace std;
 
+namespace
+{
+void printFloorList(const unordered_set<int> &floors)
+{
+	if (floors.empty())
+	{
+		cout << "Empty" << endl;
+		return;
+	}
+	for (const auto &d : floors)
+	{
+		cout << d << " ";
+	}
+	cout << endl;
+}
+} // namespace
+
 ElevatorController::ElevatorController()
 : m_pPetriNet(nullptr)
 , m_currentFloor(s_bottomFloor)
@@ -284,7 +301,7 @@ void ElevatorController::mergeToDestinations(unordered_set<int> &toAdd, const bo
 	m_destinations.erase(m_currentFloor);
 }
 
-void ElevatorController::processedLists()
+void ElevatorController::processedLists() const
 {
 	printSchedule();
 }
@@ -376,36 +393,36 @@ bool ElevatorController::isMaxGreaterThanCurrent() const
 
 // Info
 
-void ElevatorController::elevatorStopped()
+void ElevatorController::elevatorStopped() const
 {
 	unique_lock<shared_mutex> l(m_mutex);
 	cout << "Elevator stopped" << endl;
 }
 
-void ElevatorController::elevatorMoving()
+void ElevatorController::elevatorMoving() const
 {
 	printSchedule();
 }
 
-void ElevatorController::doorsAreOpen()
+void ElevatorController::doorsAreOpen() const
 {
 	unique_lock<shared_mutex> l(m_mutex);
 	cout << "Elevator doors are open" << endl;
 }
 
-void ElevatorController::doorsAreClosed()
+void ElevatorController::doorsAreClosed() const
 {
 	unique_lock<shared_mutex> l(m_mutex);
 	cout << "Elevator doors are closed" << endl;
 }
 
-void ElevatorController::goingUp()
+void ElevatorController::goingUp() const
 {
 	unique_lock<shared_mutex> l(m_mutex);
 	cout << "Scheduled to go up." << endl;
 }
 
-void ElevatorController::goingDown()
+void ElevatorController::goingDown() const
 {
 	unique_lock<shared_mutex> l(m_mutex);
 	cout << "Scheduled to go down." << endl;
@@ -438,20 +455,6 @@ void ElevatorController::printWaitingGoUp() const
 {
 	cout << "Floors with people waiting to go up: ";
 	printFloorList(m_floorsWaitingToGoUp);
-}
-
-void ElevatorController::printFloorList(const unordered_set<int> &floors) const
-{
-	if (floors.empty())
-	{
-		cout << "Empty" << endl;
-		return;
-	}
-	for (const auto &d : floors)
-	{
-		cout << d << " ";
-	}
-	cout << endl;
 }
 
 void ElevatorController::printSchedule() const

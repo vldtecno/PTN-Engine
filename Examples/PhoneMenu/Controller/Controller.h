@@ -63,7 +63,7 @@ public:
 	CallList &callLog();
 
 	//! Show the main menu on screen.
-	void showMainMenu();
+	void showMainMenu() const;
 
 	//! Select the calls option.
 	void selectCallsOption();

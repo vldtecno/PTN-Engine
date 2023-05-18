@@ -45,7 +45,7 @@ public:
 	 * \param input Flag that marks the place as an input place.
 	 */
 	Place(IPTN_EnginePlace &parent,
-		  std::string name,
+		  const std::string &name,
 		  const size_t initialNumberOfTokens,
 		  ActionFunction onEnterAction,
 		  ActionFunction onExitAction,
@@ -63,7 +63,7 @@ public:
 	 * \param input
 	 */
 	Place(IPTN_EnginePlace &parent,
-		  std::string name,
+		  const std::string &name,
 		  const size_t initialNumberOfTokens,
 		  const std::string &onEnterActionName,
 		  ActionFunction onEnterAction,

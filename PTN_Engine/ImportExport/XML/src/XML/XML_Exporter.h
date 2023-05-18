@@ -54,7 +54,7 @@ public:
 					 const std::string &tokens,
 					 const std::string &isInput,
 					 const std::string &onEnterAction,
-					 const std::string &onExitAction);
+					 const std::string &onExitAction) override;
 
 	/*!
 	 * \brief exportTransition
@@ -68,13 +68,13 @@ public:
 						  const std::vector<std::tuple<std::string, size_t>> &destinationPlaces,
 						  const std::vector<std::string> &activationConditions,
 						  const std::vector<std::string> &inhibitorPlaces,
-						  const bool requireNoActionInExecution);
+						  const bool requireNoActionInExecution) override;
 
 	/*!
 	 * \brief saveFile
 	 * \param filePath
 	 */
-	void saveFile(const std::string &filePath) const;
+	void saveFile(const std::string &filePath) const override;
 
 private:
 	pugi::xml_node m_rootNode;

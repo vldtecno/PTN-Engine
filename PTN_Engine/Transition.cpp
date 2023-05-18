@@ -25,6 +25,8 @@
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <mutex>
+#include <ranges>
+#include <tuple>
 
 namespace ptne
 {
@@ -64,10 +66,8 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
 	}
 	else
 	{
-		for (const auto &ap : activationPlaces)
-		{
-			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(ap, 1));
-		}
+		transform(activationPlaces.cbegin(), activationPlaces.cend(), back_inserter(m_activationPlaces),
+				  [](const auto &ap) { return tuple<WeakPtrPlace, size_t>(ap, 1); });
 	}
 
 	if (!destinationWeights.empty())
@@ -84,10 +84,8 @@ Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
 	}
 	else
 	{
-		for (const auto &dp : destinationPlaces)
-		{
-			m_destinationPlaces.push_back(tuple<WeakPtrPlace, size_t>(dp, 1));
-		}
+		transform(destinationPlaces.cbegin(), destinationPlaces.cend(), back_inserter(m_destinationPlaces),
+				  [](const auto &dp) { return tuple<WeakPtrPlace, size_t>(dp, 1); });
 	}
 }
 
@@ -173,55 +171,57 @@ std::vector<Transition::WeakPtrPlace> Transition::getInhibitorPlaces() const
 void Transition::export_(IExporter &exporter) const
 {
 	vector<tuple<string, size_t>> activationPlacesExport;
-	for (const auto &activationPlace : m_activationPlaces)
-	{
-		tuple<string, size_t> activationPlaceExport;
-		if (auto activationPlaceShPtr = get<0>(activationPlace).lock())
-		{
-			get<0>(activationPlaceExport) = activationPlaceShPtr->getName();
-			get<1>(activationPlaceExport) = get<1>(activationPlace);
-			activationPlacesExport.emplace_back(activationPlaceExport);
-		}
-		else
-		{
-			throw PTN_Exception("Could not lock activation place weak pointer");
-		}
-	}
+	transform(m_activationPlaces.cbegin(), m_activationPlaces.cend(), back_inserter(activationPlacesExport),
+			  [](const auto &activationPlace)
+			  {
+				  tuple<string, size_t> activationPlaceExport;
+				  if (auto activationPlaceShPtr = get<0>(activationPlace).lock())
+				  {
+					  get<0>(activationPlaceExport) = activationPlaceShPtr->getName();
+					  get<1>(activationPlaceExport) = get<1>(activationPlace);
+					  return activationPlaceExport;
+				  }
+				  else
+				  {
+					  throw PTN_Exception("Could not lock activation place weak pointer");
+				  }
+			  });
 
 	vector<tuple<string, size_t>> destinationPlacesExport;
-	for (const auto &destinationPlace : m_destinationPlaces)
-	{
-		tuple<string, size_t> destinationPlaceExport;
-		if (auto destinationPlaceShPtr = get<0>(destinationPlace).lock())
-		{
-			get<0>(destinationPlaceExport) = destinationPlaceShPtr->getName();
-			get<1>(destinationPlaceExport) = get<1>(destinationPlace);
-			destinationPlacesExport.emplace_back(destinationPlaceExport);
-		}
-		else
-		{
-			throw PTN_Exception("Could not lock destination place weak pointer");
-		}
-	}
+	transform(m_destinationPlaces.cbegin(), m_destinationPlaces.cend(), back_inserter(destinationPlacesExport),
+			  [](const auto &destinationPlace)
+			  {
+				  tuple<string, size_t> destinationPlaceExport;
+				  if (auto destinationPlaceShPtr = get<0>(destinationPlace).lock())
+				  {
+					  get<0>(destinationPlaceExport) = destinationPlaceShPtr->getName();
+					  get<1>(destinationPlaceExport) = get<1>(destinationPlace);
+					  return destinationPlaceExport;
+				  }
+				  else
+				  {
+					  throw PTN_Exception("Could not lock destination place weak pointer");
+				  }
+			  });
 
 	vector<string> activationConditionsNames;
-	for (const auto &activationCondition : m_additionalActivationConditions)
-	{
-		activationConditionsNames.emplace_back(activationCondition.first);
-	}
+	transform(m_additionalActivationConditions.cbegin(), m_additionalActivationConditions.cend(),
+			  back_inserter(activationConditionsNames),
+			  [](const auto &activationCondition) { return activationCondition.first; });
 
 	vector<string> inhibitorPlacesNames;
-	for (const auto &inhibitorPlace : m_inhibitorPlaces)
-	{
-		if (auto inhibitorPlaceShPtr = inhibitorPlace.lock())
-		{
-			inhibitorPlacesNames.emplace_back(inhibitorPlaceShPtr->getName());
-		}
-		else
-		{
-			throw PTN_Exception("Could not lock inhibitor place weak pointer");
-		}
-	}
+	transform(m_inhibitorPlaces.cbegin(), m_inhibitorPlaces.cend(), back_inserter(inhibitorPlacesNames),
+			  [](const auto &inhibitorPlace)
+			  {
+				  if (auto inhibitorPlaceShPtr = inhibitorPlace.lock())
+				  {
+					  return inhibitorPlaceShPtr->getName();
+				  }
+				  else
+				  {
+					  throw PTN_Exception("Could not lock inhibitor place weak pointer");
+				  }
+			  });
 
 	exporter.exportTransition(activationPlacesExport, destinationPlacesExport, activationConditionsNames,
 							  inhibitorPlacesNames, requireNoActionsInExecution());
@@ -309,7 +309,7 @@ void Transition::exitActivationPlaces()
 {
 	for (tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
 	{
-		WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
 		const size_t activationWeight = get<1>(tupleActivationPlace);
 
 		if (SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
@@ -323,7 +323,7 @@ void Transition::enterDestinationPlaces()
 {
 	for (tuple<WeakPtrPlace, size_t> &tupleDestinationPlace : m_destinationPlaces)
 	{
-		WeakPtrPlace &destinationPlace = get<0>(tupleDestinationPlace);
+		const WeakPtrPlace &destinationPlace = get<0>(tupleDestinationPlace);
 		const size_t destinationWeight = get<1>(tupleDestinationPlace);
 
 		if (SharedPtrPlace spPlace = lockWeakPtr(destinationPlace))
@@ -350,7 +350,7 @@ void Transition::blockStartingOnEnterActions(const bool value)
 
 	for (tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
 	{
-		WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
 		if (SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
 		{
 			spPlace->blockStartingOnEnterActions(value);

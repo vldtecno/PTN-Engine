@@ -28,8 +28,8 @@ namespace ptne
 using namespace std;
 
 PTN_EngineImp::PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
-: m_eventLoop(*this)
-, m_actionsThreadOption(actionsThreadOption)
+: m_actionsThreadOption(actionsThreadOption)
+, m_eventLoop(*this)
 {
 	if (m_actionsThreadOption == PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE)
 	{
@@ -310,10 +310,8 @@ const vector<pair<string, ConditionFunction>>
 PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &conditions) const
 {
 	vector<pair<string, ConditionFunction>> anonymousConditionsVector;
-	for (const auto &condition : conditions)
-	{
-		anonymousConditionsVector.emplace_back(pair<string, ConditionFunction>("", condition));
-	}
+	transform(conditions.cbegin(), conditions.cend(), back_inserter(anonymousConditionsVector),
+			  [](const auto &condition) { return pair<string, ConditionFunction>("", condition); });
 	return anonymousConditionsVector;
 }
 

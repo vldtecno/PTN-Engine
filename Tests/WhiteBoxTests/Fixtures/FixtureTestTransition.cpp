@@ -32,7 +32,7 @@ void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
                                              const vector<size_t> &outputTokens,
                                              const vector<size_t> &expectedInputTokens,
                                              const vector<size_t> &expectedOutputTokens,
-                                             VectorOfConditions &conditions,
+                                             const VectorOfConditions &conditions,
                                              const bool expectedFireResult)
 {
 	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
@@ -71,14 +71,14 @@ void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
 void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> &inputTokens,
                                                         const vector<size_t> &inputWeights,
                                                         const vector<size_t> &outputTokens,
-                                                        const vector<size_t> &ouptutWeights,
+                                                        const vector<size_t> &outputWeights,
                                                         const vector<size_t> &expectedInputTokens,
                                                         const vector<size_t> &expectedOutputTokens,
-                                                        VectorOfConditions &conditions,
+                                                        const VectorOfConditions &conditions,
                                                         const bool expectedFireResult)
 {
 	EXPECT_EQ(inputTokens.size(), inputWeights.size());
-	EXPECT_EQ(outputTokens.size(), ouptutWeights.size());
+	EXPECT_EQ(outputTokens.size(), outputWeights.size());
 	EXPECT_EQ(outputTokens.size(), expectedOutputTokens.size());
 
 
@@ -91,7 +91,7 @@ void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> &in
 	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	// Create transition
-	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, ouptutWeights, {}, conditions, false);
+	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions, false);
 
 	// Test transition
 	EXPECT_EQ(expectedFireResult, transition.execute());

@@ -33,7 +33,6 @@ EventLoop::EventLoop(IPTN_EngineEL &ptnEngineInternal)
 
 EventLoop::~EventLoop()
 {
-	stop();
 }
 
 bool EventLoop::isRunning() const

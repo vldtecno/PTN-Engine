@@ -35,7 +35,7 @@ class PTN_Engine::PTN_EngineImpProxy final
 {
 public:
 	//! Constructor.
-	explicit PTN_EngineImpProxy(ACTIONS_THREAD_OPTION actionsRuntimeThread);
+	explicit PTN_EngineImpProxy(ACTIONS_THREAD_OPTION actionsThreadOption);
 
 	~PTN_EngineImpProxy();
 

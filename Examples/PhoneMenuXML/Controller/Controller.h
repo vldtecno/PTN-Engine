@@ -70,7 +70,7 @@ private:
 	ptne::PTN_Engine m_petriNet;
 
 	//! Show the main menu on screen.
-	void showMainMenu();
+	void showMainMenu() const;
 
 	//! Select the calls option.
 	void selectCallsOption();
