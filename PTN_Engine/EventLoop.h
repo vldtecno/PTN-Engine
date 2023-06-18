@@ -19,6 +19,7 @@
 #pragma once
 
 #include <atomic>
+#include <barrier>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
@@ -116,6 +117,9 @@ private:
 
 	//! Event loop thread.
 	std::jthread m_eventLoopThread;
+
+	//! Barrier to synchronize the event loop thread.
+	std::barrier<> m_barrier;
 };
 
 } // namespace ptne
