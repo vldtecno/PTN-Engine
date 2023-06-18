@@ -61,7 +61,11 @@ int main(int, char **)
 {
 	// Set up controller
 	Controller controller;
+#ifdef WIN32
+	controller.importStateMachine("../PhoneMenu.xml");
+#else
 	controller.importStateMachine("./PhoneMenu.xml");
+#endif
 
 	// Set up data
 	controller.messageList().addItem(Message("Hi...", "Hi John, don't forget to water the plants."));
