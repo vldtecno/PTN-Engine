@@ -27,7 +27,7 @@ jobs:
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -DBUILD_EXAMPLES=ON -DBUILD_GMOCK=ON -DBUILD_IMPORT_EXPORT=ON -DBUILD_TESTING=ON -DBUILD_TESTS=ON
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     #- name: Test
     #  working-directory: ${{github.workspace}}/build
