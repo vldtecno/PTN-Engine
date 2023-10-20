@@ -1,6 +1,6 @@
 # This file is part of PTN Engine
 # 
-# Copyright (c) 2017 Eduardo Valgôde
+# Copyright (c) 2017-2023 Eduardo Valgôde
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,9 +35,45 @@ target_link_libraries(BlackBoxTest PUBLIC
 	gmock_main
 	PTN_Engine)
 
-if(NOT BUILD_SHARED_LIBS)
-	set_target_properties(BlackBoxTest PROPERTIES SUFFIX ${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX})
+if(BUILD_SHARED_LIBS)
+	set(BlackBoxTestsExecutable "BlackBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
+else()
+	set(BlackBoxTestsExecutable "BlackBoxTest${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
+
+add_test(NAME RoundRobin_1
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*RoundRobin_1)
+add_test(NAME RoundRobin_1_detached
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*RoundRobin_1_detached)
+add_test(NAME RoundRobin_1_continuous2
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*RoundRobin_1_continuous2)
+add_test(NAME FreeChoice_1
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*FreeChoice_1)
+add_test(NAME FreeChoice_1_detached
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*FreeChoice_1_detached)
+add_test(NAME Weights_1
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Weights_1)
+add_test(NAME Weights_1_detached
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Weights_1_detached)
+add_test(NAME Inhibited_SingleThread
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Inhibited_SingleThread)
+add_test(NAME Inhibited_1
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Inhibited_1)
+add_test(NAME Inhibited_1_detached
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Inhibited_1_detached)
+add_test(NAME ThreadSafety
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*ThreadSafety)
+add_test(NAME RegisteredMethods
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*RegisteredMethods)
+add_test(NAME AlreadyRegisteredMethods
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*AlreadyRegisteredMethods)
+add_test(NAME AdditionalActivationConditions
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*AdditionalActivationConditions)
+add_test(NAME Ordering
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*Ordering)
+add_test(NAME ThreadSafety_1
+		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*ThreadSafety_1)
+
 set_target_properties(BlackBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
 # Install rules
