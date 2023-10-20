@@ -35,11 +35,7 @@ target_link_libraries(BlackBoxTest PUBLIC
 	gmock_main
 	PTN_Engine)
 
-if(BUILD_SHARED_LIBS)
-	set(BlackBoxTestsExecutable "BlackBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
-else()
-	set(BlackBoxTestsExecutable "BlackBoxTest${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX}")
-endif()
+set(BlackBoxTestsExecutable "BlackBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
 
 add_test(NAME RoundRobin_1
 		COMMAND ${BlackBoxTestsExecutable} --gtest_filter=*RoundRobin_1)

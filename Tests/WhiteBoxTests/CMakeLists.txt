@@ -40,11 +40,7 @@ target_link_libraries(WhiteBoxTest PUBLIC
 	gmock_main
 	PTN_Engine)	
 
-if(BUILD_SHARED_LIBS)
-	set(WhiteBoxTestsExecutable "WhiteBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
-else()
-	set(WhiteBoxTestsExecutable "WhiteBoxTest${EXECUTABLE_STATIC_POSTFIX}${CMAKE_EXECUTABLE_SUFFIX}")
-endif()
+set(WhiteBoxTestsExecutable "WhiteBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
 
 add_test(NAME InputPlace
 		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*InputPlace)
