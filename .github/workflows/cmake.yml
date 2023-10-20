@@ -2,9 +2,9 @@ name: CMake
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "TestCoverage" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "TestCoverage" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
