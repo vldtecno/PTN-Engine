@@ -46,6 +46,9 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
+    - name: InstallCoverageReportDependencies
+      run: sudo apt-get -y install geninfo genhtml
+
     - name: TestCoverageData
       working-directory: ${{github.workspace}}/build/
       run: geninfo ./PTN_Engine -b ../ -o coverage.info --ignore-errors mismatch,mismatch
