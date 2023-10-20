@@ -27,6 +27,13 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+        # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+      BUILD_TYPE: Coverage
+      BUILD_EXAMPLES: true
+      BUILD_GMOCK: true
+      BUILD_IMPORT_EXPORT: true
+      BUILD_TESTING: true
+      BUILD_TESTS: true
     runs-on: ubuntu-latest
     steps:
       - name: Configure CMake
