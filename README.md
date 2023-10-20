@@ -1,7 +1,5 @@
 ![PTN Engine](<Doc/Logo/PTN%20Engine%20Logo.svg> "PTN Engine")
  
-[![Build Status](https://travis-ci.com/vldtecno/PTN-Engine.svg?branch=master)](https://travis-ci.com/vldtecno/PTN-Engine)
-
 # PTN Engine 
 The *PTN Engine* is a C++ library that implements Petri nets.
 Its purpose is to provide a framework to other programs, enabling them
