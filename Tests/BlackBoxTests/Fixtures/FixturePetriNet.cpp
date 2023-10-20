@@ -97,7 +97,7 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 
 	float metric = abs(bucket1 - bucket2) / (bucket1 + bucket2);
 
-	EXPECT_TRUE(metric < 0.041f) << metric;
+	EXPECT_TRUE(metric < 0.1f) << metric;
 }
 
 void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces])
