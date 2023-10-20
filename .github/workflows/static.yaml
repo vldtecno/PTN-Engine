@@ -1,0 +1,75 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy static content to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["PublishTestCoverage"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure CMake
+        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_BUILD_EXAMPLES=${{env.BUILD_EXAMPLES}} -DCMAKE_BUILD_GMOCK=${{env.BUILD_GMOCK}} -DCMAKE_BUILD_IMPORT_EXPORT=${{env.BUILD_IMPORT_EXPORT}} -DBUILD_TESTING=${{env.BUILD_TESTING}} -DBUILD_TESTS=${{env.BUILD_TESTS}}
+
+    - name: Build
+        # Build your program with the given configuration
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: WhiteBoxTests
+        working-directory: ${{github.workspace}}/build/Tests/WhiteBoxTests
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: BlackBoxTests
+        working-directory: ${{github.workspace}}/build/Tests/BlackBoxTests
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: InstallCoverageReportDependencies
+        run: sudo apt-get -y install lcov
+
+    - name: TestCoverageData
+        working-directory: ${{github.workspace}}/build/
+        run: geninfo ./PTN_Engine -b ../ -o coverage.info
+
+    - name: TestCoverageReport
+        working-directory: ${{github.workspace}}/build/
+        run: genhtml coverage.info -o CoverageReport
+
+    - name: Checkout
+        uses: actions/checkout@v3
+    - name: Setup Pages
+        uses: actions/configure-pages@v3
+    - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          # Upload entire repository
+          path: ${{github.workspace}}/build/CoverageReport
+    - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
