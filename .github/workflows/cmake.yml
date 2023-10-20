@@ -51,7 +51,7 @@ jobs:
 
     - name: TestCoverageData
       working-directory: ${{github.workspace}}/build/
-      run: geninfo ./PTN_Engine -b ../ -o coverage.info --ignore-errors mismatch,mismatch
+      run: geninfo ./PTN_Engine -b ../ -o coverage.info --ignore-errors
 
     - name: TestCoverageReport
       working-directory: ${{github.workspace}}/build/
