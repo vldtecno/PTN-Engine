@@ -119,7 +119,7 @@ private:
 	std::jthread m_eventLoopThread;
 
 	//! Barrier to synchronize the event loop thread.
-	std::barrier<> m_barrier;
+	std::unique_ptr<std::barrier<>> m_barrier = nullptr;
 };
 
 } // namespace ptne

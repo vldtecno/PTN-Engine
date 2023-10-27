@@ -28,7 +28,6 @@ using namespace std;
 EventLoop::EventLoop(IPTN_EngineEL &ptnEngineInternal)
 : m_ptnEngine(ptnEngineInternal)
 , m_sleepDuration(100ms)
-, m_barrier(2)
 {
 }
 
@@ -51,7 +50,7 @@ void EventLoop::stop() noexcept
 	if (m_eventLoopThread.get_stop_token().stop_possible())
 	{
 		m_eventLoopThread.request_stop();
-		m_barrier.arrive_and_wait();
+		m_barrier->arrive_and_wait();
 	}
 }
 
@@ -68,6 +67,7 @@ void EventLoop::start(const bool log, ostream &o)
 	}
 	else
 	{
+		m_barrier = make_unique<barrier<>>(2);
 		m_eventLoopThreadRunning = true;
 		m_eventLoopThread = jthread(bind_front(&EventLoop::run, this), log, ref(o));
 	}
@@ -105,6 +105,6 @@ void EventLoop::run(std::stop_token stopToken, const bool log, ostream &o)
 		}
 	}
 	m_eventLoopThreadRunning = false;
-	m_barrier.arrive();
+	m_barrier->arrive_and_wait();
 }
 } // namespace ptne
