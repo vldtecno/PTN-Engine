@@ -35,7 +35,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}/UnitTestCoverage
+      url: ${{ steps.deployment.outputs.page_url }}UnitTestCoverage
         # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 
     runs-on: ubuntu-latest
@@ -75,10 +75,14 @@ jobs:
         working-directory: ${{github.workspace}}/build/
         run: genhtml coverage.info -o CoverageReport
 
+      - name: Move Directory
+        working-directory: ${{github.workspace}}/build/
+        run: mkdir UnitTestCoverage; mv CoverageReport UnitTestCoverage
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ${{github.workspace}}/build/CoverageReport
+          path: ${{github.workspace}}/build/UnitTestCoverage
 
       - name: Deploy to GitHub Pages
         id: deployment
