@@ -35,7 +35,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}/UnitTestCoverage
         # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 
     runs-on: ubuntu-latest
@@ -83,4 +83,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
