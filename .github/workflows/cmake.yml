@@ -8,7 +8,7 @@ on:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Coverage
+  BUILD_TYPE: Release
   BUILD_EXAMPLES: true
   BUILD_GMOCK: true
   BUILD_IMPORT_EXPORT: true
@@ -46,13 +46,3 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
-    - name: InstallCoverageReportDependencies
-      run: sudo apt-get -y install lcov
-
-    - name: TestCoverageData
-      working-directory: ${{github.workspace}}/build/
-      run: geninfo ./PTN_Engine -b ../ -o coverage.info
-
-    - name: TestCoverageReport
-      working-directory: ${{github.workspace}}/build/
-      run: genhtml coverage.info -o CoverageReport
