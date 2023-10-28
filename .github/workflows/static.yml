@@ -84,7 +84,7 @@ jobs:
 
       - name: Move Documentation
         working-directory: ${{github.workspace}}/PTN-Engine/
-        run: mv FullDocumentation ../build/UnitTestCoverage
+        run: mv ./FullDocumentation ../build/UnitTestCoverage
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
