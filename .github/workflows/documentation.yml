@@ -41,7 +41,7 @@ jobs:
 
       - name: Move Documentation
         working-directory: ${{github.workspace}}/PTN-Engine/
-        run: mkdir master; mv ./FullDocumentation ./master
+        run: mkdir master; mv ./FullDocumentation ./master; ls master/FullDocumentation
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
