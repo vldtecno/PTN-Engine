@@ -24,7 +24,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}Doc
         # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 
     runs-on: ubuntu-latest
