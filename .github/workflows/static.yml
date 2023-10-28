@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Unit Test Coverage Report
+name: Documentation
 
 on:
   # Runs on pushes targeting the default branch
@@ -35,7 +35,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}master
         # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
 
     runs-on: ubuntu-latest
@@ -73,12 +73,23 @@ jobs:
 
       - name: TestCoverageReport
         working-directory: ${{github.workspace}}/build/
-        run: mkdir UnitTestCoverage; genhtml coverage.info -o UnitTestCoverage/CoverageReport
+        run: mkdir Output; genhtml coverage.info -o Output/CoverageReport
+
+      - name: Install Doxygen
+        run: sudo apt-get -y install graphviz librsvg2-bin doxygen
+
+      - name: Generate Documentation
+        working-directory: ${{github.workspace}}/PTN-Engine/
+        run: doxygen Doc/Doxygen/FullDocumentation.doxy
+
+      - name: Move Documentation
+        working-directory: ${{github.workspace}}/PTN-Engine/
+        run: mv ./FullDocumentation ../build/Output
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ${{github.workspace}}/build/UnitTestCoverage
+          path: ${{github.workspace}}/build/Output
 
       - name: Deploy to GitHub Pages
         id: deployment

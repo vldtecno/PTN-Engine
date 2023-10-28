@@ -1,5 +1,5 @@
 ![Unit Tests](https://github.com/vldtecno/PTN-Engine/actions/workflows/cmake.yml/badge.svg?branch=master)
-![Deploy Unit Test Coverage Report](https://github.com/vldtecno/PTN-Engine/actions/workflows/static.yml/badge.svg?branch=master)
+![Documentation](https://github.com/vldtecno/PTN-Engine/actions/workflows/static.yml/badge.svg?branch=master)
 
 
 ![PTN Engine](<Doc/Logo/PTN%20Engine%20Logo.svg> "PTN Engine")
