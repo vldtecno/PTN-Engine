@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Deploy Unit Test Coverage Report
+name: Unit Test Coverage Report
 
 on:
   # Runs on pushes targeting the default branch
@@ -74,17 +74,6 @@ jobs:
       - name: TestCoverageReport
         working-directory: ${{github.workspace}}/build/
         run: mkdir UnitTestCoverage; genhtml coverage.info -o UnitTestCoverage/CoverageReport
-
-      - name: Install Doxygen
-        run: sudo apt-get -y install graphviz librsvg2-bin doxygen
-
-      - name: Generate Documentation
-        working-directory: ${{github.workspace}}/PTN-Engine/
-        run: doxygen Doc/Doxygen/FullDocumentation.doxy
-
-      - name: Move Documentation
-        working-directory: ${{github.workspace}}/PTN-Engine/
-        run: mv ./FullDocumentation ../build/UnitTestCoverage
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2

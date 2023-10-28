@@ -1,0 +1,53 @@
+name: Documentation
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+        # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        run: git clone https://github.com/vldtecno/PTN-Engine.git ${{github.workspace}}/PTN-Engine
+
+      - name: Install Doxygen
+        run: sudo apt-get -y install graphviz librsvg2-bin doxygen
+
+      - name: Generate Documentation
+        working-directory: ${{github.workspace}}/PTN-Engine/
+        run: doxygen Doc/Doxygen/FullDocumentation.doxy
+
+      - name: Move Documentation
+        working-directory: ${{github.workspace}}/PTN-Engine/
+        run: mv ./FullDocumentation ../build/UnitTestCoverage
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ${{github.workspace}}/build/UnitTestCoverage
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
