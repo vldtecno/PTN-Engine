@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 #include "PTN_Engine/PTN_EngineImp.h"
-#include "PTN_Engine/IExporter.h"
-#include "PTN_Engine/IImporter.h"
 #include "PTN_Engine/JobQueue/JobQueue.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
+#include <algorithm>
 
 namespace ptne
 {
@@ -58,61 +58,41 @@ void PTN_EngineImp::clearNet()
 	m_places.clear();
 }
 
-void PTN_EngineImp::createPlace(const string &name,
-                                const size_t initialNumberOfTokens,
-                                ActionFunction onEnterAction,
-                                ActionFunction onExitAction,
-                                const bool input)
+void PTN_EngineImp::createTransition(const TransitionProperties &transitionProperties)
 {
-	auto place = make_shared<Place>(*this, name, initialNumberOfTokens, onEnterAction, onExitAction, input);
-	m_places.insert(place);
+	createTransition(transitionProperties.name,
+					 transitionProperties.activationArcs,
+					 transitionProperties.destinationArcs,
+					 transitionProperties.inhibitorArcs,
+					 !transitionProperties.additionalConditionsNames.empty() ?
+						 m_conditions.getItems(transitionProperties.additionalConditionsNames) :
+						 createAnonymousConditions(transitionProperties.additionalConditions),
+					 transitionProperties.requireNoActionsInExecution);
 }
 
-void PTN_EngineImp::createPlaceStr(const string &name,
-                                   const size_t initialNumberOfTokens,
-                                   const string &onEnterActionName,
-                                   const string &onExitActionName,
-                                   const bool input)
+void PTN_EngineImp::createPlace(const PlaceProperties &placeProperties)
 {
-	ActionFunction onEnterAction;
-	if (!onEnterActionName.empty())
+	ActionFunction onEnterAction = placeProperties.onEnterAction;
+	if (!placeProperties.onEnterActionFunctionName.empty())
 	{
-		onEnterAction = m_actions.getItem(onEnterActionName);
+		onEnterAction = m_actions.getItem(placeProperties.onEnterActionFunctionName);
 	}
 
-	ActionFunction onExitAction;
-	if (!onExitActionName.empty())
+	ActionFunction onExitAction = placeProperties.onExitAction;
+	if (!placeProperties.onExitActionFunctionName.empty())
 	{
-		onExitAction = m_actions.getItem(onExitActionName);
+		onExitAction = m_actions.getItem(placeProperties.onExitActionFunctionName);
 	}
 
-	auto place = make_shared<Place>(*this, name, initialNumberOfTokens, onEnterActionName, onEnterAction,
-									onExitActionName, onExitAction, input);
+	auto place = make_shared<Place>(*this,
+									placeProperties.name,
+									placeProperties.initialNumberOfTokens,
+									placeProperties.onEnterActionFunctionName,
+									onEnterAction,
+									placeProperties.onExitActionFunctionName,
+									onExitAction,
+									placeProperties.input);
 	m_places.insert(place);
-}
-
-void PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-                                     const vector<size_t> &activationWeights,
-                                     const vector<string> &destinationPlaces,
-                                     const vector<size_t> &destinationWeights,
-                                     const vector<string> &inhibitorPlaces,
-                                     const vector<string> &additionalConditions,
-                                     const bool requireNoActionsInExecution)
-{
-	createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights, inhibitorPlaces,
-					 m_conditions.getItems(additionalConditions), requireNoActionsInExecution);
-}
-
-void PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-                                     const vector<size_t> &activationWeights,
-                                     const vector<string> &destinationPlaces,
-                                     const vector<size_t> &destinationWeights,
-                                     const vector<string> &inhibitorPlaces,
-                                     const vector<ConditionFunction> &additionalConditions,
-                                     const bool requireNoActionsInExecution)
-{
-	createTransition(activationPlaces, activationWeights, destinationPlaces, destinationWeights, inhibitorPlaces,
-					 createAnonymousConditions(additionalConditions), requireNoActionsInExecution);
 }
 
 bool PTN_EngineImp::isEventLoopRunning() const
@@ -125,12 +105,12 @@ void PTN_EngineImp::stop() noexcept
 	m_eventLoop.stop();
 }
 
-void PTN_EngineImp::registerAction(const string &name, ActionFunction action)
+void PTN_EngineImp::registerAction(const string &name, const ActionFunction &action)
 {
 	m_actions.addItem(name, action);
 }
 
-void PTN_EngineImp::registerCondition(const string &name, ConditionFunction condition)
+void PTN_EngineImp::registerCondition(const string &name, const ConditionFunction &condition)
 {
 	m_conditions.addItem(name, condition);
 }
@@ -147,61 +127,6 @@ void PTN_EngineImp::incrementInputPlace(const string &place)
 	m_eventLoop.notifyNewEvent();
 }
 
-void PTN_EngineImp::export_(IExporter &exporter) const
-{
-	if (isEventLoopRunning())
-	{
-		throw PTN_Exception("Cannot change actions thread option while the event loop is running.");
-	}
-
-	string actionsThreadOptionStr;
-	if (!ACTIONS_THREAD_OPTION_toString(m_actionsThreadOption, actionsThreadOptionStr))
-	{
-		throw PTN_Exception("Invalid ACTIONS_THREAD_OPTION");
-	}
-	exporter.exportActionsThreadOption(actionsThreadOptionStr);
-
-	m_places.export_(exporter);
-	m_transitions.export_(exporter);
-}
-
-void PTN_EngineImp::import(const IImporter &importer)
-{
-	if (isEventLoopRunning())
-	{
-		throw PTN_Exception("Cannot import while the event loop is running.");
-	}
-
-	// TODO: Not exception safe, maybe this should go to a constructor instead.
-	clearNet();
-
-	PTN_Engine::ACTIONS_THREAD_OPTION actionThreadOption = m_actionsThreadOption;
-	string actionsThreadOptionStr = importer.getActionsThreadOption();
-	if (ACTIONS_THREAD_OPTION_fromString(actionsThreadOptionStr, actionThreadOption))
-	{
-		setActionsThreadOption(actionThreadOption);
-	}
-	else
-	{
-		throw PTN_Exception("Invalid input ACTIONS_THREAD_OPTION string");
-	}
-
-	// create places
-	for (const IImporter::PlaceInfo &placeInfo : importer.getPlaces())
-	{
-		createPlaceStr(get<0>(placeInfo), get<1>(placeInfo), get<2>(placeInfo), get<3>(placeInfo),
-					   get<4>(placeInfo));
-	}
-
-	// create transitions
-	for (const IImporter::TransitionInfo &transitionInfo : importer.getTransitions())
-	{
-		createTransition(get<0>(transitionInfo), get<1>(transitionInfo), get<2>(transitionInfo),
-		                 get<3>(transitionInfo), get<4>(transitionInfo), get<5>(transitionInfo),
-		                 get<6>(transitionInfo));
-	}
-}
-
 void PTN_EngineImp::setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 {
 	if (isEventLoopRunning())
@@ -209,7 +134,7 @@ void PTN_EngineImp::setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTI
 		throw PTN_Exception("Cannot change actions thread option while the event loop is running.");
 	}
 
-	unique_lock<shared_mutex> actionsThreadOptionGuard(m_actionsThreadOptionMutex);
+	unique_lock actionsThreadOptionGuard(m_actionsThreadOptionMutex);
 
 	if (m_actionsThreadOption == actionsThreadOption)
 	{
@@ -228,11 +153,11 @@ void PTN_EngineImp::setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTI
 
 PTN_Engine::ACTIONS_THREAD_OPTION PTN_EngineImp::getActionsThreadOption() const
 {
-	shared_lock<shared_mutex> actionsThreadOptionGuard(m_actionsThreadOptionMutex);
+	shared_lock actionsThreadOptionGuard(m_actionsThreadOptionMutex);
 	return m_actionsThreadOption;
 }
 
-void PTN_EngineImp::printState(std::ostream &o) const
+void PTN_EngineImp::printState(ostream &o) const
 {
 	m_places.printState(o);
 }
@@ -251,10 +176,10 @@ bool PTN_EngineImp::executeInt(const bool log, ostream &o)
 	{
 		printState(o);
 	}
-	vector<weak_ptr<Transition>> _enabledTransitions = enabledTransitions();
-	for (auto &transition : _enabledTransitions)
+
+	for (const auto &transition : enabledTransitions())
 	{
-		if (auto enabledTransition = transition.lock())
+		if (auto enabledTransition = lockWeakPtr(transition))
 		{
 			firedAtLeastOneTransition |= enabledTransition->execute();
 		}
@@ -287,30 +212,105 @@ PTN_Engine::EventLoopSleepDuration PTN_EngineImp::getEventLoopSleepDuration() co
 	return m_eventLoop.getSleepDuration();
 }
 
+void PTN_EngineImp::addArc(const ArcProperties &arcProperties)
+{
+	if (isEventLoopRunning())
+	{
+		throw PTN_Exception("Cannot add arc while the event loop is running.");
+	}
+
+	if (!m_places.contains(arcProperties.placeName))
+	{
+		throw PTN_Exception("The place" + arcProperties.placeName + " must already exist in order to link to an arc.");
+	}
+	auto spPlace = m_places.getPlace(arcProperties.placeName);
+
+	if (!m_transitions.contains(arcProperties.transitionName))
+	{
+		throw PTN_Exception("The transition " + arcProperties.transitionName +" must already exist in order to link to an arc.");
+	}
+
+	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
+	spTransition->addPlace(spPlace, arcProperties.type, arcProperties.weight);
+}
+
+void PTN_EngineImp::removeArc(const ArcProperties &arcProperties) const
+{
+	if (isEventLoopRunning())
+	{
+		throw PTN_Exception("Cannot remove arc while the event loop is running.");
+	}
+
+	if (!m_places.contains(arcProperties.placeName))
+	{
+		throw PTN_Exception("The place" + arcProperties.placeName + " must already exist in order to unlink an arc.");
+	}
+	auto spPlace = m_places.getPlace(arcProperties.placeName);
+
+	if (m_transitions.contains(arcProperties.transitionName))
+	{
+		throw PTN_Exception("The transition " + arcProperties.transitionName +" must already exist in order to unlink an arc.");
+	}
+
+	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
+	spTransition->removePlace(spPlace, arcProperties.type);
+}
+
+vector<PlaceProperties> PTN_EngineImp::getPlacesProperties() const
+{
+	return m_places.getPlacesProperties();
+}
+
+vector<TransitionProperties> PTN_EngineImp::getTransitionsProperties() const
+{
+	return m_transitions.getTransitionsProperties();
+}
+
+vector<vector<ArcProperties>> PTN_EngineImp::getArcsProperties() const
+{
+	return m_transitions.getArcsProperties();
+}
+
 // Private
 
-void PTN_EngineImp::createTransition(const vector<string> &activationPlaces,
-                                     const vector<size_t> &activationWeights,
-                                     const vector<string> &destinationPlaces,
-                                     const vector<size_t> &destinationWeights,
-                                     const vector<string> &inhibitorPlaces,
+void PTN_EngineImp::createTransition(const string &name,
+                                     const vector<ArcProperties> &activationArcs,
+                                     const vector<ArcProperties> &destinationArcs,
+                                     const vector<ArcProperties> &inhibitorArcs,
                                      const vector<pair<string, ConditionFunction>> &additionalConditions,
                                      const bool requireNoActionsInExecution)
 {
-	vector<WeakPtrPlace> activationPlacesVector = m_places.getPlacesFromNames(activationPlaces);
-	vector<WeakPtrPlace> destinationPlacesVector = m_places.getPlacesFromNames(destinationPlaces);
-	vector<WeakPtrPlace> inhibitorPlacesVector = m_places.getPlacesFromNames(inhibitorPlaces);
+	// if a transition with this name already exists in the net, throw an exception
+	if (m_transitions.hasTransition(name))
+	{
+		throw PTN_Exception("Cannot create transition that already exists. Name: " + name);
+	}
+
+	auto getArcsFromArcsProperties = [this](const vector<ArcProperties> &arcProperties)
+	{
+		vector<Arc> arcs;
+		for (const auto &arcProperty : arcProperties)
+		{
+			arcs.emplace_back(m_places.getPlace(arcProperty.placeName), arcProperty.weight);
+		}
+		return arcs;
+	};
 
 	m_transitions.insert(
-	make_shared<Transition>(activationPlacesVector, activationWeights, destinationPlacesVector, destinationWeights,
-							inhibitorPlacesVector, additionalConditions, requireNoActionsInExecution));
+	make_shared<Transition>(name,
+							getArcsFromArcsProperties(activationArcs),
+							getArcsFromArcsProperties(destinationArcs),
+							getArcsFromArcsProperties(inhibitorArcs),
+							additionalConditions,
+							requireNoActionsInExecution));
+
 }
 
-const vector<pair<string, ConditionFunction>>
+vector<pair<string, ConditionFunction>>
 PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &conditions) const
 {
 	vector<pair<string, ConditionFunction>> anonymousConditionsVector;
-	transform(conditions.cbegin(), conditions.cend(), back_inserter(anonymousConditionsVector),
+	ranges::transform(conditions.cbegin(), conditions.cend(), back_inserter(anonymousConditionsVector),
 			  [](const auto &condition) { return pair<string, ConditionFunction>("", condition); });
 	return anonymousConditionsVector;
 }
@@ -324,49 +324,6 @@ void PTN_EngineImp::addJob(const ActionFunction &actionFunction)
 	}
 
 	m_jobQueue->addJob(actionFunction);
-}
-
-bool PTN_EngineImp::ACTIONS_THREAD_OPTION_fromString(const string &actionsThreadOptionStr,
-													 PTN_Engine::ACTIONS_THREAD_OPTION &out)
-{
-	if (actionsThreadOptionStr == "DETACHED")
-	{
-		out = PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED;
-	}
-	else if (actionsThreadOptionStr == "EVENT_LOOP")
-	{
-		out = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP;
-	}
-	else if (actionsThreadOptionStr == "JOB_QUEUE")
-	{
-		out = PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE;
-	}
-	else
-	{
-		return false;
-	}
-	return true;
-}
-
-bool PTN_EngineImp::ACTIONS_THREAD_OPTION_toString(const PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption,
-												   string &out)
-{
-	switch (actionsThreadOption)
-	{
-	case PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED:
-		out = "DETACHED";
-		break;
-	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
-		out = "EVENT_LOOP";
-		break;
-	case PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE:
-		out = "JOB_QUEUE";
-		break;
-	default:
-		return false;
-		break;
-	}
-	return true;
 }
 
 } // namespace ptne

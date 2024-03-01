@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,124 @@
 
 namespace ptne
 {
-class IExporter;
-class IImporter;
-
 using ConditionFunction = std::function<bool(void)>;
 using ActionFunction = std::function<void(void)>;
+
+/*!
+ * \brief The PlaceProperties class
+ */
+struct DLL_PUBLIC ArcProperties final
+{
+	enum class Type {
+		ACTIVATION,
+		DESTINATION,
+		BIDIRECTIONAL,
+		INHIBITOR,
+		//RESET,
+	};
+
+	/*!
+	 * \brief weight
+	 */
+	size_t weight = 1;
+
+	/*!
+	 * \brief placeName
+	 */
+	std::string placeName;
+
+	/*!
+	 * \brief transitionName
+	 */
+	std::string transitionName;
+
+	/*!
+	 * \brief type
+	 */
+	Type type = { Type::ACTIVATION };
+};
+
+/*!
+ * \brief The TransitionProperties class
+ */
+struct DLL_PUBLIC TransitionProperties final
+{
+	/*!
+	 * \brief Name and identifier of the transition
+	 */
+	std::string name;
+
+	//!
+	//! \brief activationArcs
+	//!
+	std::vector<ArcProperties> activationArcs;
+
+	//!
+	//! \brief destinationArcs
+	//!
+	std::vector<ArcProperties> destinationArcs;
+
+	//!
+	//! \brief inhibitorArcs
+	//!
+	std::vector<ArcProperties> inhibitorArcs;
+
+	//!
+	//! \brief additional conditions function names
+	//!
+	std::vector<std::string> additionalConditionsNames;
+
+	//!
+	//! \brief A vector with functions that return bool.
+	//!
+	std::vector<ConditionFunction> additionalConditions;
+
+	//!
+	//! \brief requireNoActionsInExecution
+	//!
+	bool requireNoActionsInExecution = false;
+};
+
+/*!
+ * \brief The PlaceProperties class
+ */
+struct DLL_PUBLIC PlaceProperties final
+{
+	//!
+	//! \brief The name of the place.
+	//!
+	std::string name;
+
+	//!
+	//! \brief The number of tokens to be initialized with.
+	//!
+	size_t initialNumberOfTokens = 0;
+
+	//!
+	//! \brief The function to be called once a token enters the place.
+	//!
+	std::string onEnterActionFunctionName;
+
+	//!
+	//! \brief The function to be called once a token leaves the place.
+	//!
+	std::string onExitActionFunctionName;
+
+	//!
+	//! \brief onEnterAction
+	//!
+	ActionFunction onEnterAction = nullptr;
+
+	//!
+	//! \brief onExitAction
+	//!
+	ActionFunction onExitAction = nullptr;
+
+	//!
+	//! \brief A flag determining if this place can have tokens added manually.
+	//!
+	bool input = false;
+};
 
 //! Base class that implements the Petri net logic.
 /*!
@@ -51,6 +164,20 @@ public:
 		JOB_QUEUE
 	};
 
+	/*!
+	 * \brief toACTIONS_THREAD_OPTION
+	 * \param actionsThreadOptionStr
+	 * \return
+	 */
+	static ACTIONS_THREAD_OPTION toACTIONS_THREAD_OPTION(const std::string &actionsThreadOptionStr);
+
+	/*!
+	 * \brief toString
+	 * \param actionsThreadOption
+	 * \return
+	 */
+	static std::string toString(ACTIONS_THREAD_OPTION actionsThreadOption);
+
 	using EventLoopSleepDuration = std::chrono::duration<long, std::ratio<1, 1000>>;
 
 	virtual ~PTN_Engine();
@@ -61,212 +188,30 @@ public:
 	PTN_Engine &operator=(PTN_Engine &&) = delete;
 
 	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with functors that return bool.
+	 * \brief createTransition
+	 * \param transitionProperties
 	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions,
-	                      const bool requireNoActionsInExecution = false);
+	void createTransition(const TransitionProperties &transitionProperties);
 
 	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with names to additional conditions.
+	 * \brief createPlace
+	 * \param placeProperties
 	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<std::string> &additionalConditions,
-						  const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<std::string> &inhibitorPlaces,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param activationWeights A vector with the weights of each activation place.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param destinationWeights A vector with the weights of each destination place.
-	 * \param additionalConditions A vector with functors that return bool.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<size_t> &activationWeights,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<size_t> &destinationWeights,
-						  const std::vector<ConditionFunction> &additionalConditions,
-						  const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<std::string> &inhibitorPlaces,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param additionalConditions A vector with functors that return bool.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with functors that return bool.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<ConditionFunction> &additionalConditions,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new transition
-	 * \param activationPlaces A vector with the names of the activation places.
-	 * \param destinationPlaces A vector with the names of the destination places.
-	 * \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	 * \param additionalConditions A vector with names to additional conditions.
-	 */
-	void createTransition(const std::vector<std::string> &activationPlaces,
-						  const std::vector<std::string> &destinationPlaces,
-						  const std::vector<std::string> &inhibitorPlaces,
-						  const std::vector<std::string> &additionalConditions,
-	                      const bool requireNoActionsInExecution = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The function to be called once a token enters the place.
-	 * \param onExitAction The function to be called once a token leaves the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlace(const std::string &name,
-					 const size_t initialNumberOfTokens,
-					 ActionFunction onEnterAction,
-					 ActionFunction onExitAction,
-					 const bool input = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param onExitAction Name of the function functor to be called once a token leaves the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlace(const std::string &name,
-					 const size_t initialNumberOfTokens,
-					 const std::string &onEnterAction,
-					 const std::string &onExitAction,
-					 const bool input = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlace(const std::string &name, const size_t initialNumberOfTokens, const bool input = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction The function to be called once a token enters the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlace(const std::string &name,
-					 const size_t initialNumberOfTokens,
-					 ActionFunction onEnterAction,
-					 const bool input = false);
-
-	/*!
-	 * Create a new place in the net.
-	 * \param name The name of the place.
-	 * \param initialNumberOfTokens The number of tokens to be initialized with.
-	 * \param onEnterAction Name of the function to be called once a token enters the place.
-	 * \param input A flag determining if this place can have tokens added manually.
-	 */
-	void createPlace(const std::string &name,
-					 const size_t initialNumberOfTokens,
-					 const std::string &onEnterAction,
-					 const bool input = false);
+	void createPlace(const PlaceProperties &placeProperties);
 
 	/*!
 	 * Register an action to be called by the Petri net.
 	 * \param name The name of the place.
 	 * \param action The function to be called once a token enters the place.
 	 */
-	void registerAction(const std::string &name, ActionFunction action);
+	void registerAction(const std::string &name, const ActionFunction &action) const;
 
 	/*!
 	 * Register a condition
 	 * \param name The name of the condition
 	 * \param conditions A function pointer to a condition.
 	 */
-	void registerCondition(const std::string &name, ConditionFunction condition);
+	void registerCondition(const std::string &name, const ConditionFunction &condition) const;
 
 	/*!
 	 * Start the petri net event loop.
@@ -294,19 +239,6 @@ public:
 	 * \param o Output stream.
 	 */
 	void printState(std::ostream &o) const;
-
-	/*!
-	 * \brief Exports the Petri net using the provided exporter.
-	 * \param exporter Object capable of exporting all important information about the Petri net's structure to
-	 * some other format.
-	 */
-	void export_(IExporter &exporter) const;
-
-	/*!
-	 * \brief Imports the Petri net using the provided importer.
-	 * \param importer Object containing all necessary information to create a new Petri net.
-	 */
-	void import(const IImporter &importer);
 
 	//! Constructor
 	explicit PTN_Engine(ACTIONS_THREAD_OPTION actionsRuntimeThread = ACTIONS_THREAD_OPTION::JOB_QUEUE);
@@ -339,6 +271,41 @@ public:
 	 * \return
 	 */
 	EventLoopSleepDuration getEventLoopSleepDuration() const;
+
+	/*!
+	 * \brief addArc
+	 * \param arcProperties
+	 */
+	void addArc(const ArcProperties& arcProperties);
+
+	/*!
+	 * \brief addArc
+	 * \param arcProperties
+	 */
+	void removeArc(const ArcProperties& arcProperties);
+
+	/*!
+	 * \brief clearNet
+	 */
+	void clearNet();
+
+	/*!
+	 * \brief getPlacesProperties
+	 * \return
+	 */
+	std::vector<PlaceProperties> getPlacesProperties() const;
+
+	/*!
+	 * \brief getTransitionsProperties
+	 * \return
+	 */
+	std::vector<TransitionProperties> getTransitionsProperties() const;
+
+	/*!
+	 * \brief getArcsProperties
+	 * \return
+	 */
+	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
 
 private:
 	class PTN_EngineImpProxy;

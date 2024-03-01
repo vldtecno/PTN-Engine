@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2019 Eduardo Valgôde
+ * Copyright (c) 2019-2023 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,16 @@
  * limitations under the License.
  */
 
-#include "View/MessagesMenuView.h"
+#include "PTN_Engine/ImportExport/ImporterFactory.h"
+#include "XML/XML_FileImporter.h"
 
-#include <iostream>
-
+namespace ptne
+{
 using namespace std;
 
-void MessagesMenuView::showMessagesList(const MessageList &messageList, const size_t selectedMessage)
+unique_ptr<IFileImporter> ImporterFactory::createXMLFileImporter()
 {
-	for (size_t i = 0; i < messageList.size(); ++i)
-	{
-		if (i == selectedMessage)
-		{
-			cout << "=>";
-		}
-		else
-		{
-			cout << "  ";
-		}
-		cout << i << " - " << messageList.getItem(i).m_title << endl;
-	}
+    return make_unique<XML_FileImporter>();
 }
 
-void MessagesMenuView::displayMessage(const Message &message)
-{
-	cout << "TITLE:" << endl;
-	cout << message.m_title << endl << endl;
-
-	cout << "MESSAGE:" << endl;
-	cout << message.m_body << endl << endl;
-}
+} // namespace ptne

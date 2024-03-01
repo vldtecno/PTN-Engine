@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<PTN-Engine version="2.0" format="1" name="blah" actionsThreadOption="EVENT_LOOP">
+	<Places>
+		<Place name="ShowMessage" tokens="0" input="false" onEnterAction="showMessage" onExitAction="" />
+		<Place name="NextMessage" tokens="0" input="false" onEnterAction="selectNextMessage" onExitAction="" />
+		<Place name="MessagesMenu" tokens="0" input="false" onEnterAction="showMessageMenu" onExitAction="" />
+		<Place name="SelectMessagesOption" tokens="0" input="false" onEnterAction="selectMessagesOption" onExitAction="" />
+		<Place name="SelectCallsOption" tokens="0" input="false" onEnterAction="selectCallsOption" onExitAction="" />
+		<Place name="MessagesMenuSelected" tokens="1" input="false" onEnterAction="showMainMenu" onExitAction="" />
+		<Place name="CallsMenuSelected" tokens="0" input="false" onEnterAction="showMainMenu" onExitAction="" />
+		<Place name="InputC" tokens="0" input="true" onEnterAction="" onExitAction="" />
+		<Place name="InputB" tokens="0" input="true" onEnterAction="" onExitAction="" />
+		<Place name="CallsLog" tokens="0" input="false" onEnterAction="showCallsMenu" onExitAction="" />
+		<Place name="InputA" tokens="0" input="true" onEnterAction="" onExitAction="" />
+	</Places>
+	<Transitions>
+		<Transition>
+			<Name value="T12" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T11" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T8" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T7" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T6" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T10" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T5" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T4" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T3" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T9" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T2" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+		<Transition>
+			<Name value="T1" />
+			<ActivationConditions />
+			<RequireNoActionsInExecution value="false" />
+		</Transition>
+	</Transitions>
+	<Arcs>
+		<Arc>
+			<Place value="InputC" />
+			<Transition value="T12" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="ShowMessage" />
+			<Transition value="T12" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T12" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputB" />
+			<Transition value="T11" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T11" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="ShowMessage" />
+			<Transition value="T11" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputC" />
+			<Transition value="T8" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T8" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenuSelected" />
+			<Transition value="T8" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputB" />
+			<Transition value="T7" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenuSelected" />
+			<Transition value="T7" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T7" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputC" />
+			<Transition value="T6" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsLog" />
+			<Transition value="T6" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsMenuSelected" />
+			<Transition value="T6" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="NextMessage" />
+			<Transition value="T10" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T10" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputB" />
+			<Transition value="T5" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsMenuSelected" />
+			<Transition value="T5" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsLog" />
+			<Transition value="T5" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="SelectCallsOption" />
+			<Transition value="T4" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsMenuSelected" />
+			<Transition value="T4" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputA" />
+			<Transition value="T3" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenuSelected" />
+			<Transition value="T3" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="SelectCallsOption" />
+			<Transition value="T3" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputA" />
+			<Transition value="T9" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenu" />
+			<Transition value="T9" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="NextMessage" />
+			<Transition value="T9" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="SelectMessagesOption" />
+			<Transition value="T2" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="MessagesMenuSelected" />
+			<Transition value="T2" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+		<Arc>
+			<Place value="InputA" />
+			<Transition value="T1" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="CallsMenuSelected" />
+			<Transition value="T1" />
+			<Weight value="1" />
+			<Type value="Activation" />
+		</Arc>
+		<Arc>
+			<Place value="SelectMessagesOption" />
+			<Transition value="T1" />
+			<Weight value="1" />
+			<Type value="Destination" />
+		</Arc>
+	</Arcs>
+</PTN-Engine>
+

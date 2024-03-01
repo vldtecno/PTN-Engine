@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  */
 
 #include <iostream>
-
 #include "PTN_Engine/PTN_Engine.h"
 
 using namespace std;
@@ -42,10 +41,19 @@ int main(int, char **)
 	ConditionFunction finished = [&x]() { return x <= 1; };
 	ConditionFunction notFinished = [&finished]() { return !finished(); };
 
-	pn.createPlace("Compute", 0, compute, true);
-	pn.createPlace("Finished", 0);
-	pn.createTransition({ "Compute" }, { "Compute" }, { notFinished });
-	pn.createTransition({ "Compute" }, { "Finished" }, { finished });
+	pn.createPlace({ .name="Compute",
+					 .onEnterAction=compute,
+					 .input=true});
+	pn.createPlace({.name="Finished"});
+
+	pn.createTransition({ .name = "T1",
+						  .activationArcs = { { .placeName = "Compute" } },
+						  .destinationArcs = { { .placeName = "Compute" } },
+						  .additionalConditions={ notFinished } });
+	pn.createTransition({ .name = "T2",
+						  .activationArcs= { { .placeName = "Compute" } },
+						  .destinationArcs = { { .placeName = "Finished" } },
+						  .additionalConditions={ finished } });
 
 	for (size_t i : { 0, 1, 2, 3, 6, 10 })
 	{

@@ -1,6 +1,6 @@
 /*
  * This file is part of PTN Engine
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,17 @@
 #pragma once
 
 #include "PTN_Engine/PTN_Engine.h"
-#include <shared_mutex>
-
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
 #include <algorithm>
 #include <mutex>
+#include <shared_mutex>
 
 namespace ptne
 {
-/*!
- * \brief The ManagedContainer class
- */
+//!
+//! \brief The ManagedContainer class
+//!
 template <typename T>
 class ManagedContainer
 {
@@ -40,33 +39,34 @@ public:
 	ManagedContainer &operator=(const ManagedContainer &) = delete;
 	ManagedContainer &operator=(const ManagedContainer &&) = delete;
 
-	/*!
-	 * \brief Add item to container.
-	 * \param name - Name of the item used as key.
-	 * \param item - The item itself.
-	 */
+	//!
+	//! \brief Add item to container.
+	//! \throws InvalidFunctionNameException, RepeatedFunctionException
+	//! \param name - Name of the item used as key.
+	//! \param item - The item itself.
+	//!
 	void addItem(const std::string &name, T item)
 	{
-		std::unique_lock<std::shared_mutex> lock(m_mutex);
+		std::unique_lock lock(m_mutex);
 		if (name.empty())
 		{
 			throw InvalidFunctionNameException(name);
 		}
 
-		if (m_items.find(name) != m_items.end())
+		if (m_items.contains(name))
 		{
-			throw RepeatedActionException(name);
+			throw RepeatedFunctionException(name);
 		}
 
 		m_items[name] = item;
 	}
 
-	/*!
-	 * \brief Retrieve a copy of the item.
-	 * \param name - Identifier of the item.
-	 * \throws InvalidFunctionNameException
-	 * \return Copy of the item identified by name.
-	 */
+	//!
+	//! \brief Retrieve a copy of the item.
+	//! \param name - Identifier of the item.
+	//! \throws InvalidFunctionNameException
+	//! \return Copy of the item identified by name.
+	//!
 	T getItem(const std::string &name) const
 	{
 		if (name.empty())
@@ -74,36 +74,36 @@ public:
 			throw InvalidFunctionNameException(name);
 		}
 
-		std::shared_lock<std::shared_mutex> lock(m_mutex);
-		if (m_items.find(name) == m_items.end())
+		std::shared_lock lock(m_mutex);
+		if (!m_items.contains(name))
 		{
 			throw InvalidFunctionNameException(name);
 		}
 		return m_items.at(name);
 	}
 
-	/*!
-	 * \brief getItems gets copies of the items based on their identifying names.
-	 * Invalid names result in a InvalidFunctionNameException.
-	 * \throws InvalidFunctionNameException
-	 * \param names of the items
-	 * \return vector with the names and copies of the items found in the container.
-	 */
+	//!
+	//! \brief getItems gets copies of the items based on their identifying names.
+	//!        Invalid names result in a InvalidFunctionNameException.
+	//! \throws InvalidFunctionNameException
+	//! \param names of the items
+	//! \return vector with the names and copies of the items found in the container.
+	//!
 	std::vector<std::pair<std::string, T>> getItems(const std::vector<std::string> &names) const
 	{
-		std::shared_lock<std::shared_mutex> lock(m_mutex);
+		std::shared_lock lock(m_mutex);
 		std::vector<std::pair<std::string, T>> items;
-		for_each(names.cbegin(), names.cend(),
+		std::ranges::for_each(names.cbegin(), names.cend(),
 				 [&](const std::string &name)
 				 {
 					 if (name.empty())
 					 {
-						 throw InvalidFunctionNameException(name);
+						throw InvalidFunctionNameException(name);
 					 }
 
-					 if (m_items.find(name) == m_items.end())
+					 if (!m_items.contains(name))
 					 {
-						 throw InvalidFunctionNameException(name);
+						throw InvalidFunctionNameException(name);
 					 }
 					 items.push_back(std::pair<std::string, ConditionFunction>(name, m_items.at(name)));
 				 });

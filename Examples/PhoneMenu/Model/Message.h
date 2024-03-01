@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,13 @@
  */
 
 #pragma once
+
 #include <string>
 
 //! A very simple message model.
 class Message
 {
 public:
-	/*!
-	 * Message constructor.
-	 * \param title Title of the message.
-	 * \param message Body of the message.
-	 */
-	Message(const std::string &title, const std::string &message)
-	: m_title(title)
-	, m_body(message)
-	{
-	}
-
-	//! Message title.
 	std::string m_title;
-
-	//! Message body.
 	std::string m_body;
 };

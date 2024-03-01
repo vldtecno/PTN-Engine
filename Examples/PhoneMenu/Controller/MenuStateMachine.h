@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,24 @@
 
 #pragma once
 
-#include "PTN_Engine/PTN_Engine.h"
+#include "Controller/IMenuStateMachine.h"
 
 class Controller;
 
-//! Implements PTN Engine net defining the phone menu behaviour.
-/*!
- * The behaviour is defined in the constructor.
- */
-class MenuStateMachine : public ptne::PTN_Engine
+//!
+//! \brief Implements PTN Engine net defining the phone menu behaviour.
+//!
+class MenuStateMachine : public IMenuStateMachine
 {
 public:
-	/*!
-	 * Constructor.
-	 * \param ptrDispatcher Shared pointer to the controller.
-	 */
-	explicit MenuStateMachine(Controller &menuController);
+	void setControllerFunctions(Controller &menuController) override;
 
 	//! Press A key event.
-	void pressA();
+	void pressA() override;
 
 	//! Press B key event.
-	void pressB();
+	void pressB() override;
 
 	//! Press C key event.
-	void pressC();
+	void pressC() override;
 };

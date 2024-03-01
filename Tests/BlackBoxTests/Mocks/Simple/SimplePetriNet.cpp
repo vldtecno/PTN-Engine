@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018-2023 Eduardo Valgôde
+ * Copyright (c) 2018-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,20 @@
 #include "Mocks/Simple/SimpleController.h"
 
 using namespace std;
+using namespace ptne;
 
 SimplePetriNet::SimplePetriNet(SimpleController &controller)
-: PTN_Engine(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
+: PTN_Engine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
 {
-	createPlace("P1", 0, bind(&SimpleController::collectThreadId, &controller), true);
-	createPlace("P2", 0);
+	createPlace({ .name="P1",
+				  .onEnterAction=bind(&SimpleController::collectThreadId, &controller),
+				  .input=true });
+	createPlace({ .name="P2" });
 
-	createTransition({ "P1" }, { "P2" });
-	createTransition({ "P2" }, {});
+	createTransition({ .name = "T1",
+					   .activationArcs = { ArcProperties{ .placeName = "P1" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P2" } } });
+	createTransition({ .name = "T2", .activationArcs = { ArcProperties{ .placeName = "P2" } } });
 }
 
 void SimplePetriNet::addExecuteP1()
@@ -36,7 +41,7 @@ void SimplePetriNet::addExecuteP1()
 	incrementInputPlace("P1");
 }
 
-size_t SimplePetriNet::getNumberOfTokens(const std::string &placeName) const
+size_t SimplePetriNet::getNumberOfTokens(const string &placeName) const
 {
 	return ptne::PTN_Engine::getNumberOfTokens(placeName);
 }

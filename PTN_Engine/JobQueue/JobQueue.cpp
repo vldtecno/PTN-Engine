@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ void JobQueue::activate()
 	launch();
 }
 
-void JobQueue::inactivate()
+void JobQueue::deactivate()
 {
 	if (!m_isJobQueueActive)
 	{
@@ -53,7 +53,7 @@ bool JobQueue::isActive() const
 
 void JobQueue::launch()
 {
-	lock_guard<mutex> l(m_jobQueueMutex);
+	lock_guard l(m_jobQueueMutex);
 	if (!m_isJobQueueRunning && !m_jobQueue.empty() && m_isJobQueueActive)
 	{
 		m_isJobQueueRunning = true;
@@ -63,7 +63,7 @@ void JobQueue::launch()
 
 void JobQueue::run(stop_token stopToken)
 {
-	unique_lock<mutex> l(m_jobQueueMutex);
+	unique_lock l(m_jobQueueMutex);
 	while (!m_jobQueue.empty() && !stopToken.stop_requested())
 	{
 		ActionFunction job = m_jobQueue.back();
@@ -78,7 +78,7 @@ void JobQueue::run(stop_token stopToken)
 void JobQueue::addJob(const ActionFunction &actionFunction)
 {
 	{
-		lock_guard<mutex> l(m_jobQueueMutex);
+		lock_guard l(m_jobQueueMutex);
 		m_jobQueue.push_front(actionFunction);
 	}
 	launch();

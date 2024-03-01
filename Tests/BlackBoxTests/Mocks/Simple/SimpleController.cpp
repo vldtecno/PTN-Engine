@@ -26,14 +26,12 @@ SimpleController::SimpleController()
 {
 }
 
-SimpleController::~SimpleController()
-{
-}
+SimpleController::~SimpleController() = default;
 
 void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 {
 	m_collectedThreadIds.clear();
-	auto f = [&]() -> void
+	auto f = [this]()
 	{
 		this_thread::sleep_for(chrono::milliseconds(5));
 		for (int i = 0; i < 10; ++i)
@@ -42,15 +40,10 @@ void SimpleController::doSomethingConcurrently(const size_t numberOfThreads)
 		}
 	};
 
-	vector<thread> threads;
+	vector<jthread> threads;
 	for (size_t i = 0; i < numberOfThreads; ++i)
 	{
-		threads.emplace_back(thread(f));
-	}
-
-	for (auto &t : threads)
-	{
-		t.join();
+		threads.emplace_back(f);
 	}
 }
 
@@ -64,7 +57,7 @@ void SimpleController::collectThreadId()
 	m_collectedThreadIds.insert(this_thread::get_id());
 }
 
-size_t SimpleController::getNumberOfTokens(const std::string &placeName) const
+size_t SimpleController::getNumberOfTokens(const string &placeName) const
 {
 	return m_petriNet.getNumberOfTokens(placeName);
 }

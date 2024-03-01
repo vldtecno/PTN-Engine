@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,52 +26,68 @@ RoundRobinPetriNet::RoundRobinPetriNet(Dispatcher &dispatcher,
 : PTN_Engine(actionsThreadOption)
 {
 	// Places
-	createPlace("InputWaitPackage", 0, true);
+	createPlace({ .name="InputWaitPackage",
+				  .input=true });
 
-	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, &dispatcher),
-				bind(&Dispatcher::onLeaveWaitPackage, &dispatcher));
+	createPlace({ .name="WaitPackage",
+				  .initialNumberOfTokens=1,
+				  .onEnterAction=bind_front(&Dispatcher::actionWaitPackage, &dispatcher),
+				  .onExitAction=bind_front(&Dispatcher::onLeaveWaitPackage, &dispatcher) });
 
-	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, &dispatcher),
-				bind(&Dispatcher::onLeaveChannelA, &dispatcher));
+	createPlace({ .name="ChannelA",
+				  .onEnterAction=bind_front(&Dispatcher::actionChannelA, &dispatcher),
+				  .onExitAction=bind_front(&Dispatcher::onLeaveChannelA, &dispatcher) });
 
-	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, &dispatcher),
-				bind(&Dispatcher::onLeaveChannelB, &dispatcher));
+	createPlace({ .name="ChannelB",
+				  .onEnterAction=bind_front(&Dispatcher::actionChannelB, &dispatcher),
+				  .onExitAction=bind_front(&Dispatcher::onLeaveChannelB, &dispatcher) });
 
-	createPlace("SelectA", 1, bind(&Dispatcher::actionSelectA, &dispatcher),
-				bind(&Dispatcher::onLeaveSelectChannelA, &dispatcher));
+	createPlace({ .name="SelectA",
+				  .initialNumberOfTokens=1,
+				  .onEnterAction=bind_front(&Dispatcher::actionSelectA, &dispatcher),
+				  .onExitAction=bind_front(&Dispatcher::onLeaveSelectChannelA, &dispatcher) });
 
-	createPlace("SelectB", 0, bind(&Dispatcher::actionSelectB, &dispatcher),
-				bind(&Dispatcher::onLeaveSelectChannelB, &dispatcher));
+	createPlace({ .name="SelectB",
+				  .onEnterAction=bind_front(&Dispatcher::actionSelectB, &dispatcher),
+				  .onExitAction=bind_front(&Dispatcher::onLeaveSelectChannelB, &dispatcher) });
 
-	createPlace("PackageCounter", 0);
+	createPlace({ .name="PackageCounter" });
 
 
 	// Transitions
 
 	// Use A
-	createTransition({ "InputWaitPackage", "WaitPackage", "SelectA" }, // activation
-					 { "ChannelA", "PackageCounter" } // destination
-	);
+	createTransition({ .name = "T1",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "WaitPackage" },
+										   ArcProperties{ .placeName = "SelectA" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "ChannelA" },
+											ArcProperties{ .placeName = "PackageCounter" } } });
 
 	// Use B
-	createTransition({ "InputWaitPackage", "WaitPackage", "SelectB" }, // activation
-					 { "ChannelB", "PackageCounter" } // destination
-	);
+	createTransition({ .name = "T2",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "WaitPackage" },
+										   ArcProperties{ .placeName = "SelectB" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "ChannelB" },
+											ArcProperties{ .placeName = "PackageCounter" } } });
 
 	// Switch to A
-	createTransition({ "ChannelA" }, // activation
-					 { "SelectB", "WaitPackage" } // destination
-	);
+	createTransition({ .name = "T3",
+					   .activationArcs = { ArcProperties{ .placeName = "ChannelA" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "SelectB" },
+											ArcProperties{ .placeName = "WaitPackage" } } });
 
 	// Switch to B
-	createTransition({ "ChannelB" }, // activation
-					 { "SelectA", "WaitPackage" } // destination
-	);
+	createTransition({ .name = "T4",
+					   .activationArcs = { ArcProperties{ .placeName = "ChannelB" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "SelectA" },
+											ArcProperties{ .placeName = "WaitPackage" } } });
 
 	// Reset Counter
-	createTransition({ "PackageCounter" }, // activation
-					 {}, // destination
-					 { bind(&Dispatcher::resetCounter, &dispatcher) });
+	createTransition({ .name = "T5",
+					   .activationArcs = { ArcProperties{ .placeName = "PackageCounter" } },
+					   .additionalConditions={ bind_front(&Dispatcher::resetCounter, &dispatcher) } });
 }
 
 void RoundRobinPetriNet::dispatch()

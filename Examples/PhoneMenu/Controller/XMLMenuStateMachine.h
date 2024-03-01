@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2019 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,21 @@
 
 #pragma once
 
-#include <string>
+#include "Controller/IMenuStateMachine.h"
 
-#include "Model/List.h"
-#include "Model/Message.h"
+class Controller;
 
-//! View of the messages menu.
-class MessagesMenuView
+//!
+//! \brief Implements PTN Engine net defining the phone menu behaviour.
+//!
+class XMLMenuStateMachine : public IMenuStateMachine
 {
 public:
-	using MessageList = List<Message>;
+	void setControllerFunctions(Controller &menuController) override;
+	void pressA() override;
+	void pressB() override;
+	void pressC() override;
 
-	MessagesMenuView() = default;
-
-	/*!
-	 * Show the message list on screen.
-	 * \param messageList List of messages.
-	 * \param selectedMessage Selected message from the list.
-	 */
-	void showMessagesList(const MessageList &messageList, const size_t selectedMessage);
-
-	/*!
-	 * Print the selected message on screen.
-	 * \param message Message to be displayed.
-	 */
-	void displayMessage(const Message &message);
+	void exportStateMachine(const std::string &filePath) const;
+	void importStateMachine(const std::string &filePath);
 };

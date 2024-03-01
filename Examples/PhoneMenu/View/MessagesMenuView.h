@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2018 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "Model/List.h"
 #include "Model/Message.h"
 
@@ -29,18 +27,21 @@ class MessagesMenuView
 public:
 	using MessageList = List<Message>;
 
-	MessagesMenuView() = default;
+	MessagesMenuView(MessageList& messagesList);
 
-	/*!
-	 * Show the message list on screen.
-	 * \param messageList List of messages.
-	 * \param selectedMessage Selected message from the list.
-	 */
-	void showMessagesList(const MessageList &messageList, const size_t selectedMessage);
+	//!
+	//! Show the message list on screen.
+	//! \param messageList List of messages.
+	//! \param selectedMessage Selected message from the list.
+	//!
+	void showMessagesList(const size_t selectedMessage) const;
 
-	/*!
-	 * Print the selected message on screen.
-	 * \param message Message to be displayed.
-	 */
-	void displayMessage(const Message &message);
+	//!
+	//! Print the selected message on screen.
+	//! \param message Message to be displayed.
+	//!
+	void displayMessage(const Message &message) const;
+
+private:
+	MessageList &m_messageList;
 };

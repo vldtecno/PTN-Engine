@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 #include "Mocks/Dispatcher/WeightedPetriNet.h"
+#include "PTN_Engine/PTN_Engine.h"
 
 using namespace ptne;
 using namespace std;
@@ -25,21 +26,20 @@ WeightedPetriNet::WeightedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsThre
 : PTN_Engine(actionsThreadOption)
 {
 	// Places
-	createPlace("InputWaitPackage", 0, true);
-	createPlace("WaitPackage", 0);
-	createPlace("ChannelA", 0);
-	createPlace("ChannelB", 0);
-
+	createPlace({.name="InputWaitPackage", .input=true});
+	createPlace({.name="WaitPackage"});
+	createPlace({.name="ChannelA"});
+	createPlace({.name="ChannelB"});
 
 	// Transitions
+	createTransition({ .name = "T1",
+					   .activationArcs = { ArcProperties{ .weight = 1, .placeName = "InputWaitPackage" } },
+					   .destinationArcs = { ArcProperties{ .weight = 1 , .placeName = "WaitPackage"} } });
 
-	createTransition({ "InputWaitPackage" }, // activation
-					 vector<size_t>{ 1 }, { "WaitPackage" }, // destination
-					 vector<size_t>{ 1 });
-
-	createTransition({ "WaitPackage" }, // activation
-					 vector<size_t>{ 3 }, { "ChannelA", "ChannelB" }, // destination
-					 vector<size_t>{ 4, 10 });
+	createTransition({ .name = "T2",
+					   .activationArcs = { ArcProperties{ .weight = 3, .placeName = "WaitPackage" } },
+					   .destinationArcs = { ArcProperties{ .weight = 4, .placeName = "ChannelA" },
+											ArcProperties{ .weight = 10, .placeName = "ChannelB" } } });
 }
 
 void WeightedPetriNet::dispatch()

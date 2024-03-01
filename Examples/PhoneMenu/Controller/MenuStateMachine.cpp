@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,58 +21,102 @@
 
 using namespace ptne;
 
-MenuStateMachine::MenuStateMachine(Controller &menuController)
-: PTN_Engine()
+void MenuStateMachine::setControllerFunctions(Controller &menuController)
 {
 	using namespace std;
 
 	// Places
-	createPlace("InputA", 0, true);
-	createPlace("InputB", 0, true);
-	createPlace("InputC", 0, true);
-	createPlace("CallsMenuSelected", 1, bind(&Controller::showMainMenu, &menuController));
-	createPlace("MessagesMenuSelected", 0, bind(&Controller::showMainMenu, &menuController));
-	createPlace("SelectMessagesOption", 0, bind(&Controller::selectMessagesOption, &menuController));
-	createPlace("SelectCallsOption", 0, bind(&Controller::selectCallsOption, &menuController));
-	createPlace("CallsLog", 0, bind(&Controller::showCallsMenu, &menuController));
-	createPlace("MessagesMenu", 0, bind(&Controller::showMessageMenu, &menuController));
-	createPlace("NextMessage", 0, bind(&Controller::selectNextMessage, &menuController));
-	createPlace("ShowMessage", 0, bind(&Controller::showMessage, &menuController));
+	createPlace({ .name="InputA",
+				  .input=true });
+	createPlace({ .name="InputB",
+				  .input=true });
+	createPlace({ .name="InputC",
+				  .input=true });
+	createPlace({ .name="CallsMenuSelected",
+				  .initialNumberOfTokens=1,
+				  .onEnterAction=bind_front(&Controller::showMainMenu, &menuController) });
+	createPlace({ .name="MessagesMenuSelected",
+				  .onEnterAction=bind_front(&Controller::showMainMenu, &menuController) });
+	createPlace({ .name="SelectMessagesOption",
+				  .onEnterAction=bind_front(&Controller::selectMessagesOption, &menuController) });
+	createPlace({ .name="SelectCallsOption",
+				  .onEnterAction=bind_front(&Controller::selectCallsOption, &menuController) });
+	createPlace({ .name="CallsLog",
+				  .onEnterAction=bind_front(&Controller::showCallsMenu, &menuController) });
+	createPlace({ .name="MessagesMenu",
+				  .onEnterAction=bind_front(&Controller::showMessageMenu, &menuController) });
+	createPlace({ .name="NextMessage",
+				  .onEnterAction=bind_front(&Controller::selectNextMessage, &menuController) });
+	createPlace({ .name="ShowMessage",
+				  .onEnterAction=bind_front(&Controller::showMessage, &menuController) });
 
 	// Transitions
 
 	// Switch menu
-	createTransition({ "InputA", "CallsMenuSelected" }, { "SelectMessagesOption" });
+	createTransition({ .name = "T1",
+					   .activationArcs = { {.placeName = "InputA" },
+										   {.placeName = "CallsMenuSelected" } },
+					   .destinationArcs = { {.placeName = "SelectMessagesOption" } } });
 
-	createTransition({ "SelectMessagesOption" }, { "MessagesMenuSelected" });
+	createTransition({ .name = "T2",
+					   .activationArcs = { { .placeName = "SelectMessagesOption" } },
+					   .destinationArcs = { { .placeName = "MessagesMenuSelected" } } });
 
 	// Switch menu
-	createTransition({ "InputA", "MessagesMenuSelected" }, { "SelectCallsOption" });
+	createTransition({ .name = "T3",
+					   .activationArcs = { { .placeName = "InputA" },
+										   { .placeName = "MessagesMenuSelected" } },
+					   .destinationArcs = { { .placeName = "SelectCallsOption" } } });
 
-	createTransition({ "SelectCallsOption" }, { "CallsMenuSelected" });
+	createTransition({ .name = "T4",
+					   .activationArcs = { { .placeName = "SelectCallsOption" } },
+					   .destinationArcs = { { .placeName = "CallsMenuSelected" } } });
 
 	// Select calls log
-	createTransition({ "InputB", "CallsMenuSelected" }, { "CallsLog" });
+	createTransition({ .name = "T5",
+					   .activationArcs = { { .placeName = "InputB" },
+										   { .placeName = "CallsMenuSelected" } },
+					   .destinationArcs = { { .placeName = "CallsLog" } } });
 
 	// Leave calls log
-	createTransition({ "InputC", "CallsLog" }, { "CallsMenuSelected" });
+	createTransition({ .name = "T6",
+					   .activationArcs = { { .placeName = "InputC" },
+										   { .placeName = "CallsLog" } },
+					   .destinationArcs = { { .placeName = "CallsMenuSelected" } } });
 
 	// Select messages menu
-	createTransition({ "InputB", "MessagesMenuSelected" }, { "MessagesMenu" });
+	createTransition({ .name = "T7",
+					   .activationArcs = { { .placeName = "InputB" },
+										   { .placeName = "MessagesMenuSelected" } },
+					   .destinationArcs = { { .placeName = "MessagesMenu" } } });
 
 	// Leave messages menu
-	createTransition({ "InputC", "MessagesMenu" }, { "MessagesMenuSelected" });
+	createTransition({ .name = "T8",
+					   .activationArcs = { { .placeName = "InputC" },
+										   { .placeName = "MessagesMenu" } },
+					   .destinationArcs = { { .placeName = "MessagesMenuSelected" } } });
 
 	// Select next message
-	createTransition({ "InputA", "MessagesMenu" }, { "NextMessage" });
+	createTransition({ .name = "T9",
+					   .activationArcs = { { .placeName = "InputA" },
+										   { .placeName = "MessagesMenu" } },
+					   .destinationArcs = { { .placeName = "NextMessage" } } });
 
-	createTransition({ "NextMessage" }, { "MessagesMenu" });
+	createTransition({ .name = "T10",
+					   .activationArcs = { { .placeName = "NextMessage" } },
+					   .destinationArcs = { { .placeName = "MessagesMenu" } } });
 
 	// Show message
-	createTransition({ "InputB", "MessagesMenu" }, { "ShowMessage" });
+	createTransition({ .name = "T11",
+					   .activationArcs = { { .placeName = "InputB" },
+										   { .placeName = "MessagesMenu" } },
+					   .destinationArcs = { { .placeName = "ShowMessage" } }});
 
 	// Leave show message
-	createTransition({ "InputC", "ShowMessage" }, { "MessagesMenu" });
+	createTransition({ .name = "T12",
+					   .activationArcs = { { .placeName = "InputC" },
+										   { .placeName = "ShowMessage" } },
+					   .destinationArcs = { { .placeName = "MessagesMenu" } } });
 }
 
 void MenuStateMachine::pressA()

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
 #include "PTN_Engine/PTN_Engine.h"
 
 //! Implements PTN Engine net defining a free choice behaviour.
-/*!
- * The behaviour is defined in the constructor.
- */
+//!
+//! The behaviour is defined in the constructor.
+//!
 class FreeChoicePetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 {
 	// For testing purposes.
 	friend class FixturePetriNet;
 
 public:
-	explicit FreeChoicePetriNet(
+	FreeChoicePetriNet(
 	Dispatcher &dispatcher,
 	PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption = PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,12 @@
  */
 
 #pragma once
+
 #include <string>
 
-//!
 class Call
 {
 public:
-	//!
-	Call(const std::string &date, const std::string &number)
-	: m_date(date)
-	, m_number(number)
-	{
-	}
-
-	//!
 	std::string m_date;
-
-	//!
 	std::string m_number;
 };

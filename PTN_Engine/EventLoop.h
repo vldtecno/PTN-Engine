@@ -32,19 +32,19 @@ namespace ptne
 class IPTN_EngineEL;
 class Transition;
 
-/*!
- * \brief The EventLoop class manages an event loop thread, where all the events are passed to the petri net
- * engine.
- */
+//!
+//! \brief The EventLoop class manages an event loop thread, where all the events are passed to the petri net
+//! engine.
+//!
 class EventLoop
 {
 public:
 	using SleepDuration = std::chrono::duration<long, std::ratio<1, 1000>>;
 
-	/*!
-	 * \brief EventLoop
-	 * \param ptnEngineInternal
-	 */
+	//!
+	//! \brief EventLoop
+	//! \param ptnEngineInternal
+	//!
 	explicit EventLoop(IPTN_EngineEL &ptnEngineInternal);
 
 	~EventLoop();
@@ -54,47 +54,47 @@ public:
 	EventLoop &operator=(const EventLoop &) = delete;
 	EventLoop &operator=(EventLoop &&) = delete;
 
-	/*!
-	 * \brief Inform if the event loop is running.
-	 * \return True if the event loop thread is running.
-	 */
+	//!
+	//! \brief Inform if the event loop is running.
+	//! \return True if the event loop thread is running.
+	//!
 	bool isRunning() const;
 
-	/*!
-	 * \brief Order the event loop to stop.
-	 */
+	//!
+	//! \brief Order the event loop to stop.
+	//!
 	void stop() noexcept;
 
-	/*!
-	 * \brief Start the event loop thread.
-	 * \param log Whether to log or not.
-	 * \param o The output stream to write the log messages to.
-	 */
+	//!
+	//! \brief Start the event loop thread.
+	//! \param log Whether to log or not.
+	//! \param o The output stream to write the log messages to.
+	//!
 	void start(const bool log, std::ostream &o);
 
-	/*!
-	 * \brief Notify the event loop thread of a new event.
-	 */
+	//!
+	//! \brief Notify the event loop thread of a new event.
+	//!
 	void notifyNewEvent();
 
-	/*!
-	 * \brief Set the event loop watchdog timer period.
-	 * \param sleepTime The event loop watchdog timer period.
-	 */
+	//!
+	//! \brief Set the event loop watchdog timer period.
+	//! \param sleepTime The event loop watchdog timer period.
+	//!
 	void setSleepDuration(const SleepDuration sleepDuration);
 
-	/*!
-	 * \brief Get the event loop watchdog timer period.
-	 * \return The event loop watchdog timer period.
-	 */
+	//!
+	//! \brief Get the event loop watchdog timer period.
+	//! \return The event loop watchdog timer period.
+	//!
 	SleepDuration getSleepDuration() const;
 
 private:
-	/*!
-	 * \brief Event loop function.
-	 * \param log Flag to turn on logging on or off.
-	 * \param o Log where to write log messages.
-	 */
+	//!
+	//! \brief Event loop function.
+	//! \param log Flag to turn on logging on or off.
+	//! \param o Log where to write log messages.
+	//!
 	void run(std::stop_token stopToken, const bool log, std::ostream &o);
 
 	//! Reference to the petri net engine.
@@ -113,7 +113,7 @@ private:
 	mutable std::shared_mutex m_sleepDurationMutex;
 
 	//! While idle, watchdog timer period.
-	SleepDuration m_sleepDuration;
+	SleepDuration m_sleepDuration = std::chrono::milliseconds(100);
 
 	//! Event loop thread.
 	std::jthread m_eventLoopThread;

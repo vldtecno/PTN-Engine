@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,34 +18,39 @@
 
 #pragma once
 
-#include "Controller/MenuStateMachine.h"
+#include "Controller/IMenuStateMachine.h"
 #include "Model/Call.h"
 #include "Model/List.h"
 #include "Model/Message.h"
 #include "View/CallLogView.h"
 #include "View/MainMenuView.h"
 #include "View/MessagesMenuView.h"
+#include <memory>
 
-//! Example of a controller class
-/*!
- * Controls the display of a simplified hypothetical phone's menus,
- * using only three keys.
- */
+//!
+//! \brief Example of a controller class
+//!
+//! \details Controls the display of a simplified hypothetical phone's menus, using only three keys.
+//!
 class Controller
 {
 public:
 	using MessageList = List<Message>;
-
 	using CallList = List<Call>;
 
-	//! Constructor.
-	Controller();
+	Controller(MainMenuView &mainMenuView,
+			   MessagesMenuView &messagesMenu,
+			   CallLogView &callLogView,
+			   MessageList &m_messageList,
+			   CallList &m_callLog);
 
 	~Controller();
 
 	void execute();
 
 	void stop();
+
+	void setStateMachine(std::shared_ptr<IMenuStateMachine> stateMachine);
 
 	// Actions
 
@@ -58,10 +63,6 @@ public:
 	//! Triggers an event indicating key "C" was pressed.
 	void pressC();
 
-	MessageList &messageList();
-
-	CallList &callLog();
-
 	//! Show the main menu on screen.
 	void showMainMenu() const;
 
@@ -72,44 +73,45 @@ public:
 	void selectMessagesOption();
 
 	//! Show the calls menu or log.
-	void showCallsMenu();
+	void showCallsMenu() const;
 
 	//! Show the messages menu.
-	void showMessageMenu();
+	void showMessageMenu() const;
 
 	//! Select the next message.
 	void selectNextMessage();
 
 	//! Show the selected message.
-	void showMessage();
+	void showMessage() const;
+
+	//! Dummy function for showing in import export from files
+	bool justReturnTrue() const;
 
 private:
 	//! The state machine of the controller.
-	MenuStateMachine m_petriNet;
+	std::shared_ptr<IMenuStateMachine> m_menuStateMachine = nullptr;
 
 	// Views
 
 	//! A view of the main menu.
-	MainMenuView m_mainMenu;
+	MainMenuView &m_mainMenuView;
 
 	//! A view of the messages.
-	MessagesMenuView m_messagesMenu;
+	MessagesMenuView &m_messagesMenuView;
 
 	//! A view of the call logs.
-	CallLogView m_callLogView;
-
+	CallLogView &m_callLogView;
 
 	// Data sources
 
 	//! The message data.
-	MessageList m_messageList;
+	MessageList &m_messageList;
 
 	//! The call log data.
-	CallList m_callLog;
-
+	CallList &m_callLog;
 
 	// Internals
 
 	//! Index of the selected message.
-	size_t m_messageSelected;
+	size_t m_messageSelected = 0;
 };

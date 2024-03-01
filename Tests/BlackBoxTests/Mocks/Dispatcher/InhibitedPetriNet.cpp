@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,40 +25,42 @@ InhibitedPetriNet::InhibitedPetriNet(PTN_Engine::ACTIONS_THREAD_OPTION actionsTh
 : PTN_Engine(actionsThreadOption)
 {
 	// Places
-	createPlace("InputWaitPackage", 0, true);
+	createPlace({ .name="InputWaitPackage",
+				  .input=true });
 
-	createPlace("P1", 1);
-	createPlace("P2", 1);
-	createPlace("P3", 1);
-	createPlace("P4", 0);
-	createPlace("P5", 0);
+	createPlace({ .name="P1",
+				  .initialNumberOfTokens=1});
+	createPlace({ .name="P2",
+				  .initialNumberOfTokens=1});
+	createPlace({ .name="P3",
+				  .initialNumberOfTokens=1});
+	createPlace({ .name="P4",
+				  .initialNumberOfTokens=0});
+	createPlace({ .name="P5",
+				  .initialNumberOfTokens=0});
 
 	// Transitions
+	createTransition( {.name = "T1",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "P1" },
+										   ArcProperties{ .placeName = "P3" } },
+					   .destinationArcs = {ArcProperties{ .placeName = "P4" } } });
 
+	createTransition({ .name = "T2",
+					   .activationArcs = { ArcProperties{ .placeName = "P2" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P5" } },
+					   .inhibitorArcs = { ArcProperties{ .placeName = "P3" } } });
 
-	createTransition({ "InputWaitPackage", "P1", "P3" }, // activation
-					 { "P4" } // destination
-	);
+	createTransition({ .name = "T3",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "P4" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P1" },
+											ArcProperties{ .placeName = "P3" } } });
 
-
-	createTransition({ "P2" }, // activation
-					 { "P5" }, // destination
-					 { "P3" }, // inhibitor arc
-					 false // require no actions in execution
-	);
-
-
-	createTransition({ "InputWaitPackage", "P4" }, // activation
-					 { "P1", "P3" }, // destination
-	                 false // require no actions in execution
-	);
-
-
-	createTransition({ "P5" }, // activation
-					 { "P2" }, // destination
-					 { "P4" }, // inhibitor arc
-	                 false // require no actions in execution
-	);
+	createTransition({ .name = "T4",
+					   .activationArcs = { ArcProperties{ .placeName = "P5" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P2" } },
+					   .inhibitorArcs = { ArcProperties{ .placeName = "P4" } } });
 }
 
 void InhibitedPetriNet::dispatch()

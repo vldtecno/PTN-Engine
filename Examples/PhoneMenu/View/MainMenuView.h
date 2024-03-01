@@ -22,21 +22,16 @@
 class MainMenuView
 {
 public:
-	//!
-	MainMenuView();
-
-	~MainMenuView();
-
 	//! Print the menu on screen.
 	void showMenu() const;
 
-	/*!
-	 * Select an option.
-	 * \param option Number of the option.
-	 */
+	//!
+	//! Select an option.
+	//! \param option Number of the option.
+	//!
 	void select(const int option);
 
 private:
 	//! Selected option.
-	int m_selection;
+	int m_selection = 0;
 };

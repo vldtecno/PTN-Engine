@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 #pragma once
+
 #include <stdexcept>
 #include <vector>
 
@@ -27,29 +28,29 @@ class List
 public:
 	List() = default;
 
-	/*!
-	 * Add an item to the list.
-	 * \param item Item.
-	 */
+	//!
+	//! \brief Add an item to the list.
+	//! \param item Item.
+	//!
 	void addItem(const T &item)
 	{
 		m_items.push_back(item);
 	}
 
-	/*!
-	 * The number of elements.
-	 * \return Number of elements.
-	 */
+	//!
+	//! \brief The number of elements.
+	//! \return Number of elements.
+	//!
 	size_t size() const
 	{
 		return m_items.size();
 	}
 
-	/*!
-	 * Get an item from the list.
-	 * \param i Index of the selected item.
-	 * \return A copy of the item.
-	 */
+	//!
+	//! \brief Get an item from the list.
+	//! \param i Index of the selected item.
+	//! \return A copy of the item.
+	//!
 	T getItem(const size_t i) const
 	{
 		if (i < m_items.size())

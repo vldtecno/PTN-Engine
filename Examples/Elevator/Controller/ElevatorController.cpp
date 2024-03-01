@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 
 #include "Controller/ElevatorController.h"
 #include "Controller/ElevatorPetriNet.h"
-
 #include <algorithm>
 #include <iostream>
 #include <mutex>
@@ -43,28 +42,11 @@ void printFloorList(const unordered_set<int> &floors)
 } // namespace
 
 ElevatorController::ElevatorController()
-: m_pPetriNet(nullptr)
-, m_currentFloor(s_bottomFloor)
+: m_currentFloor(s_bottomFloor)
 , m_toAddToDestination(s_bottomFloor)
-, m_destinations()
-, m_nextTravelDestinations()
-, m_floorsWaitingToGoUp()
-, m_floorsWaitingToGoDown()
 {
 	m_pPetriNet = make_unique<ElevatorPetriNet>(*this);
 	m_pPetriNet->execute(false);
-}
-
-ElevatorController::~ElevatorController()
-{
-}
-
-void ElevatorController::checkPetriNetPointer() const
-{
-	if (m_pPetriNet == nullptr)
-	{
-		throw runtime_error("Petri net not available.");
-	}
 }
 
 void ElevatorController::openDoors()
@@ -80,7 +62,7 @@ void ElevatorController::closeDoors()
 bool ElevatorController::callElevatorUp(const int floor)
 {
 	{
-		unique_lock<shared_mutex> l(m_mutex);
+		unique_lock l(m_mutex);
 		if (floor < s_bottomFloor || floor >= s_topFloor)
 		{
 			return false;
@@ -94,7 +76,7 @@ bool ElevatorController::callElevatorUp(const int floor)
 bool ElevatorController::callElevatorDown(const int floor)
 {
 	{
-		unique_lock<shared_mutex> l(m_mutex);
+		unique_lock l(m_mutex);
 		if (floor <= s_bottomFloor || floor > s_topFloor)
 		{
 			return false;
@@ -108,7 +90,7 @@ bool ElevatorController::callElevatorDown(const int floor)
 bool ElevatorController::setDestinationFloor(const int floor)
 {
 	{
-		unique_lock<shared_mutex> l(m_mutex);
+		unique_lock l(m_mutex);
 		if (floor < s_bottomFloor || floor > s_topFloor)
 		{
 			return false;
@@ -127,7 +109,7 @@ void ElevatorController::stop()
 // Actions
 void ElevatorController::addDestination1()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	m_nextTravelDestinations.erase(m_toAddToDestination);
 	m_destinations.insert(m_toAddToDestination);
 	printDestinations();
@@ -135,7 +117,7 @@ void ElevatorController::addDestination1()
 
 void ElevatorController::addDestination2()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	if (m_destinations.contains(m_toAddToDestination))
 	{
 		return;
@@ -150,14 +132,14 @@ void ElevatorController::addDestination2()
 
 void ElevatorController::addWaitingToGoDown()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	m_floorsWaitingToGoDown.insert(m_toAddToDestination);
 	printWaitingGoDown();
 }
 
 void ElevatorController::addWaitingToGoUp()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	m_floorsWaitingToGoUp.insert(m_toAddToDestination);
 	printWaitingGoUp();
 }
@@ -176,7 +158,7 @@ void ElevatorController::removeDestinationGD()
 
 void ElevatorController::removeDestination()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Removed " << m_currentFloor << " from destinations" << endl;
 	auto it = m_destinations.find(m_currentFloor);
 	if (it != m_destinations.end())
@@ -187,7 +169,7 @@ void ElevatorController::removeDestination()
 
 void ElevatorController::removeCurrentFromWaitingToGoDown()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	size_t i = m_floorsWaitingToGoDown.erase(m_currentFloor);
 	if (i > 0)
 	{
@@ -197,7 +179,7 @@ void ElevatorController::removeCurrentFromWaitingToGoDown()
 
 void ElevatorController::removeCurrentFromWaitingToGoUp()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	size_t i = m_floorsWaitingToGoUp.erase(m_currentFloor);
 	if (i > 0)
 	{
@@ -207,14 +189,14 @@ void ElevatorController::removeCurrentFromWaitingToGoUp()
 
 void ElevatorController::rotateLists()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	swap(m_destinations, m_nextTravelDestinations);
 	m_destinations.erase(m_currentFloor);
 }
 
 void ElevatorController::increaseFloor()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Ascending... " << endl;
 	++m_currentFloor;
 	printCurrentFloor();
@@ -222,7 +204,7 @@ void ElevatorController::increaseFloor()
 
 void ElevatorController::decreaseFloor()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Descending... " << endl;
 	--m_currentFloor;
 	printCurrentFloor();
@@ -230,18 +212,18 @@ void ElevatorController::decreaseFloor()
 
 void ElevatorController::mergeGoingUpGTCurrent()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	mergeToDestinations(m_floorsWaitingToGoDown, false);
 }
 
 void ElevatorController::mergeMinGoingUp()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	if (m_floorsWaitingToGoUp.empty())
 	{
 		return;
 	}
-	const int minWaiting = *min_element(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
+	const int minWaiting = *ranges::min_element(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
 	m_destinations.insert(minWaiting);
 	m_floorsWaitingToGoUp.erase(minWaiting);
 
@@ -251,12 +233,12 @@ void ElevatorController::mergeMinGoingUp()
 
 void ElevatorController::mergeMaxGoingDown()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	if (m_floorsWaitingToGoDown.empty())
 	{
 		return;
 	}
-	const int maxWaiting = *max_element(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
+	const int maxWaiting = *ranges::max_element(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
 	m_destinations.insert(maxWaiting);
 	m_floorsWaitingToGoDown.erase(maxWaiting);
 
@@ -266,7 +248,7 @@ void ElevatorController::mergeMaxGoingDown()
 
 void ElevatorController::mergePostponedToCurrent()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	m_destinations.insert(m_nextTravelDestinations.begin(), m_nextTravelDestinations.end());
 	m_nextTravelDestinations.clear();
 
@@ -275,7 +257,7 @@ void ElevatorController::mergePostponedToCurrent()
 
 void ElevatorController::mergeGoingDownSTCurrent()
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	mergeToDestinations(m_floorsWaitingToGoDown, true);
 }
 
@@ -286,7 +268,7 @@ void ElevatorController::mergeToDestinations(unordered_set<int> &toAdd, const bo
 	{
 		deleted = false;
 		auto floorIt =
-		std::find_if(toAdd.cbegin(), toAdd.cend(),
+		ranges::find_if(toAdd.cbegin(), toAdd.cend(),
 					 [this, &lessThan](const int floor)
 					 { return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor); });
 		if (floorIt != toAdd.cend())
@@ -313,7 +295,7 @@ bool ElevatorController::isFloorNotInList() const
 
 bool ElevatorController::isFloorInList() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	return m_destinations.contains(m_currentFloor);
 }
 
@@ -324,69 +306,69 @@ bool ElevatorController::isDestinationListNotEmpty() const
 
 bool ElevatorController::isDestinationListEmpty() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	return m_destinations.empty();
 }
 
 bool ElevatorController::isMarkedFloorNotCurrentFloor() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	return m_toAddToDestination != m_currentFloor;
 }
 
 bool ElevatorController::isMarkedFloorGreaterThanCurrentFloor() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	return m_toAddToDestination > m_currentFloor;
 }
 
 bool ElevatorController::isMarkedFloorSmallerThanCurrentFloor() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	return m_toAddToDestination < m_currentFloor;
 }
 
 bool ElevatorController::isMinSmallerThanCurrent() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int minFloor = *min_element(m_destinations.cbegin(), m_destinations.cend());
+	int minFloor = *ranges::min_element(m_destinations.cbegin(), m_destinations.cend());
 	return minFloor < m_currentFloor;
 }
 
 bool ElevatorController::isMinGreaterThanCurrent() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int minFloor = *min_element(m_destinations.cbegin(), m_destinations.cend());
+	int minFloor = *ranges::min_element(m_destinations.cbegin(), m_destinations.cend());
 	return minFloor > m_currentFloor;
 }
 
 bool ElevatorController::isMaxSmallerThanCurrent() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int maxFloor = *max_element(m_destinations.cbegin(), m_destinations.cend());
+	int maxFloor = *ranges::max_element(m_destinations.cbegin(), m_destinations.cend());
 	return maxFloor < m_currentFloor;
 }
 
 bool ElevatorController::isMaxGreaterThanCurrent() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	if (m_destinations.empty())
 	{
 		return false;
 	}
-	int maxFloor = *max_element(m_destinations.cbegin(), m_destinations.cend());
+	int maxFloor = *ranges::max_element(m_destinations.cbegin(), m_destinations.cend());
 	return maxFloor > m_currentFloor;
 }
 
@@ -395,7 +377,7 @@ bool ElevatorController::isMaxGreaterThanCurrent() const
 
 void ElevatorController::elevatorStopped() const
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Elevator stopped" << endl;
 }
 
@@ -406,25 +388,25 @@ void ElevatorController::elevatorMoving() const
 
 void ElevatorController::doorsAreOpen() const
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Elevator doors are open" << endl;
 }
 
 void ElevatorController::doorsAreClosed() const
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Elevator doors are closed" << endl;
 }
 
 void ElevatorController::goingUp() const
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Scheduled to go up." << endl;
 }
 
 void ElevatorController::goingDown() const
 {
-	unique_lock<shared_mutex> l(m_mutex);
+	unique_lock l(m_mutex);
 	cout << "Scheduled to go down." << endl;
 }
 
@@ -459,7 +441,7 @@ void ElevatorController::printWaitingGoUp() const
 
 void ElevatorController::printSchedule() const
 {
-	shared_lock<shared_mutex> l(m_mutex);
+	shared_lock l(m_mutex);
 	cout << endl;
 	cout << "Scheduled floors: " << endl;
 	printDestinations();

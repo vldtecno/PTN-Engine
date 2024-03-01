@@ -17,16 +17,20 @@
  */
 
 #include "View/CallLogView.h"
-
 #include <iostream>
 
 using namespace std;
 
-void CallLogView::viewCallLog(const List<Call> &callLog)
+CallLogView::CallLogView(List<Call> &callLog)
+: m_callLog(callLog)
 {
-	for (size_t i = 0; i < callLog.size(); ++i)
+}
+
+void CallLogView::viewCallLog() const
+{
+	for (size_t i = 0; i < m_callLog.size(); ++i)
 	{
-		const Call &call = callLog.getItem(i);
+		const Call &call = m_callLog.getItem(i);
 		cout << call.m_date << " - " << call.m_number << endl;
 	}
 }

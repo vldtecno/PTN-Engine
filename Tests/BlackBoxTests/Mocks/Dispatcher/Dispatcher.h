@@ -18,11 +18,9 @@
 
 #pragma once
 
+#include "Mocks/Dispatcher/IDispatcherPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include <memory>
-
-//! Interface for Petri nets controlling the logic of this dispatcher
-class IDispatcherPetriNet;
 
 //! Alternately uses channel a and b to dispatch packages.
 class RoundRobinPetriNet;
@@ -37,31 +35,21 @@ class WeightedPetriNet;
 class InhibitedPetriNet;
 
 //! Mock/fake controller class
-/*!
- * This is the controller of a package dispatcher that has two channels available: A and B.
- * When a package arrives it can either use one or the other.
- */
+//!
+//! This is the controller of a package dispatcher that has two channels available: A and B.
+//! When a package arrives it can either use one or the other.
+//!
 class Dispatcher
 {
-private:
-	//! For testing purposes only
-	friend class FixturePetriNet;
-
-	//! Petri net that defines and controls the dispatcher business logic.
-	std::unique_ptr<IDispatcherPetriNet> m_pPetriNet;
-
-	//! If the counter can be reset.
-	bool m_resetCounter;
-
 public:
 	Dispatcher();
 
 	~Dispatcher();
 
-	/*!
-	 * Set the flag to reset the counter.
-	 * \param resetCounter Reset counter on or off.
-	 */
+	//!
+	//! Set the flag to reset the counter.
+	//! \param resetCounter Reset counter on or off.
+	//!
 	void setResetCounter(const bool resetCounter);
 
 	//! Puts a token in the input place and triggers the net to perform one dispatch operation.
@@ -97,26 +85,26 @@ public:
 	//! Action to be performed when channel B is no longer selected.
 	void onLeaveSelectChannelB();
 
-	/*!
-	 * If the counter can be reset.
-	 * \return if the counter can be reset.
-	 */
+	//!
+	//! If the counter can be reset.
+	//! \return if the counter can be reset.
+	//!
 	bool resetCounter() const;
 
 	//! Flag that indicates it is waiting for a package.
-	bool m_isWaitingPackage;
+	bool m_isWaitingPackage = true;
 
 	//! Flag that indicates it is using channel A.
-	bool m_isUsingChannelA;
+	bool m_isUsingChannelA = false;
 
 	//! Flag that indicates it is using channel B.
-	bool m_isUsingChannelB;
+	bool m_isUsingChannelB = false;
 
 	//! Flag that indicates channel A is selected.
-	bool m_isChannelASelected;
+	bool m_isChannelASelected = true;
 
 	//! Flag that indicates channel B is selected.
-	bool m_isChannelBSelected;
+	bool m_isChannelBSelected = false;
 
 	//! Select round robin Petri net.
 	void setRoundRobinMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION);
@@ -132,7 +120,15 @@ public:
 
 	void execute();
 
-	bool stillRunning() const;
-
 	void stop();
+
+private:
+	//! For testing purposes only
+	friend class FixturePetriNet;
+
+	//! Petri net that defines and controls the dispatcher business logic.
+	std::unique_ptr<IDispatcherPetriNet> m_pPetriNet = nullptr;
+
+	//! If the counter can be reset.
+	bool m_resetCounter = false;
 };

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ ElevatorPetriNet::ElevatorPetriNet(ElevatorController &elevatorController)
 	createButtonPressingTransitions();
 	createCallingButtonTransitions();
 }
+
+ElevatorPetriNet::~ElevatorPetriNet() = default;
 
 void ElevatorPetriNet::closeDoors()
 {
@@ -83,300 +85,584 @@ void ElevatorPetriNet::stop()
 
 void ElevatorPetriNet::createInputPlaces()
 {
-	createPlace("CloseDoors", 0, true);
-	createPlace("OpenDoors", 0, true);
-	createPlace("CallButtonUp", 0, true);
-	createPlace("CallButtonDown", 0, true);
-	createPlace("DestinationButton", 0, true);
+	createPlace({ .name="CloseDoors",
+				  .input=true });
+	createPlace({ .name="OpenDoors",
+				  .input=true });
+	createPlace({ .name="CallButtonUp",
+				  .input=true });
+	createPlace({ .name="CallButtonDown",
+				  .input=true });
+	createPlace({ .name="DestinationButton",
+				  .input=true });
 }
 
 void ElevatorPetriNet::createCabinePlaces()
 {
-	createPlace("Stopped", 0, bind(&ElevatorController::elevatorStopped, &m_elevatorController));
-	createPlace("Stopped_", 1);
-	createPlace("Moving", 0, bind(&ElevatorController::elevatorMoving, &m_elevatorController));
-	createPlace("Moving_", 0);
-	createPlace("DoorsOpened", 1, bind(&ElevatorController::doorsAreOpen, &m_elevatorController));
-	createPlace("DoorsClosed", 0, bind(&ElevatorController::doorsAreClosed, &m_elevatorController));
-	createPlace("DoorsClosed_", 0);
+	createPlace({ .name = "Stopped",
+				  .onEnterAction = bind_front(&ElevatorController::elevatorStopped, &m_elevatorController) });
+	createPlace({ .name = "Stopped_",
+				  .initialNumberOfTokens = 1 });
+	createPlace({ .name="Moving",
+				  .onEnterAction=bind_front(&ElevatorController::elevatorMoving, &m_elevatorController)});
+	createPlace({ .name="Moving_"});
+	createPlace({ .name="DoorsOpened", .initialNumberOfTokens=1,
+				  .onEnterAction=bind_front(&ElevatorController::doorsAreOpen, &m_elevatorController)});
+	createPlace({ .name="DoorsClosed",
+				  .onEnterAction=bind_front(&ElevatorController::doorsAreClosed, &m_elevatorController)});
+	createPlace({ .name="DoorsClosed_"});
 
-	createPlace("RemoveFromListGU", 0, bind(&ElevatorController::removeDestinationGU, &m_elevatorController));
-	createPlace("RemoveFromListGD", 0, bind(&ElevatorController::removeDestinationGD, &m_elevatorController));
-	createPlace("ArrivedDestination", 0);
+	createPlace({ .name="RemoveFromListGU",
+				  .onEnterAction=bind_front(&ElevatorController::removeDestinationGU, &m_elevatorController) });
+	createPlace({ .name="RemoveFromListGD",
+				  .onEnterAction=bind_front(&ElevatorController::removeDestinationGD, &m_elevatorController) });
+	createPlace({ .name="ArrivedDestination" });
 
-	createPlace("ProcessLists", 0);
-	createPlace("ProcessedLists", 1, bind(&ElevatorController::processedLists, &m_elevatorController));
+	createPlace({ .name="ProcessLists" });
+	createPlace({ .name="ProcessedLists",
+				  .initialNumberOfTokens=1,
+				  .onEnterAction=bind_front(&ElevatorController::processedLists, &m_elevatorController) });
 
-	createPlace("GoingUp", 0, bind(&ElevatorController::goingUp, &m_elevatorController));
-	createPlace("GoingUp_", 0);
-	createPlace("GoingDown", 0, bind(&ElevatorController::goingDown, &m_elevatorController));
-	createPlace("GoingDown_", 0);
+	createPlace({ .name="GoingUp",
+				  .onEnterAction=bind_front(&ElevatorController::goingUp, &m_elevatorController) });
+	createPlace({ .name="GoingUp_" });
+	createPlace({ .name="GoingDown",
+				  .onExitAction=bind_front(&ElevatorController::goingDown, &m_elevatorController) });
+	createPlace({ .name="GoingDown_" });
 }
 
 void ElevatorPetriNet::createArrivalPlaces()
 {
-	createPlace("Ready", 1);
+	createPlace({ .name = "Ready",
+				  .initialNumberOfTokens=1 });
 
-	createPlace("SwapGD", 0, bind(&ElevatorController::rotateLists, &m_elevatorController));
-	createPlace("SwapGU", 0, bind(&ElevatorController::rotateLists, &m_elevatorController));
+	createPlace({ .name="SwapGD",
+				  .onEnterAction=bind_front(&ElevatorController::rotateLists, &m_elevatorController)});
+	createPlace({ .name="SwapGU",
+				  .onEnterAction=bind_front(&ElevatorController::rotateLists, &m_elevatorController)});
 
-	createPlace("MergeGoingUpGTCurrent", 0,
-				bind(&ElevatorController::mergeGoingUpGTCurrent, &m_elevatorController));
-	createPlace("MergeMinGoingUp1", 0, bind(&ElevatorController::mergeMinGoingUp, &m_elevatorController));
-	createPlace("MergeMaxGoingDown1", 0, bind(&ElevatorController::mergeMaxGoingDown, &m_elevatorController));
-	createPlace("MergePostponedToCurrent11", 0,
-				bind(&ElevatorController::mergePostponedToCurrent, &m_elevatorController));
-	createPlace("MergePostponedToCurrent12", 0,
-				bind(&ElevatorController::mergePostponedToCurrent, &m_elevatorController));
-
-	createPlace("MergeGoingDownSTCurrent", 0,
-				bind(&ElevatorController::mergeGoingDownSTCurrent, &m_elevatorController));
-	createPlace("MergeMaxGoingDown2", 0, bind(&ElevatorController::mergeMaxGoingDown, &m_elevatorController));
-	createPlace("MergeMinGoingUp2", 0, bind(&ElevatorController::mergeMinGoingUp, &m_elevatorController));
-	createPlace("MergePostponedToCurrent21", 0,
-				bind(&ElevatorController::mergePostponedToCurrent, &m_elevatorController));
-	createPlace("MergePostponedToCurrent22", 0,
-				bind(&ElevatorController::mergePostponedToCurrent, &m_elevatorController));
+	createPlace({ .name="MergeGoingUpGTCurrent",
+				  .onEnterAction=bind_front(&ElevatorController::mergeGoingUpGTCurrent, &m_elevatorController) });
+	createPlace({ .name="MergeMinGoingUp1",
+				  .onEnterAction=bind_front(&ElevatorController::mergeMinGoingUp, &m_elevatorController) });
+	createPlace({ .name="MergeMaxGoingDown1",
+				  .onEnterAction=bind_front(&ElevatorController::mergeMaxGoingDown, &m_elevatorController) });
+	createPlace({ .name="MergePostponedToCurrent11",
+				  .onEnterAction=bind_front(&ElevatorController::mergePostponedToCurrent, &m_elevatorController) });
+	createPlace({ .name="MergePostponedToCurrent12",
+				  .onEnterAction=bind_front(&ElevatorController::mergePostponedToCurrent, &m_elevatorController) });
+	createPlace({ .name="MergeGoingDownSTCurrent",
+				  .onEnterAction=bind_front(&ElevatorController::mergeGoingDownSTCurrent, &m_elevatorController) });
+	createPlace({ .name="MergeMaxGoingDown2",
+				  .onEnterAction=bind_front(&ElevatorController::mergeMaxGoingDown, &m_elevatorController) });
+	createPlace({ .name="MergeMinGoingUp2",
+				  .onEnterAction=bind_front(&ElevatorController::mergeMinGoingUp, &m_elevatorController) });
+	createPlace({ .name="MergePostponedToCurrent21",
+				  .onEnterAction=bind_front(&ElevatorController::mergePostponedToCurrent, &m_elevatorController) });
+	createPlace({ .name="MergePostponedToCurrent22",
+				  .onEnterAction=bind_front(&ElevatorController::mergePostponedToCurrent, &m_elevatorController) });
 }
 
 void ElevatorPetriNet::createButtonPressPlaces()
 {
-	createPlace("AddToTravel", 0, bind(&ElevatorController::addDestination1, &m_elevatorController));
-	createPlace("AddToNextTravel", 0, bind(&ElevatorController::addDestination2, &m_elevatorController));
-	createPlace("WaitToGoUp", 0, bind(&ElevatorController::addWaitingToGoUp, &m_elevatorController));
-	createPlace("WaitToGoDown", 0, bind(&ElevatorController::addWaitingToGoDown, &m_elevatorController));
-	createPlace("D1", 0);
-	createPlace("D2", 0);
-	createPlace("D3", 0);
-	createPlace("D4", 0);
-	createPlace("D5", 0);
+	createPlace({ .name = "AddToTravel",
+				  .onEnterAction=bind_front(&ElevatorController::addDestination1, &m_elevatorController) });
+	createPlace({ .name = "AddToNextTravel",
+				  .onEnterAction=bind_front(&ElevatorController::addDestination2, &m_elevatorController) });
+	createPlace({ .name = "WaitToGoUp",
+				  .onEnterAction=bind_front(&ElevatorController::addWaitingToGoUp, &m_elevatorController) });
+	createPlace({ .name = "WaitToGoDown",
+				  .onEnterAction=bind_front(&ElevatorController::addWaitingToGoDown, &m_elevatorController) });
+	createPlace({ .name="D1"});
+	createPlace({ .name="D2"});
+	createPlace({ .name="D3"});
+	createPlace({ .name="D4"});
+	createPlace({ .name="D5"});
 }
 
 void ElevatorPetriNet::createSimulationPlaces()
 {
-	createPlace("IncreaseFloor", 0, bind(&ElevatorController::increaseFloor, &m_elevatorController));
-	createPlace("DecreaseFloor", 0, bind(&ElevatorController::decreaseFloor, &m_elevatorController));
+	createPlace({ .name="IncreaseFloor",
+				  .onEnterAction=bind_front(&ElevatorController::increaseFloor, &m_elevatorController)});
+	createPlace({ .name="DecreaseFloor",
+				  .onEnterAction=bind_front(&ElevatorController::decreaseFloor, &m_elevatorController)});
 }
 
 void ElevatorPetriNet::createCabineTransitions()
 {
-	createTransition({ "CloseDoors", "Stopped_", "DoorsOpened" }, { "Stopped_", "DoorsClosed" });
+	createTransition({ .name = "T1",
+					   .activationArcs = { { .placeName = "CloseDoors" },
+										   { .placeName = "Stopped_" },
+										   { .placeName = "DoorsOpened" } },
+					   .destinationArcs = { { .placeName = "Stopped_" },
+											{ .placeName = "DoorsClosed" } } });
 
-	createTransition({ "OpenDoors", "Stopped_", "DoorsClosed_" }, { "Stopped_", "DoorsOpened" });
+	createTransition({ .name = "T2",
+					   .activationArcs = { { .placeName = "OpenDoors" },
+										   { .placeName = "Stopped_" },
+										   { .placeName = "DoorsClosed_" } },
+					   .destinationArcs = { { .placeName = "Stopped_" },
+											{ .placeName = "DoorsOpened" } } });
 
-	createTransition({ "Stopped_", "DoorsClosed_", "ProcessedLists" }, { "DoorsClosed_", "Moving" },
-					 { "OpenDoors" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T3",
+					   .activationArcs = { { .placeName = "Stopped_" },
+										   { .placeName = "DoorsClosed_" },
+										   { .placeName = "ProcessedLists" } },
+					   .destinationArcs = { { .placeName = "DoorsClosed_" },
+											{ .placeName = "Moving" } },
+					   .inhibitorArcs = { { .placeName = "OpenDoors" } },
+					   .additionalConditions{ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "ArrivedDestination", "Moving_" }, { "Stopped", "OpenDoors" });
+	createTransition({ .name = "T4",
+					   .activationArcs = { { .placeName = "ArrivedDestination" },
+										   { .placeName = "Moving_" } },
+					   .destinationArcs = { { .placeName = "Stopped" },
+											{ .placeName = "OpenDoors" } } });
 
 	// Trick to prevent read arcs from executing multiple times one place
-	createTransition({ "DoorsClosed" }, { "DoorsClosed_" });
-	createTransition({ "Moving" }, { "Moving_" });
-	createTransition({ "Stopped" }, { "Stopped_" });
-	createTransition({ "GoingUp" }, { "GoingUp_" });
-	createTransition({ "GoingDown" }, { "GoingDown_" });
+	createTransition({ .name = "T5",
+					   .activationArcs = { { .placeName = "DoorsClosed" } },
+					   .destinationArcs = { { .placeName = "DoorsClosed_" } } });
+	createTransition({ .name = "T6",
+					   .activationArcs = { { .placeName = "Moving" } },
+					   .destinationArcs = { { .placeName = "Moving_" } } });
+	createTransition({ .name = "T7",
+					   .activationArcs = { { .placeName = "Stopped" } },
+					   .destinationArcs = { { .placeName = "Stopped_" } } });
+	createTransition({ .name = "T8",
+					   .activationArcs = { { .placeName = "GoingUp" } },
+					   .destinationArcs = { { .placeName = "GoingUp_" } } });
+	createTransition({ .name = "T9",
+					   .activationArcs = { { .placeName = "GoingDown" } },
+					   .destinationArcs = { { .placeName = "GoingDown_" } } });
 }
 
 void ElevatorPetriNet::createSimulationTransitions()
 {
-	createTransition({ "GoingUp_", "Ready", "Moving_" }, { "Moving_", "GoingUp_", "IncreaseFloor" },
-					 vector<string>{ "ArrivedDestination" });
+	createTransition({ .name = "T10",
+					   .activationArcs = { { .placeName = "GoingUp_" },
+										   { .placeName = "Ready" },
+										   { .placeName = "Moving_" } },
+					   .destinationArcs = { { .placeName = "Moving_" },
+											{ .placeName = "GoingUp_" },
+											{ .placeName = "IncreaseFloor" } },
+					   .inhibitorArcs = { { .placeName = "ArrivedDestination" } } });
 
-	createTransition({ "GoingDown_", "Ready", "Moving_" }, { "Moving_", "GoingDown_", "DecreaseFloor" },
-					 vector<string>{ "ArrivedDestination" });
+	createTransition({ .name = "T11",
+					   .activationArcs = { { .placeName = "GoingDown_" },
+										   { .placeName = "Ready" },
+										   { .placeName = "Moving_" } },
+					   .destinationArcs = { { .placeName = "Moving_" },
+											{ .placeName = "GoingDown_" },
+											{ .placeName = "DecreaseFloor" } },
+					   .inhibitorArcs = { { .placeName = "ArrivedDestination" } } });
 
-	createTransition({ "IncreaseFloor" }, { "Ready" },
-					 { bind(&ElevatorController::isFloorNotInList, &m_elevatorController) }, true);
+	createTransition({ .name = "T12",
+					   .activationArcs = { { .placeName = "IncreaseFloor" } },
+					   .destinationArcs = { { .placeName = "Ready" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isFloorNotInList, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "DecreaseFloor" }, { "Ready" },
-					 { bind(&ElevatorController::isFloorNotInList, &m_elevatorController) }, true);
+	createTransition({ .name = "T13",
+					   .activationArcs = { { .placeName = "DecreaseFloor" } },
+					   .destinationArcs = { { .placeName = "Ready" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isFloorNotInList, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "IncreaseFloor" }, { "RemoveFromListGU" },
-					 { bind(&ElevatorController::isFloorInList, &m_elevatorController) }, true);
+	createTransition({ .name = "T14",
+					   .activationArcs = { { .placeName = "IncreaseFloor" } },
+					   .destinationArcs = { { .placeName = "RemoveFromListGU" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isFloorInList, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "RemoveFromListGU" }, { "ProcessLists", "ArrivedDestination", "Ready" });
+	createTransition({ .name = "T15",
+					   .activationArcs = { { .placeName = "RemoveFromListGU" } },
+					   .destinationArcs = { { .placeName = "ProcessLists" },
+											{ .placeName = "ArrivedDestination" },
+											{ .placeName = "Ready" } } });
 
-	createTransition({ "DecreaseFloor" }, { "RemoveFromListGD" },
-					 { bind(&ElevatorController::isFloorInList, &m_elevatorController) }, true);
+	createTransition({ .name = "T16",
+					   .activationArcs = { { .placeName = "DecreaseFloor" } },
+					   .destinationArcs = { { .placeName = "RemoveFromListGD" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isFloorInList, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "RemoveFromListGD" }, { "ProcessLists", "ArrivedDestination", "Ready" });
+	createTransition({ .name = "T17",
+					   .activationArcs = { { .placeName = "RemoveFromListGD" } },
+					   .destinationArcs = { { .placeName = "ProcessLists" },
+											{ .placeName = "ArrivedDestination" },
+											{ .placeName = "Ready" } } });
 }
 
 void ElevatorPetriNet::createArrivingFloorTransitions()
 {
 	// Arriving a floor going down.
 
-	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" },
-					 { "Ready", "GoingDown_", "DoorsClosed_", "ProcessedLists" },
-					 { "OpenDoors", "ArrivedDestination" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T18",
+					   .activationArcs = { { .placeName = "Ready" },
+										   { .placeName = "ProcessLists" },
+										   { .placeName = "GoingDown_" },
+										   { .placeName = "DoorsClosed_" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "GoingDown_" },
+											{ .placeName = "DoorsClosed_" },
+											{ .placeName = "ProcessedLists" } },
+					   .inhibitorArcs = { { .placeName = "OpenDoors" },
+										  { .placeName = "ArrivedDestination" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "Ready", "ProcessLists", "GoingDown_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGD" },
-					 { "OpenDoors", "ArrivedDestination" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T19",
+					   .activationArcs = { { .placeName = "Ready" },
+										   { .placeName = "ProcessLists" },
+										   { .placeName = "GoingDown_" },
+										   { .placeName = "DoorsClosed_" } },
+					   .destinationArcs = { { .placeName = "DoorsClosed_" },
+											{ .placeName = "SwapGD" } },
+					   .inhibitorArcs = { { .placeName = "OpenDoors" },
+										  { .placeName = "ArrivedDestination" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "SwapGD" }, { "MergeGoingUpGTCurrent" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T20",
+					   .activationArcs = { { .placeName = "SwapGD" } },
+					   .destinationArcs = { { .placeName = "MergeGoingUpGTCurrent" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "SwapGD" }, { "MergeMinGoingUp1" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T21",
+					   .activationArcs = { { .placeName = "SwapGD" } },
+					   .destinationArcs = { { .placeName = "MergeMinGoingUp1" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeGoingUpGTCurrent" }, { "Ready", "ProcessedLists", "GoingUp" });
+	createTransition({ .name = "T22",
+					   .activationArcs = { { .placeName = "MergeGoingUpGTCurrent" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingUp" } } });
 
-	createTransition({ "MergeMinGoingUp1" }, { "MergeMaxGoingDown1" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T23",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp1" } },
+					   .destinationArcs = { { .placeName = "MergeMaxGoingDown1" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMinGoingUp1" }, { "GoingDown", "Ready", "ProcessedLists" },
-					 { bind(&ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) }, true);
+	createTransition({ .name = "T24",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp1" } },
+					   .destinationArcs = { { .placeName = "GoingDown" },
+											{ .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMinGoingUp1" }, { "MergePostponedToCurrent11" },
-					 { bind(&ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) }, true);
+	createTransition({ .name = "T25",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp1" } },
+					   .destinationArcs = { { .placeName = "MergePostponedToCurrent11" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T26",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown1" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMaxGoingDown1" }, { "MergePostponedToCurrent12" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-					   bind(&ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T27",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown1" } },
+					   .destinationArcs = { { .placeName = "MergePostponedToCurrent12" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+											   bind_front(&ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMaxGoingDown1" }, { "Ready", "ProcessedLists", "GoingUp" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-					   bind(&ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T28",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown1" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingUp" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+											   bind_front(&ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergePostponedToCurrent11" }, { "Ready", "ProcessedLists", "GoingUp" });
+	createTransition({ .name = "T29",
+					   .activationArcs = { { .placeName = "MergePostponedToCurrent11" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingUp" } } });
 
-	createTransition({ "MergePostponedToCurrent12" }, { "Ready", "ProcessedLists", "GoingDown" });
+	createTransition({ .name = "T30",
+					   .activationArcs = { { .placeName = "MergePostponedToCurrent12" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingDown" } } });
 
 
 	// Arriving a floor going up.
 
-	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" },
-					 { "Ready", "GoingUp_", "DoorsClosed_", "ProcessedLists" },
-					 { "OpenDoors", "ArrivedDestination" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T31",
+					   .activationArcs = { { .placeName = "Ready" },
+										   { .placeName = "ProcessLists" },
+										   { .placeName = "GoingUp_" },
+										   { .placeName = "DoorsClosed_" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "GoingUp_" },
+											{ .placeName = "DoorsClosed_" },
+											{ .placeName = "ProcessedLists" } },
+					   .inhibitorArcs = { { .placeName = "OpenDoors" },
+										  { .placeName = "ArrivedDestination" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "Ready", "ProcessLists", "GoingUp_", "DoorsClosed_" }, { "DoorsClosed_", "SwapGU" },
-					 { "OpenDoors", "ArrivedDestination" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T32",
+					   .activationArcs = { { .placeName = "Ready" },
+										   { .placeName = "ProcessLists" },
+										   { .placeName = "GoingUp_" },
+										   { .placeName = "DoorsClosed_" } },
+					   .destinationArcs = { { .placeName = "DoorsClosed_" },
+											{ .placeName = "SwapGU" } },
+					   .inhibitorArcs = { { .placeName = "OpenDoors" },
+										  { .placeName = "ArrivedDestination" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "SwapGU" }, { "MergeGoingDownSTCurrent" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T33",
+					   .activationArcs = { { .placeName = "SwapGU" } },
+					   .destinationArcs = { { .placeName = "MergeGoingDownSTCurrent" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "SwapGU" }, { "MergeMaxGoingDown2" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T34",
+					   .activationArcs = { { .placeName = "SwapGU" } },
+					   .destinationArcs = { { .placeName = "MergeMaxGoingDown2" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeGoingDownSTCurrent" }, { "Ready", "ProcessedLists", "GoingDown" });
+	createTransition({ .name = "T35",
+					   .activationArcs = { { .placeName = "MergeGoingDownSTCurrent" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingDown" } } });
 
-	createTransition({ "MergeMaxGoingDown2" }, { "MergeMinGoingUp2" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T36",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown2" } },
+					   .destinationArcs = { { .placeName = "MergeMinGoingUp2" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMaxGoingDown2" }, { "GoingUp", "Ready", "ProcessedLists" },
-					 { bind(&ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) }, true);
+	createTransition({ .name = "T37",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown2" } },
+					   .destinationArcs = { { .placeName = "GoingUp" },
+											{ .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMaxGreaterThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMaxGoingDown2" }, { "MergePostponedToCurrent21" },
-					 { bind(&ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) }, true);
+	createTransition({ .name = "T38",
+					   .activationArcs = { { .placeName = "MergeMaxGoingDown2" } },
+					   .destinationArcs = { { .placeName = "MergePostponedToCurrent21" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMaxSmallerThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists" },
-					 { bind(&ElevatorController::isDestinationListEmpty, &m_elevatorController) }, true);
+	createTransition({ .name = "T39",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp2" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListEmpty, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMinGoingUp2" }, { "MergePostponedToCurrent22" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-					   bind(&ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T40",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp2" } },
+					   .destinationArcs = { { .placeName = "MergePostponedToCurrent22" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+											   bind_front(&ElevatorController::isMinGreaterThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergeMinGoingUp2" }, { "Ready", "ProcessedLists", "GoingDown" },
-					 { bind(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
-					   bind(&ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T41",
+					   .activationArcs = { { .placeName = "MergeMinGoingUp2" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingDown" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isDestinationListNotEmpty, &m_elevatorController),
+											   bind_front(&ElevatorController::isMinSmallerThanCurrent, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "MergePostponedToCurrent21" }, { "Ready", "ProcessedLists", "GoingDown" });
+	createTransition({ .name = "T42",
+					   .activationArcs = { { .placeName = "MergePostponedToCurrent21" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingDown" } } });
 
-	createTransition({ "MergePostponedToCurrent22" }, { "Ready", "ProcessedLists", "GoingUp" });
+	createTransition({ .name = "T43",
+					   .activationArcs = { { .placeName = "MergePostponedToCurrent22" } },
+					   .destinationArcs = { { .placeName = "Ready" },
+											{ .placeName = "ProcessedLists" },
+											{ .placeName = "GoingUp" } } });
 }
 
 void ElevatorPetriNet::createButtonPressingTransitions()
 {
-	createTransition({ "DestinationButton", "Ready" }, { "D3" }, vector<string>{ "GoingUp_", "GoingDown_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T44",
+					   .activationArcs = { { .placeName = "DestinationButton" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D3" } },
+					   .inhibitorArcs = { { .placeName = "GoingUp_" },
+										  { .placeName = "GoingDown_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "DestinationButton", "GoingUp_", "Ready" }, { "D1", "GoingUp_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T45",
+					   .activationArcs = { { .placeName = "DestinationButton" },
+										   { .placeName = "GoingUp_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D1" },
+											{ .placeName = "GoingUp_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "DestinationButton", "GoingDown_", "Ready" }, { "D2", "GoingDown_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T46",
+					   .activationArcs = { { .placeName = "DestinationButton" },
+										   { .placeName = "GoingDown_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D2" },
+											{ .placeName = "GoingDown_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D1" }, { "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T47",
+					   .activationArcs = { { .placeName = "D1" } },
+					   .destinationArcs = { { .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D1" }, { "AddToNextTravel" },
-					 { bind(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T48",
+					   .activationArcs = { { .placeName = "D1" } },
+					   .destinationArcs = { { .placeName = "AddToNextTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D2" }, { "AddToNextTravel" },
-					 { bind(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T49",
+					   .activationArcs = { { .placeName = "D2" } },
+					   .destinationArcs = { { .placeName = "AddToNextTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D2" }, { "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T50",
+					   .activationArcs = { { .placeName = "D2" } },
+					   .destinationArcs = { { .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D3" }, { "GoingUp", "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T51",
+					   .activationArcs = { { .placeName = "D3" } },
+					   .destinationArcs = { { .placeName = "GoingUp" },
+											{ .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D3" }, { "GoingDown", "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T52",
+					   .activationArcs = { { .placeName = "D3" } },
+					   .destinationArcs = { { .placeName = "GoingDown" },
+											{ .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "AddToNextTravel" }, { "Ready" });
+	createTransition({ .name = "T53",
+					   .activationArcs = { { .placeName = "AddToNextTravel" } },
+					   .destinationArcs = { { .placeName = "Ready" } } });
 
-	createTransition({ "AddToTravel" }, { "Ready" });
+	createTransition({ .name = "T54",
+					   .activationArcs = { { .placeName = "AddToTravel" } },
+					   .destinationArcs = { { .placeName = "Ready" } } });
 }
 
 void ElevatorPetriNet::createCallingButtonTransitions()
 {
 	// Calling the elevator to go up.
 
-	createTransition({ "CallButtonUp", "Ready" }, { "D3" }, vector<string>{ "GoingUp_", "GoingDown_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T55",
+					   .activationArcs = { { .placeName = "CallButtonUp" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D3" } },
+					   .inhibitorArcs = { { .placeName = "GoingUp_" },
+										  { .placeName = "GoingDown_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "CallButtonUp", "GoingUp_", "Ready" }, { "D4", "GoingUp_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T56",
+					   .activationArcs = { { .placeName = "CallButtonUp" },
+										   { .placeName = "GoingUp_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D4" },
+											{ .placeName = "GoingUp_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "CallButtonUp", "GoingDown_", "Ready" }, { "WaitToGoUp", "GoingDown_" });
+	createTransition({ .name = "T57",
+					   .activationArcs = { { .placeName = "CallButtonUp" },
+										   { .placeName = "GoingDown_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "WaitToGoUp" },
+											{ .placeName = "GoingDown_" } } });
 
-	createTransition({ "D4" }, { "WaitToGoUp" },
-					 { bind(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T58",
+					   .activationArcs = { { .placeName = "D4" } },
+					   .destinationArcs = { { .placeName = "WaitToGoUp" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D4" }, { "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T59",
+					   .activationArcs = { { .placeName = "D4" } },
+					   .destinationArcs = { { .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "WaitToGoUp" }, { "Ready" });
+	createTransition({ .name = "T60",
+					   .activationArcs = { { .placeName = "WaitToGoUp" } },
+					   .destinationArcs = { { .placeName = "Ready" } } });
 
 
 	// Calling the elevator to go down.
 
-	createTransition({ "CallButtonDown", "Ready" }, { "D3" }, vector<string>{ "GoingUp_", "GoingDown_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T61",
+					   .activationArcs = { { .placeName = "CallButtonDown" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D3" } },
+					   .inhibitorArcs = { { .placeName = "GoingUp_" },
+										  { .placeName = "GoingDown_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "CallButtonDown", "GoingDown_", "Ready" }, { "D5", "GoingDown_" },
-					 { bind(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) }, true);
+	createTransition({ .name = "T62",
+					   .activationArcs = { { .placeName = "CallButtonDown" },
+										   { .placeName = "GoingDown_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "D5" },
+											{ .placeName = "GoingDown_" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorNotCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "CallButtonDown", "GoingUp_", "Ready" }, { "WaitToGoDown", "GoingUp_" });
+	createTransition({ .name = "T63",
+					   .activationArcs = { { .placeName = "CallButtonDown" },
+										   { .placeName = "GoingUp_" },
+										   { .placeName = "Ready" } },
+					   .destinationArcs = { { .placeName = "WaitToGoDown" },
+											{ .placeName = "GoingUp_" } } });
 
-	createTransition({ "D5" }, { "AddToTravel" },
-					 { bind(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T64",
+					   .activationArcs = { { .placeName = "D5" } },
+					   .destinationArcs = { { .placeName = "AddToTravel" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorSmallerThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "D5" }, { "WaitToGoDown" },
-					 { bind(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
-					 true);
+	createTransition({ .name = "T65",
+					   .activationArcs = { { .placeName = "D5" } },
+					   .destinationArcs = { { .placeName = "WaitToGoDown" } },
+					   .additionalConditions={ bind_front(&ElevatorController::isMarkedFloorGreaterThanCurrentFloor, &m_elevatorController) },
+					   .requireNoActionsInExecution=true });
 
-	createTransition({ "WaitToGoDown" }, { "Ready" });
+	createTransition({ .name = "T66",
+					   .activationArcs = { { .placeName = "WaitToGoDown" } },
+					   .destinationArcs = { { .placeName = "Ready" } } });
 }

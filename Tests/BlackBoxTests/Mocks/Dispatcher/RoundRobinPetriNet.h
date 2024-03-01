@@ -23,9 +23,9 @@
 #include "PTN_Engine/PTN_Engine.h"
 
 //! Implements PTN Engine net defining a round robin behaviour.
-/*!
- * The behaviour is defined in the constructor.
- */
+//!
+//! The behaviour is defined in the constructor.
+//!
 class RoundRobinPetriNet : public IDispatcherPetriNet, public ptne::PTN_Engine
 {
 	// For testing purposes.

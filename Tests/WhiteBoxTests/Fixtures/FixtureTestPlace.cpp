@@ -17,18 +17,16 @@
  */
 
 #include "Fixtures/FixtureTestPlace.h"
-#include "PTN_Engine/PTN_Engine.h"
 
 using namespace ptne;
-using std::bind;
+using std::bind_front;
 
 FixtureTestPlace::FixtureTestPlace()
-: m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
-, m_place(m_ptnEngine,
+: m_place(m_ptnEngine,
           "",
           size_t(0),
-          bind(&Controller::onEnter, &m_controller),
-          bind(&Controller::onExit, &m_controller))
+          bind_front(&Controller::onEnter, &m_controller),
+          bind_front(&Controller::onExit, &m_controller))
 {
 	m_ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
@@ -70,8 +68,8 @@ void FixtureTestPlace::exitPlace()
 
 void FixtureTestPlace::inputPlace()
 {
-	ptne::Place inputPlace(m_ptnEngine, "", size_t(0), bind(&Controller::onEnter, m_controller),
-						   bind(&Controller::onExit, m_controller));
+	ptne::Place inputPlace(m_ptnEngine, "", size_t(0), bind_front(&Controller::onEnter, m_controller),
+						   bind_front(&Controller::onExit, m_controller));
 	EXPECT_EQ(false, inputPlace.isInputPlace());
 }
 

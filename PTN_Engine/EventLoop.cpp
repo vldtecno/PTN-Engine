@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,10 @@ using namespace std;
 
 EventLoop::EventLoop(IPTN_EngineEL &ptnEngineInternal)
 : m_ptnEngine(ptnEngineInternal)
-, m_sleepDuration(100ms)
 {
 }
 
-EventLoop::~EventLoop()
-{
-}
+EventLoop::~EventLoop() = default;
 
 bool EventLoop::isRunning() const
 {
@@ -75,31 +72,31 @@ void EventLoop::start(const bool log, ostream &o)
 
 void EventLoop::notifyNewEvent()
 {
-	unique_lock<mutex> eventNotifierGuard(m_eventNotifierMutex);
+	unique_lock eventNotifierGuard(m_eventNotifierMutex);
 	m_eventNotifier.notify_all();
 }
 
 void EventLoop::setSleepDuration(const SleepDuration sleepDuration)
 {
-	unique_lock<shared_mutex> lock(m_sleepDurationMutex);
+	unique_lock lock(m_sleepDurationMutex);
 	// TODO validate input
 	m_sleepDuration = sleepDuration;
 }
 
 EventLoop::SleepDuration EventLoop::getSleepDuration() const
 {
-	shared_lock<shared_mutex> lock(m_sleepDurationMutex);
+	shared_lock lock(m_sleepDurationMutex);
 	return m_sleepDuration;
 }
 
-void EventLoop::run(std::stop_token stopToken, const bool log, ostream &o)
+void EventLoop::run(stop_token stopToken, const bool log, ostream &o)
 {
 	while (!stopToken.stop_requested())
 	{
 		if (!m_ptnEngine.executeInt(log, o))
 		{
-			shared_lock<shared_mutex> lock(m_sleepDurationMutex);
-			unique_lock<mutex> eventNotifierGuard(m_eventNotifierMutex);
+			shared_lock lock(m_sleepDurationMutex);
+			unique_lock eventNotifierGuard(m_eventNotifierMutex);
 			m_eventNotifier.wait_for(eventNotifierGuard, m_sleepDuration,
 									 [this] { return m_ptnEngine.getNewInputReceived(); });
 		}

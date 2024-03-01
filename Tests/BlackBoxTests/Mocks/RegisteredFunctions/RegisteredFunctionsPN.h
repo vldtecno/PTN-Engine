@@ -39,7 +39,5 @@ public:
 
 	Controller &m_controller;
 
-	bool isEventLoopRunning() const;
-
 	size_t getNumberOfTokens(const std::string &placeName) const;
 };

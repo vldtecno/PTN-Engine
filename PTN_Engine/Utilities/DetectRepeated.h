@@ -18,40 +18,33 @@
 
 #include <algorithm>
 #include <memory>
-#include <stdexcept>
 #include <vector>
 
-namespace ptne
+namespace ptne::utility
 {
-namespace utility
+template <typename T, class E>
+void detectRepeated(std::vector<std::weak_ptr<T>> items)
 {
-	namespace
+	auto equals = [](const std::weak_ptr<T> &t, const std::weak_ptr<T> &u)
 	{
-		template <typename T>
-		bool equals(const std::weak_ptr<T> &t, const std::weak_ptr<T> &u)
-		{
-			return !t.owner_before(u) && !u.owner_before(t);
-		}
-	} // namespace
+		return !t.owner_before(u) && !u.owner_before(t);
+	};
 
-	template <typename T, class E>
-	void detectRepeated(std::vector<std::weak_ptr<T>> items)
-	{
-		std::sort(items.begin(), items.end(), std::owner_less<std::weak_ptr<T>>());
-		if (items.end() - std::unique(items.begin(), items.end(), equals<T>) > 0)
-		{
-			throw E();
-		}
-	}
+	std::ranges::sort(items.begin(), items.end(), std::owner_less<std::weak_ptr<T>>());
 
-	template <class T, class E>
-	void detectRepeatedNames(std::vector<T> items)
+	if (items.end() - std::unique(items.begin(), items.end(), equals) > 0)
 	{
-		std::sort(items.begin(), items.end());
-		if (items.end() - std::unique(items.begin(), items.end()) > 0)
-		{
-			throw E();
-		}
+		throw E();
 	}
-} // namespace utility
-} // namespace ptne
+}
+
+template <class T, class E>
+void detectRepeatedNames(std::vector<T> items)
+{
+	std::ranges::sort(items.begin(), items.end());
+	if (items.end() - std::unique(items.begin(), items.end()) > 0)
+	{
+		throw E();
+	}
+}
+} // namespace ptne::utility

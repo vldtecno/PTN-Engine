@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2019 Eduardo Valgôde
+ * Copyright (c) 2019 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
  * limitations under the License.
  */
 
-#include "View/CallLogView.h"
+#pragma once
 
-#include <iostream>
+#include "PTN_Engine/Utilities/Explicit.h"
+#include <memory>
 
-using namespace std;
-
-void CallLogView::viewCallLog(const List<Call> &callLog)
+namespace ptne
 {
-	for (size_t i = 0; i < callLog.size(); ++i)
-	{
-		const Call &call = callLog.getItem(i);
-		cout << call.m_date << " - " << call.m_number << endl;
-	}
-}
+class IFileImporter;
+
+class DLL_PUBLIC ImporterFactory
+{
+public:
+    static std::unique_ptr<IFileImporter> createXMLFileImporter();
+};
+
+} // namespace ptne

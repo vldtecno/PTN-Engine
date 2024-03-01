@@ -1,13 +1,13 @@
 # This file is part of PTN Engine
-# 
+#
 # Copyright (c) 2017-2023 Eduardo Valgôde
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-#Two variants of the PTN_Engine library are created. 
+#Two variants of the PTN_Engine library are created.
 include_directories (
 	../
 	${INCLUDE_DIR})
@@ -48,7 +48,7 @@ file (GLOB
 	${PTN_Engine_SRC_4}
 	${PTN_Engine_SRC_5})
 
-add_library (PTN_Engine 
+add_library (PTN_Engine
 	${PTN_Engine_SRC})
 
 target_compile_definitions (PTN_Engine PUBLIC

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,21 @@
  */
 
 #include "PTN_Engine/Place.h"
-#include "PTN_Engine/IExporter.h"
 #include "PTN_Engine/IPTN_EnginePlace.h"
 #include "PTN_Engine/PTN_Exception.h"
-#include "limits.h"
-#include <future>
 #include <string>
+#include <thread>
+#include <mutex>
 
 namespace ptne
 {
 using namespace std;
 
 Place::Place(IPTN_EnginePlace &parent,
-             const std::string &name,
+             const string &name,
              const size_t initialNumberOfTokens,
-             ActionFunction onEnterAction,
-             ActionFunction onExitAction,
+             const ActionFunction &onEnterAction,
+             const ActionFunction &onExitAction,
              const bool input)
 : m_ptnEngine(parent)
 , m_name(name)
@@ -44,12 +43,12 @@ Place::Place(IPTN_EnginePlace &parent,
 }
 
 Place::Place(IPTN_EnginePlace &parent,
-             const std::string &name,
+             const string &name,
              const size_t initialNumberOfTokens,
              const string &onEnterActionName,
-             ActionFunction onEnterAction,
+             const ActionFunction &onEnterAction,
              const string &onExitActionName,
-             ActionFunction onExitAction,
+             const ActionFunction &onExitAction,
              const bool input)
 : m_ptnEngine(parent)
 , m_name(name)
@@ -69,7 +68,7 @@ string Place::getName() const
 
 void Place::enterPlace(const size_t tokens)
 {
-	unique_lock<shared_mutex> guard(m_mutex);
+	unique_lock guard(m_mutex);
 	increaseNumberOfTokens(tokens);
 	if (m_onEnterAction == nullptr)
 	{
@@ -80,14 +79,14 @@ void Place::enterPlace(const size_t tokens)
 		// TODO make this wait period configurable
 		// add a max wait time after which an exception
 		// is thrown.
-		std::this_thread::sleep_for(100ms);
+		this_thread::sleep_for(100ms);
 	}
 	executeAction(m_onEnterAction, m_onEnterActionsInExecution);
 }
 
 void Place::exitPlace(const size_t tokens)
 {
-	unique_lock<shared_mutex> guard(m_mutex);
+	unique_lock guard(m_mutex);
 	decreaseNumberOfTokens(tokens);
 	if (m_onExitAction == nullptr)
 	{
@@ -129,41 +128,41 @@ void Place::decreaseNumberOfTokens(const size_t tokens)
 
 void Place::setNumberOfTokens(const size_t tokens)
 {
-	unique_lock<shared_mutex> guard(m_mutex);
+	unique_lock guard(m_mutex);
 	m_numberOfTokens = tokens;
 }
 
 size_t Place::getNumberOfTokens() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return m_numberOfTokens;
 }
 
 bool Place::isInputPlace() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return m_isInputPlace;
 }
 
-const string Place::getOnEnterActionName() const
+string Place::getOnEnterActionName() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return m_onEnterActionName;
 }
 
-const string Place::getOnExitActionName() const
+string Place::getOnExitActionName() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return m_onExitActionName;
 }
 
-void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &actionsInExecution)
+void Place::executeAction(const ActionFunction &action, atomic<size_t> &actionsInExecution)
 {
 	switch (m_ptnEngine.getActionsThreadOption())
 	{
 	default:
 	{
-		throw std::runtime_error("Invalid configuration");
+		throw PTN_Exception("Invalid configuration");
 	}
 	case PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD:
 	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
@@ -192,7 +191,7 @@ void Place::executeAction(const ActionFunction &action, std::atomic<size_t> &act
 			action();
 			--actionsInExecution;
 		};
-		auto t = std::thread(job);
+		auto t = thread(job);
 		t.detach();
 		break;
 	}
@@ -209,10 +208,15 @@ void Place::blockStartingOnEnterActions(const bool value)
 	m_blockStartingOnEnterActions = value;
 }
 
-void Place::export_(IExporter &exporter) const
+PlaceProperties Place::placeProperties() const
 {
-	exporter.exportPlace(m_name, to_string(m_numberOfTokens), m_isInputPlace ? "true" : "false",
-						 m_onEnterActionName, m_onExitActionName);
+	PlaceProperties placeProperties;
+	placeProperties.name = m_name;
+	placeProperties.onEnterActionFunctionName = m_onEnterActionName;
+	placeProperties.onExitActionFunctionName = m_onExitActionName;
+	placeProperties.initialNumberOfTokens = m_numberOfTokens;
+	placeProperties.input = m_isInputPlace;
+	return placeProperties;
 }
 
 } // namespace ptne

@@ -18,14 +18,6 @@
 
 #include "Mocks/Controller.h"
 
-Controller::Controller()
-: m_activationConditionCallCounter(0)
-, m_enterCounter(0)
-, m_exitCounter(0)
-, m_canFire(true)
-{
-}
-
 void Controller::onEnter()
 {
 	++m_enterCounter;

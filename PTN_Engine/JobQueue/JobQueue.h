@@ -21,15 +21,14 @@
 #include "PTN_Engine/PTN_Engine.h"
 #include <atomic>
 #include <deque>
-#include <memory>
 #include <mutex>
 #include <thread>
 
 namespace ptne
 {
-/*!
- * \brief Manages a thread that accepts tasks to be executed in sequence.
- */
+//!
+//! \brief Manages a thread that accepts tasks to be executed in sequence.
+//!
 class JobQueue
 {
 public:
@@ -44,29 +43,29 @@ public:
 	void activate();
 
 	//! Deactivate the job queue.
-	void inactivate();
+	void deactivate();
 
-	/*!
-	 * \brief Informs on whether the job queue is running or not.
-	 * \return True if the job queue is active.
-	 */
+	//!
+	//! \brief Informs on whether the job queue is running or not.
+	//! \return True if the job queue is active.
+	//!
 	bool isActive() const;
 
-	/*!
-	 * \brief Adds a job to the job queue.
-	 * \param Function/job to be executed.
-	 */
+	//!
+	//! \brief Adds a job to the job queue.
+	//! \param Function/job to be executed.
+	//!
 	void addJob(const ActionFunction &actionFunction);
 
-	/*!
-	 * \brief Run the job queue. Should be executed in its own thread.
-	 */
+	//!
+	//! \brief Run the job queue. Should be executed in its own thread.
+	//!
 	void run(std::stop_token stopToken);
 
 private:
-	/*!
-	 * \brief Launch the job queue.
-	 */
+	//!
+	//! \brief Launch the job queue.
+	//!
 	void launch();
 
 	//! Whether the job queue is active or not.

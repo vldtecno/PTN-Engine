@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include <future>
-#include <ostream>
-#include <set>
 #include "Mocks/Simple/SimplePetriNet.h"
+#include <set>
+#include <thread>
 
 //! A very simple controller with a very simple petri net.
 class SimpleController

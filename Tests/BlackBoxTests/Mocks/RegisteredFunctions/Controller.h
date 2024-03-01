@@ -42,14 +42,12 @@ public:
 
 	std::string getSomeString() const;
 
-	bool isEventLoopRunning() const;
-
 	size_t getNumberOfTokens(const std::string &placeName) const;
 
 	void stop();
 
 private:
-	RegisteredFunctionsPN m_petriNet;
+	RegisteredFunctionsPN m_menuStateMachine;
 
 	void actionPlace1();
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,85 +19,73 @@
  */
 
 #include "PTN_Engine/Transition.h"
-#include "PTN_Engine/IExporter.h"
 #include "PTN_Engine/PTN_Exception.h"
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/Utilities/DetectRepeated.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
+#include <algorithm>
+#include <array>
 #include <mutex>
-#include <ranges>
-#include <tuple>
+#include <vector>
 
 namespace ptne
 {
 using namespace std;
 
-Transition::Transition(const vector<WeakPtrPlace> &activationPlaces,
-                       const vector<size_t> &activationWeights,
-                       const vector<WeakPtrPlace> &destinationPlaces,
-                       const vector<size_t> &destinationWeights,
-                       const vector<WeakPtrPlace> &inhibitorPlaces,
+Transition::Transition(const string &name,
+                       const vector<Arc> &activationArcs,
+                       const vector<Arc> &destinationArcs,
+                       const vector<Arc> &inhibitorArcs,
                        const vector<pair<string, ConditionFunction>> &additionalActivationConditions,
                        const bool requireNoActionsInExecution)
-: m_additionalActivationConditions{ additionalActivationConditions }
-, m_inhibitorPlaces(inhibitorPlaces)
+: m_name(name)
+, m_activationArcs(activationArcs)
+, m_destinationArcs(destinationArcs)
+, m_additionalActivationConditions(additionalActivationConditions)
+, m_inhibitorArcs(inhibitorArcs)
 , m_requireNoActionsInExecution(requireNoActionsInExecution)
 {
-	if (activationPlaces.size() != activationWeights.size() && !activationWeights.empty())
+	auto getPlacesFromArcs = [](const vector<Arc> &arcs)
 	{
-		throw ActivationWeightDimensionException();
-	}
+		vector<WeakPtrPlace> places;
+		ranges::transform(arcs.cbegin(), arcs.cend(), back_inserter(places), [](const auto &arc) {
+			return arc.place; });
+		return places;
+	};
 
-	if (destinationPlaces.size() != destinationWeights.size() && !destinationWeights.empty())
+	utility::detectRepeated<Place, ActivationPlaceRepetitionException>(getPlacesFromArcs(activationArcs));
+	utility::detectRepeated<Place, DestinationPlaceRepetitionException>(getPlacesFromArcs(destinationArcs));
+
+	auto validateWeights = [](const vector<Arc> &arcs)
 	{
-		throw DestinationWeightDimensionException();
-	}
-
-	utility::detectRepeated<Place, ActivationPlaceRepetitionException>(activationPlaces);
-
-	utility::detectRepeated<Place, DestinationPlaceRepetitionException>(destinationPlaces);
-
-	if (!activationWeights.empty())
-	{
-		for (size_t i = 0; i < activationPlaces.size(); ++i)
+		if (ranges::find_if(arcs.cbegin(), arcs.cend(), [](const auto &arc) {
+			return arc.weight == 0;
+		}) != arcs.cend())
 		{
-			m_activationPlaces.push_back(tuple<WeakPtrPlace, size_t>(activationPlaces[i], activationWeights[i]));
+			throw ZeroValueWeightException();
 		}
-	}
-	else
-	{
-		transform(activationPlaces.cbegin(), activationPlaces.cend(), back_inserter(m_activationPlaces),
-				  [](const auto &ap) { return tuple<WeakPtrPlace, size_t>(ap, 1); });
-	}
+	};
 
-	if (!destinationWeights.empty())
-	{
-		for (size_t i = 0; i < destinationPlaces.size(); ++i)
-		{
-			if (destinationWeights[i] == 0)
-			{
-				throw ZeroValueWeightException();
-			}
-			m_destinationPlaces.push_back(
-			tuple<WeakPtrPlace, size_t>(destinationPlaces[i], destinationWeights[i]));
-		}
-	}
-	else
-	{
-		transform(destinationPlaces.cbegin(), destinationPlaces.cend(), back_inserter(m_destinationPlaces),
-				  [](const auto &dp) { return tuple<WeakPtrPlace, size_t>(dp, 1); });
-	}
+	validateWeights(activationArcs);
+	validateWeights(destinationArcs);
+	validateWeights(inhibitorArcs);
 }
 
 Transition::Transition(Transition &&transition) noexcept
 {
-	unique_lock<shared_mutex> guard(m_mutex);
+	unique_lock guard(m_mutex);
 	moveMembers(transition);
+}
+
+string Transition::getName() const
+{
+	shared_lock guard(m_mutex);
+	return m_name;
 }
 
 bool Transition::execute()
 {
-	unique_lock<shared_mutex> guard(m_mutex);
+	unique_lock guard(m_mutex);
 	bool result = false;
 
 	blockStartingOnEnterActions(true);
@@ -119,7 +107,7 @@ bool Transition::execute()
 
 bool Transition::isEnabled() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return isEnabledInternal();
 }
 
@@ -144,114 +132,192 @@ bool Transition::isActive() const
 		   checkAdditionalConditions();
 }
 
-vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getActivationPlaces() const
+vector<Arc> Transition::getActivationPlaces() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
-	return m_activationPlaces;
+	shared_lock guard(m_mutex);
+	return m_activationArcs;
 }
 
-vector<tuple<Transition::WeakPtrPlace, size_t>> Transition::getDestinationPlaces() const
+vector<Arc> Transition::getDestinationPlaces() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
-	return m_destinationPlaces;
+	shared_lock guard(m_mutex);
+	return m_destinationArcs;
 }
 
-vector<std::pair<std::string, ConditionFunction>> Transition::getAdditionalActivationConditions() const
+vector<pair<string, ConditionFunction>> Transition::getAdditionalActivationConditions() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
+	shared_lock guard(m_mutex);
 	return m_additionalActivationConditions;
 }
 
-std::vector<Transition::WeakPtrPlace> Transition::getInhibitorPlaces() const
+vector<Arc> Transition::getInhibitorArcs() const
 {
-	shared_lock<shared_mutex> guard(m_mutex);
-	return m_inhibitorPlaces;
-}
-
-void Transition::export_(IExporter &exporter) const
-{
-	vector<tuple<string, size_t>> activationPlacesExport;
-	transform(m_activationPlaces.cbegin(), m_activationPlaces.cend(), back_inserter(activationPlacesExport),
-			  [](const auto &activationPlace)
-			  {
-				  tuple<string, size_t> activationPlaceExport;
-				  if (auto activationPlaceShPtr = get<0>(activationPlace).lock())
-				  {
-					  get<0>(activationPlaceExport) = activationPlaceShPtr->getName();
-					  get<1>(activationPlaceExport) = get<1>(activationPlace);
-					  return activationPlaceExport;
-				  }
-				  else
-				  {
-					  throw PTN_Exception("Could not lock activation place weak pointer");
-				  }
-			  });
-
-	vector<tuple<string, size_t>> destinationPlacesExport;
-	transform(m_destinationPlaces.cbegin(), m_destinationPlaces.cend(), back_inserter(destinationPlacesExport),
-			  [](const auto &destinationPlace)
-			  {
-				  tuple<string, size_t> destinationPlaceExport;
-				  if (auto destinationPlaceShPtr = get<0>(destinationPlace).lock())
-				  {
-					  get<0>(destinationPlaceExport) = destinationPlaceShPtr->getName();
-					  get<1>(destinationPlaceExport) = get<1>(destinationPlace);
-					  return destinationPlaceExport;
-				  }
-				  else
-				  {
-					  throw PTN_Exception("Could not lock destination place weak pointer");
-				  }
-			  });
-
-	vector<string> activationConditionsNames;
-	transform(m_additionalActivationConditions.cbegin(), m_additionalActivationConditions.cend(),
-			  back_inserter(activationConditionsNames),
-			  [](const auto &activationCondition) { return activationCondition.first; });
-
-	vector<string> inhibitorPlacesNames;
-	transform(m_inhibitorPlaces.cbegin(), m_inhibitorPlaces.cend(), back_inserter(inhibitorPlacesNames),
-			  [](const auto &inhibitorPlace)
-			  {
-				  if (auto inhibitorPlaceShPtr = inhibitorPlace.lock())
-				  {
-					  return inhibitorPlaceShPtr->getName();
-				  }
-				  else
-				  {
-					  throw PTN_Exception("Could not lock inhibitor place weak pointer");
-				  }
-			  });
-
-	exporter.exportTransition(activationPlacesExport, destinationPlacesExport, activationConditionsNames,
-							  inhibitorPlacesNames, requireNoActionsInExecution());
+	shared_lock guard(m_mutex);
+	return m_inhibitorArcs;
 }
 
 bool Transition::requireNoActionsInExecution() const
 {
+	shared_lock guard(m_mutex);
 	return m_requireNoActionsInExecution;
 }
 
 bool Transition::checkInhibitorPlaces() const
 {
-	for (const WeakPtrPlace &inhibitorPlace : m_inhibitorPlaces)
+	auto numberOfTokensGreaterThan0 = [](const auto &inhibitorArc)
 	{
-		SharedPtrPlace spInhibitorPlace = lockWeakPtr(inhibitorPlace);
+		SharedPtrPlace spInhibitorArc = lockWeakPtr(inhibitorArc.place);
+		return spInhibitorArc->getNumberOfTokens() > 0;
+	};
 
-		if (spInhibitorPlace->getNumberOfTokens() > 0)
-		{
-			return false;
-		}
+	if (ranges::find_if(m_inhibitorArcs.cbegin(), m_inhibitorArcs.cend(), numberOfTokensGreaterThan0) != m_inhibitorArcs.end())
+	{
+		return false;
 	}
 	return true;
 }
 
+TransitionProperties Transition::getTransitionProperties() const
+{
+	TransitionProperties transitionProperties;
+
+	auto getAdditionalConditionsNames = [this]()
+	{
+		vector<string> additionalActivationConditionNames;
+		for (const auto &[additionalActivationConditionName,_] : m_additionalActivationConditions)
+		{
+			additionalActivationConditionNames.push_back(additionalActivationConditionName);
+		}
+		return additionalActivationConditionNames;
+	};
+
+	transitionProperties.additionalConditionsNames = getAdditionalConditionsNames();
+	transitionProperties.name = getName();
+	transitionProperties.requireNoActionsInExecution = m_requireNoActionsInExecution;
+
+	return transitionProperties;
+}
+
+array<vector<ArcProperties>,3> Transition::getArcsProperties() const
+{
+	array<vector<ArcProperties>, 3> arcsProperties;
+	auto arcPropertiesFromArcs =
+	[this](const vector<Arc> &arcs, ArcProperties::Type type)
+	{
+		vector<ArcProperties> arcProperties;
+		for (const auto &arc : arcs)
+		{
+			auto spPlace = lockWeakPtr(arc.place);
+			arcProperties.emplace_back(arc.weight, spPlace->getName(), getName(), type);
+		}
+		return arcProperties;
+	};
+
+	arcsProperties[0] = arcPropertiesFromArcs(m_activationArcs, ArcProperties::Type::ACTIVATION);
+	arcsProperties[1] = arcPropertiesFromArcs(m_destinationArcs, ArcProperties::Type::DESTINATION);
+	arcsProperties[2] = arcPropertiesFromArcs(m_inhibitorArcs, ArcProperties::Type::INHIBITOR);
+
+	return arcsProperties;
+}
+
+void Transition::addPlace(const shared_ptr<Place> &place, const ArcProperties::Type type, const size_t weight)
+{
+	unique_lock guard(m_mutex);
+
+	auto addArcTo = [&place, weight] (auto &placesContainer)
+	{
+		auto sameNameAs = [&place] (const auto &arc) {
+			return lockWeakPtr(arc.place)->getName() == place->getName();
+		};
+
+		if (ranges::find_if(placesContainer.cbegin(), placesContainer.cend(), sameNameAs) == placesContainer.cend())
+		{
+			placesContainer.push_back({ place, weight });
+		}
+	};
+
+	switch (type)
+	{
+	default:
+	{
+		throw PTN_Exception("Unexpected type");
+	}
+	case ArcProperties::Type::ACTIVATION:
+	{
+		addArcTo(m_activationArcs);
+		break;
+	}
+	case ArcProperties::Type::BIDIRECTIONAL:
+	{
+		addArcTo(m_activationArcs);
+		addArcTo(m_destinationArcs);
+		break;
+	}
+	case ArcProperties::Type::DESTINATION:
+	{
+		addArcTo(m_destinationArcs);
+		break;
+	}
+	case ArcProperties::Type::INHIBITOR:
+	{
+		addArcTo(m_inhibitorArcs);
+		break;
+	}
+	}
+}
+
+void Transition::removePlace(const shared_ptr<Place> &place, const ArcProperties::Type type)
+{
+	unique_lock guard(m_mutex);
+
+	auto removePlaceFrom = [&place](auto &placesContainer)
+	{
+		auto sameNameAs = [&place](const auto &arc)
+		{ return lockWeakPtr(arc.place)->getName() == place->getName(); };
+
+		auto it = ranges::find_if(placesContainer.cbegin(), placesContainer.cend(), sameNameAs);
+		if (it != placesContainer.cend())
+		{
+			placesContainer.erase(it);
+		}
+	};
+
+	switch (type)
+	{
+	default:
+	{
+		throw PTN_Exception("Unexpected type");
+	}
+	case ArcProperties::Type::ACTIVATION:
+	{
+		removePlaceFrom(m_activationArcs);
+		break;
+	}
+	case ArcProperties::Type::BIDIRECTIONAL:
+	{
+		removePlaceFrom(m_activationArcs);
+		removePlaceFrom(m_destinationArcs);
+		break;
+	}
+	case ArcProperties::Type::DESTINATION:
+	{
+		removePlaceFrom(m_destinationArcs);
+		break;
+	}
+	case ArcProperties::Type::INHIBITOR:
+	{
+		removePlaceFrom(m_inhibitorArcs);
+		break;
+	}
+	}
+}
+
 bool Transition::checkActivationPlaces() const
 {
-	for (const tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	for (const Arc &activationArc : m_activationArcs)
 	{
-		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
-		const size_t activationWeight = get<1>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = activationArc.place;
+		const size_t activationWeight = activationArc.weight;
 
 		SharedPtrPlace spPlace = lockWeakPtr(activationPlace);
 
@@ -265,12 +331,11 @@ bool Transition::checkActivationPlaces() const
 
 bool Transition::checkAdditionalConditions() const
 {
-	for (const auto &p : m_additionalActivationConditions)
+	for (const auto&[name, activationCondition] : m_additionalActivationConditions)
 	{
-		const ConditionFunction &activationCondition = p.second;
 		if (!activationCondition)
 		{
-			throw PTN_Exception("Invalid activation condition " + p.first);
+			throw PTN_Exception("Invalid activation condition " + name);
 		}
 		else
 		{
@@ -285,9 +350,9 @@ bool Transition::checkAdditionalConditions() const
 
 bool Transition::noActionsInExecution() const
 {
-	for (const tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	for (const Arc &activationArc : m_activationArcs)
 	{
-		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = activationArc.place;
 
 		SharedPtrPlace spPlace = lockWeakPtr(activationPlace);
 
@@ -299,18 +364,18 @@ bool Transition::noActionsInExecution() const
 	return true;
 }
 
-void Transition::performTransit()
+void Transition::performTransit() const
 {
 	exitActivationPlaces();
 	enterDestinationPlaces();
 }
 
-void Transition::exitActivationPlaces()
+void Transition::exitActivationPlaces() const
 {
-	for (tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	for (const Arc &activationArc : m_activationArcs)
 	{
-		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
-		const size_t activationWeight = get<1>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = activationArc.place;
+		const size_t activationWeight = activationArc.weight;
 
 		if (SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
 		{
@@ -319,12 +384,12 @@ void Transition::exitActivationPlaces()
 	}
 }
 
-void Transition::enterDestinationPlaces()
+void Transition::enterDestinationPlaces() const
 {
-	for (tuple<WeakPtrPlace, size_t> &tupleDestinationPlace : m_destinationPlaces)
+	for (const Arc &destinationArc : m_destinationArcs)
 	{
-		const WeakPtrPlace &destinationPlace = get<0>(tupleDestinationPlace);
-		const size_t destinationWeight = get<1>(tupleDestinationPlace);
+		const WeakPtrPlace &destinationPlace = destinationArc.place;
+		const size_t destinationWeight = destinationArc.weight;
 
 		if (SharedPtrPlace spPlace = lockWeakPtr(destinationPlace))
 		{
@@ -335,22 +400,22 @@ void Transition::enterDestinationPlaces()
 
 void Transition::moveMembers(Transition &transition)
 {
-	m_activationPlaces = std::move(transition.m_activationPlaces);
-	m_destinationPlaces = std::move(transition.m_destinationPlaces);
+	m_activationArcs = std::move(transition.m_activationArcs);
+	m_destinationArcs = std::move(transition.m_destinationArcs);
+	m_inhibitorArcs = std::move(transition.m_inhibitorArcs);
 	m_additionalActivationConditions = std::move(transition.m_additionalActivationConditions);
-	m_inhibitorPlaces = std::move(transition.m_inhibitorPlaces);
 }
 
-void Transition::blockStartingOnEnterActions(const bool value)
+void Transition::blockStartingOnEnterActions(const bool value) const
 {
 	if (!m_requireNoActionsInExecution)
 	{
 		return;
 	}
 
-	for (tuple<WeakPtrPlace, size_t> &tupleActivationPlace : m_activationPlaces)
+	for (const Arc &activationArc : m_activationArcs)
 	{
-		const WeakPtrPlace &activationPlace = get<0>(tupleActivationPlace);
+		const WeakPtrPlace &activationPlace = activationArc.place;
 		if (SharedPtrPlace spPlace = lockWeakPtr(activationPlace))
 		{
 			spPlace->blockStartingOnEnterActions(value);

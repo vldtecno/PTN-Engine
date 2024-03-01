@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Eduardo Valgôde
  * Copyright (c) 2021 Kale Evans
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,6 @@
 using namespace ptne;
 using namespace std;
 
-FixtureTestTransition::FixtureTestTransition()
-: m_ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP)
-{
-}
-
 void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
                                              const vector<size_t> &outputTokens,
                                              const vector<size_t> &expectedInputTokens,
@@ -35,20 +30,35 @@ void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
                                              const VectorOfConditions &conditions,
                                              const bool expectedFireResult)
 {
-	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
-	vector<weak_ptr<Place>> wInputPlaces = createPlaceWPtrs(inputPlaces);
+	vector<SharedPtrPlace> inputPlaces = createPlaces(inputTokens);
+	vector<WeakPtrPlace> wInputPlaces = createPlaceWPtrs(inputPlaces);
 
-	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
-	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+	vector<SharedPtrPlace> outputPlaces = createPlaces(outputTokens);
+	vector<WeakPtrPlace> wOutputPlaces = createPlaceWPtrs(outputPlaces);
 
 	for (size_t i : outputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(m_ptnEngine, "", i, nullptr, nullptr));
+		auto newPlace = make_shared<Place>(m_ptnEngine, "", i, nullptr, nullptr);
 		outputPlaces.push_back(newPlace);
 		wOutputPlaces.push_back(newPlace);
 	}
 
-	Transition transition(wInputPlaces, {}, wOutputPlaces, {}, {}, conditions, false);
+	auto createArcs = [] (const vector<SharedPtrPlace> &places)
+	{
+		vector<Arc> arcs;
+		for (const auto &place : places)
+		{
+			arcs.emplace_back(place);
+		}
+		return arcs;
+	};
+
+	Transition transition("T1",
+						  createArcs(inputPlaces),
+						  createArcs(outputPlaces),
+						  {},
+						  conditions,
+						  false);
 
 	EXPECT_EQ(expectedFireResult, transition.execute());
 
@@ -83,15 +93,30 @@ void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> &in
 
 
 	// Create input places
-	vector<shared_ptr<Place>> inputPlaces = createPlaces(inputTokens);
-	vector<weak_ptr<Place>> wPtrInputPlaces = createPlaceWPtrs(inputPlaces);
+	vector<SharedPtrPlace> inputPlaces = createPlaces(inputTokens);
+	vector<WeakPtrPlace> wPtrInputPlaces = createPlaceWPtrs(inputPlaces);
 
 	// Create output places
-	vector<shared_ptr<Place>> outputPlaces = createPlaces(outputTokens);
-	vector<weak_ptr<Place>> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+	vector<SharedPtrPlace> outputPlaces = createPlaces(outputTokens);
+	vector<WeakPtrPlace> wOutputPlaces = createPlaceWPtrs(outputPlaces);
+
+	auto createArcs = [] (const vector<SharedPtrPlace> &places, const vector<size_t> &weights)
+	{
+		vector<Arc> arcs;
+		for (size_t i = 0; i < places.size(); ++i)
+		{
+			arcs.emplace_back(places[i], weights[i]);
+		}
+		return arcs;
+	};
 
 	// Create transition
-	Transition transition(wPtrInputPlaces, inputWeights, wOutputPlaces, outputWeights, {}, conditions, false);
+	Transition transition("T1",
+						  createArcs(inputPlaces, inputWeights),
+						  createArcs(outputPlaces, outputWeights),
+						  {},
+						  conditions,
+						  false);
 
 	// Test transition
 	EXPECT_EQ(expectedFireResult, transition.execute());
@@ -111,25 +136,25 @@ void FixtureTestTransition::createTransitionWithWeights(const vector<size_t> &in
 	}
 }
 
-vector<shared_ptr<Place>> FixtureTestTransition::createPlaces(const vector<size_t> &inputTokens)
+vector<SharedPtrPlace> FixtureTestTransition::createPlaces(const vector<size_t> &inputTokens)
 {
 	// Create input places
-	vector<shared_ptr<Place>> inputPlaces;
+	vector<SharedPtrPlace> inputPlaces;
 	for (size_t i : inputTokens)
 	{
-		shared_ptr<Place> newPlace(new Place(m_ptnEngine, "", i, nullptr, nullptr));
+		auto newPlace = make_shared<Place>(m_ptnEngine, "", i, nullptr, nullptr);
 		inputPlaces.push_back(newPlace);
 	}
 	return inputPlaces;
 }
 
-vector<weak_ptr<Place>> FixtureTestTransition::createPlaceWPtrs(const vector<shared_ptr<Place>> &places)
+vector<WeakPtrPlace> FixtureTestTransition::createPlaceWPtrs(const vector<SharedPtrPlace> &places) const
 {
 	// Create input places
-	vector<weak_ptr<Place>> wPtrPlaces;
-	for (const shared_ptr<Place> &spPlace : places)
+	vector<WeakPtrPlace> wPtrPlaces;
+	for (const SharedPtrPlace &spPlace : places)
 	{
-		wPtrPlaces.push_back(weak_ptr<Place>(spPlace));
+		wPtrPlaces.push_back(WeakPtrPlace(spPlace));
 	}
 	return wPtrPlaces;
 }

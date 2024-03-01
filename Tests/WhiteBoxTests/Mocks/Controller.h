@@ -18,17 +18,17 @@
  */
 
 #pragma once
+
 #include <cstddef>
 
+//!
 //! Sample controller.
-/*!
- * Sample controller.
- */
+//!
 class Controller final
 {
 public:
 	//! Constructor.
-	Controller();
+	Controller() = default;
 
 	//! On enter action.
 	void onEnter();
@@ -53,14 +53,14 @@ public:
 
 private:
 	//! Activation condition call counter
-	mutable size_t m_activationConditionCallCounter;
+	mutable size_t m_activationConditionCallCounter = 0;
 
 	//! Counter of times entered.
-	size_t m_enterCounter;
+	size_t m_enterCounter = 0;
 
 	//! Counter of times exited.
-	size_t m_exitCounter;
+	size_t m_exitCounter = 0;
 
 	//! Activation condition.
-	bool m_canFire;
+	bool m_canFire = true;
 };

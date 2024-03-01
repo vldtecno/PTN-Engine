@@ -18,11 +18,10 @@
 
 #pragma once
 
+#include "Controller/IElevatorPetriNet.h"
 #include <memory>
 #include <shared_mutex>
 #include <unordered_set>
-
-class IElevatorPetriNet;
 
 //! Elevator controller class
 class ElevatorController
@@ -32,8 +31,6 @@ class ElevatorController
 public:
 	//! Constructor.
 	ElevatorController();
-
-	~ElevatorController();
 
 	//! Command to open elevator doors.
 	void openDoors();
@@ -68,7 +65,7 @@ private:
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 
 	//! The state machine of the controller.
-	PtrPetriNet m_pPetriNet;
+	PtrPetriNet m_pPetriNet = nullptr;
 
 	//! Floor where the elevator currently is.
 	int m_currentFloor = 0;
@@ -96,9 +93,6 @@ private:
 
 	//! Remove current floor from m_floorsWaitingToGoUp
 	void removeCurrentFromWaitingToGoUp();
-
-	//! Check if pointer to PTN is valid.
-	void checkPetriNetPointer() const;
 
 	// Information
 	void printCurrentFloor() const;

@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher/Dispatcher.h"
 #include "gtest/gtest.h"
-#include <chrono>
+#include "Mocks/Dispatcher/Dispatcher.h"
+#include <array>
 
 //! Fixture for testing a complete PTN net.
-/*!
- * To test a complete PTN Engine net from the users point of view.
- * It only uses the public interface.
- */
+//!
+//! To test a complete PTN Engine net from the users point of view.
+//! It only uses the public interface.
+//!
 class FixturePetriNet : public ::testing::Test
 {
 public:
@@ -45,29 +45,29 @@ public:
 	//! Constructor.
 	FixturePetriNet();
 
-	/*!
-	 * Tests the number of tokens in all places of the net.
-	 * \param expectedTokens Expected number of tokens in each place.
-	 */
-	void testRoundRobinState(const size_t expectedTokens[s_numberOfRoundRobinPlaces]);
+	//!
+	//! Tests the number of tokens in all places of the net.
+	//! \param expectedTokens Expected number of tokens in each place.
+	//!
+	void testRoundRobinState(const std::array < size_t, s_numberOfRoundRobinPlaces> &expectedTokens) const;
 
-	/*!
-	 * Tests the number of tokens in all places of the net.
-	 * \param expectedTokens Expected number of tokens in each place.
-	 */
-	void testFreeChoiceState(const size_t expectedTokens[s_numberOfFreeChoicePlaces]);
+	//!
+	//! Tests the number of tokens in all places of the net.
+	//! \param expectedTokens Expected number of tokens in each place.
+	//!
+	void testFreeChoiceState(const std::array<size_t, s_numberOfFreeChoicePlaces> &expectedTokens) const;
 
-	/*!
-	 * Tests the number of tokens in all places of the net.
-	 * \param expectedTokens Expected number of tokens in each place.
-	 */
-	void testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces]);
+	//!
+	//! Tests the number of tokens in all places of the net.
+	//! \param expectedTokens Expected number of tokens in each place.
+	//!
+	void testWeightedState(const std::array<size_t, s_numberOfWeightedPlaces> &expectedTokens) const;
 
-	/*!
-	 * Tests the number of tokens in all places of the net.
-	 * \param expectedTokens Expected number of tokens in each place.
-	 */
-	void testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces]);
+	//!
+	//! Tests the number of tokens in all places of the net.
+	//! \param expectedTokens Expected number of tokens in each place.
+	//!
+	void testInhibitedState(const std::array<size_t, s_numberOfInhibitedNetPlaces> &expectedTokens) const;
 
 	//! Controller containing the PTN Engine net.
 	Dispatcher m_dispatcher;

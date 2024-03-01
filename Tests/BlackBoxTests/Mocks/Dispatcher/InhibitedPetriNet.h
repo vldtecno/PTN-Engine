@@ -18,14 +18,13 @@
 
 #pragma once
 
-#include "Mocks/Dispatcher/Dispatcher.h"
 #include "Mocks/Dispatcher/IDispatcherPetriNet.h"
 #include "PTN_Engine/PTN_Engine.h"
 
 //! Implements PTN Engine net with a Petri net that uses the inhibitor arc.
-/*!
- * The behaviour is defined in the constructor.
- */
+//!
+//! The behaviour is defined in the constructor.
+//!
 class InhibitedPetriNet : public IDispatcherPetriNet, private ptne::PTN_Engine
 {
 	// For testing purposes.

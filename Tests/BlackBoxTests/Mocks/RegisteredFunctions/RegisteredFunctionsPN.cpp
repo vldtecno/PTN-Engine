@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2018-2023 Eduardo Valgôde
+ * Copyright (c) 2018-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@
 
 #include "Mocks/RegisteredFunctions/RegisteredFunctionsPN.h"
 #include "Mocks/RegisteredFunctions/Controller.h"
+#include "PTN_Engine/PTN_Engine.h"
 
 using namespace std;
+using namespace ptne;
 
 RegisteredFunctionsPN::RegisteredFunctionsPN(Controller &controller,
-                                             PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
-: ptne::PTN_Engine(actionsThreadOption)
+											 PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
+: PTN_Engine(actionsThreadOption)
 , m_controller(controller)
 {
 }
@@ -39,12 +41,21 @@ void RegisteredFunctionsPN::registerCallbacks()
 
 void RegisteredFunctionsPN::createPetriNetStructure()
 {
-	createPlace("P0", 0, true);
-	createPlace("P1", 0, "actionPlace1", false);
-	createPlace("P2", 0, "actionPlace2", false);
+	createPlace({ .name="P0",
+				  .input=true });
+	createPlace({ .name="P1",
+				  .onEnterActionFunctionName="actionPlace1" });
+	createPlace({ .name="P2",
+				  .onEnterActionFunctionName="actionPlace2" });
 
-	createTransition({ "P0" }, { "P1" }, {}, vector<string>{ "externalCondition1", "externalCondition2" });
-	createTransition({ "P0" }, { "P2" }, {}, vector<string>{ "externalCondition3" });
+	createTransition({ .name = "T1",
+					   .activationArcs = { ArcProperties{ .placeName = "P0" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P1" } },
+					   .additionalConditionsNames = { "externalCondition1", "externalCondition2" } });
+	createTransition({ .name = "T2",
+					   .activationArcs = { ArcProperties{ .placeName = "P0" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "P2" } },
+					   .additionalConditionsNames = {  "externalCondition3" }  });
 }
 
 void RegisteredFunctionsPN::addExecuteP0()
@@ -53,12 +64,7 @@ void RegisteredFunctionsPN::addExecuteP0()
 	execute();
 }
 
-bool RegisteredFunctionsPN::isEventLoopRunning() const
-{
-	return PTN_Engine::isEventLoopRunning();
-}
-
-size_t RegisteredFunctionsPN::getNumberOfTokens(const std::string &placeName) const
+size_t RegisteredFunctionsPN::getNumberOfTokens(const string &placeName) const
 {
 	return PTN_Engine::getNumberOfTokens(placeName);
 }

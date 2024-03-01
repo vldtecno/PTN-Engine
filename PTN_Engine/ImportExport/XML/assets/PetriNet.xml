@@ -30,7 +30,8 @@
 	</Places>
 	
 	<Transitions>		
-		<Transition name="t1">
+		<Transition>
+		    <Name value="T1" />
 			<ActivationConditions>
 				<ActivationCondition name="condition1" />
 				<ActivationCondition name="condititon2" />
@@ -48,7 +49,8 @@
 			</DestinationPlaces>			
 		</Transition>
 
-		<Transition name="t2">
+		<Transition>
+		    <Name value="T2" />
 			<ActivationConditions>
 				<ActivationCondition name="condititon2" />
 			</ActivationConditions>

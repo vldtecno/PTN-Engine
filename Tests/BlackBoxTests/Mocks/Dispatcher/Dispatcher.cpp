@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,15 @@
 #include "Mocks/Dispatcher/RoundRobinPetriNet.h"
 #include "Mocks/Dispatcher/WeightedPetriNet.h"
 
-#include <iostream>
-
 using namespace std;
 
 
 Dispatcher::Dispatcher()
-: m_pPetriNet(nullptr)
-, m_resetCounter(false)
-, m_isWaitingPackage(true)
-, m_isUsingChannelA(false)
-, m_isUsingChannelB(false)
-, m_isChannelASelected(true)
-, m_isChannelBSelected(false)
 {
 	setRoundRobinMode(ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
 
-Dispatcher::~Dispatcher()
-{
-}
+Dispatcher::~Dispatcher() = default;
 
 void Dispatcher::actionWaitPackage()
 {
@@ -96,15 +85,6 @@ void Dispatcher::onLeaveSelectChannelB()
 bool Dispatcher::resetCounter() const
 {
 	return m_resetCounter;
-}
-
-bool Dispatcher::stillRunning() const
-{
-	if (m_pPetriNet)
-	{
-		return m_pPetriNet->stillRunning();
-	}
-	return false;
 }
 
 void Dispatcher::setResetCounter(const bool resetCounter)

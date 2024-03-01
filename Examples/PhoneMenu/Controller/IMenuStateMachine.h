@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2019 Eduardo Valgôde
+ * Copyright (c) 2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,22 @@
  */
 
 #pragma once
-#include <string>
 
-//! A very simple message model.
-class Message
+#include "PTN_Engine/PTN_Engine.h"
+
+class Controller;
+
+class IMenuStateMachine : public ptne::PTN_Engine
 {
 public:
-	/*!
-	 * Message constructor.
-	 * \param title Title of the message.
-	 * \param message Body of the message.
-	 */
-	Message(const std::string &title, const std::string &message)
-	: m_title(title)
-	, m_body(message)
-	{
-	}
+	virtual void setControllerFunctions(Controller &menuController) = 0;
 
-	//! Message title.
-	std::string m_title;
+	//! Press A key event.
+	virtual void pressA() = 0;
 
-	//! Message body.
-	std::string m_body;
+	//! Press B key event.
+	virtual void pressB() = 0;
+
+	//! Press C key event.
+	virtual void pressC() = 0;
 };

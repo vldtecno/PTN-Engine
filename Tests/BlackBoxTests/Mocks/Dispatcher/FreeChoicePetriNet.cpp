@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,61 +26,73 @@ FreeChoicePetriNet::FreeChoicePetriNet(Dispatcher &dispatcher,
 : PTN_Engine(actionsThreadOption)
 {
 	// Places
-	createPlace("InputWaitPackage", 0, true);
+	PlaceProperties placeProperties;
+	placeProperties.name = "InputWaitPackage";
+	placeProperties.input = true;
 
-	createPlace("WaitPackage", 1, bind(&Dispatcher::actionWaitPackage, &dispatcher),
-				bind(&Dispatcher::onLeaveWaitPackage, &dispatcher));
+	createPlace({ .name="InputWaitPackage",
+				  .input=true });
 
-	createPlace("ChannelA", 0, bind(&Dispatcher::actionChannelA, &dispatcher),
-				bind(&Dispatcher::onLeaveChannelA, &dispatcher));
+    createPlace({ .name="WaitPackage",
+                  .initialNumberOfTokens=1,
+                  .onEnterAction=bind(&Dispatcher::actionWaitPackage, &dispatcher),
+                  .onExitAction=bind(&Dispatcher::onLeaveWaitPackage, &dispatcher) });
 
-	createPlace("CounterA", 0);
+	createPlace({ .name="ChannelA",
+				  .onEnterAction=bind(&Dispatcher::actionChannelA, &dispatcher),
+				  .onExitAction=bind(&Dispatcher::onLeaveChannelA, &dispatcher) });
 
-	createPlace("ChannelB", 0, bind(&Dispatcher::actionChannelB, &dispatcher),
-				bind(&Dispatcher::onLeaveChannelB, &dispatcher));
+	createPlace({ .name="CounterA"});
 
-	createPlace("CounterB", 0);
+	createPlace({ .name="ChannelB",
+				  .onEnterAction=bind(&Dispatcher::actionChannelB, &dispatcher),
+				  .onExitAction=bind(&Dispatcher::onLeaveChannelB, &dispatcher) });
 
-	createPlace("PackageCounter", 0);
+	createPlace({ .name="CounterB" });
+
+	createPlace({ .name="PackageCounter" });
 
 
 	// Transitions
 
 	// Use A
-	createTransition({ "InputWaitPackage", "WaitPackage" }, // activation
-					 { "ChannelA", "PackageCounter" } // destination
-	);
+	createTransition({ .name = "T1",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "WaitPackage" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "ChannelA" },
+											ArcProperties{ .placeName = "PackageCounter" } } });
 
 	// Use B
-	createTransition({ "InputWaitPackage", "WaitPackage" }, // activation
-					 { "ChannelB", "PackageCounter" } // destination
-	);
+	createTransition({ .name = "T2",
+					   .activationArcs = { ArcProperties{ .placeName = "InputWaitPackage" },
+										   ArcProperties{ .placeName = "WaitPackage" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "ChannelB" },
+											ArcProperties{ .placeName = "PackageCounter" } } });
 
 	// From A back to waiting a package
-	createTransition({ "ChannelA" }, // activation
-					 { "WaitPackage", "CounterA" } // destination
-	);
+	createTransition({ .name = "T3",
+					   .activationArcs = { ArcProperties{ .placeName = "ChannelA" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "WaitPackage" },
+											ArcProperties{ .placeName = "CounterA" } } });
 
 	// From B back to waiting a package
-	createTransition({ "ChannelB" }, // activation
-					 { "WaitPackage", "CounterB" } // destination
-	);
+	createTransition({ .name = "T4",
+					   .activationArcs = { ArcProperties{ .placeName = "ChannelB" } },
+					   .destinationArcs = { ArcProperties{ .placeName = "WaitPackage" },
+											ArcProperties{ .placeName = "CounterB" } } });
 
 	// Reset Counters
-	createTransition({ "PackageCounter" }, // activation
-					 {}, // destination
-					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, &dispatcher) });
+	createTransition({ .name = "T5",
+					   .activationArcs = { ArcProperties{ .placeName = "PackageCounter" } },
+					   .additionalConditions={ bind(&Dispatcher::resetCounter, &dispatcher) } });
 
-	createTransition({ "CounterA" }, // activation
-					 {}, // destination
-					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, &dispatcher) });
+	createTransition({ .name = "T6",
+					   .activationArcs = { ArcProperties{ .placeName = "CounterA" } },
+					   .additionalConditions={ bind(&Dispatcher::resetCounter, &dispatcher) } });
 
-	createTransition({ "CounterB" }, // activation
-					 {}, // destination
-					 // additional conditions
-					 { bind(&Dispatcher::resetCounter, &dispatcher) });
+	createTransition({ .name = "T7",
+					   .activationArcs = { ArcProperties{ .placeName = "CounterB" } },
+					   .additionalConditions={ bind(&Dispatcher::resetCounter, &dispatcher) } });
 }
 
 void FreeChoicePetriNet::dispatch()

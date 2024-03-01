@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,16 @@
 class ElevatorController;
 
 //! Implements PTN Engine net defining the phone menu behaviour.
-/*!
- * The behaviour is defined in the constructor.
- */
 class ElevatorPetriNet : public IElevatorPetriNet, private ptne::PTN_Engine
 {
 public:
-	/*!
-	 * Constructor.
-	 * \param ptrDispatcher Shared pointer to the controller.
-	 */
+	//!
+	//! Constructor.
+	//! \param ptrDispatcher Shared pointer to the controller.
+	//!
 	explicit ElevatorPetriNet(ElevatorController &elevatorController);
+
+	~ElevatorPetriNet() override;
 
 	// Events
 

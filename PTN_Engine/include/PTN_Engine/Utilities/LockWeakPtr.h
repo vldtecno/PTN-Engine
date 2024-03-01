@@ -13,19 +13,19 @@
 #pragma warning(disable : 4275)
 #endif
 
+#include "PTN_Engine/PTN_Exception.h"
 #include "PTN_Engine/Utilities/Explicit.h"
 #include <memory>
-#include <stdexcept>
 
-namespace
+namespace ptne
 {
 
 //! Exception to be thrown if attempting to lock an expired pointer.
-class DLL_PUBLIC ExpiredSharedPtrException : public std::runtime_error
+class DLL_PUBLIC ExpiredSharedPtrException : public PTN_Exception
 {
 public:
 	ExpiredSharedPtrException()
-	: runtime_error("Expired shared pointer.")
+	: PTN_Exception("Expired shared pointer.")
 	{
 	}
 };

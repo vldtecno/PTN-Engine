@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
  */
 
 #pragma once
-
-#include "Mocks/Dispatcher/Dispatcher.h"
 
 //! Base class for a PTN Engine net that controls the dispatcher.
 class IDispatcherPetriNet

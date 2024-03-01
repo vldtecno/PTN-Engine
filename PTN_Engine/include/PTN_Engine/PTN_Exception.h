@@ -94,24 +94,11 @@ public:
  * Exception to be thrown if the user tries to add a Condition to the net that with the name of an already
  * existing one.
  */
-class DLL_PUBLIC RepeatedActionException : public PTN_Exception
+class DLL_PUBLIC RepeatedFunctionException : public PTN_Exception
 {
 public:
-	explicit RepeatedActionException(const std::string &name)
-	: PTN_Exception("Trying to add an already existing action: " + name + ".")
-	{
-	}
-};
-
-/*!
- * Exception to be thrown if the user tries to add an Action to the net that with the name of an already
- * existing one.
- */
-class DLL_PUBLIC RepeatedConditionException : public PTN_Exception
-{
-public:
-	explicit RepeatedConditionException(const std::string &name)
-	: PTN_Exception("Trying to add an already existing condition: " + name + ".")
+	explicit RepeatedFunctionException(const std::string &name)
+	: PTN_Exception("Trying to add an already existing function: " + name + ".")
 	{
 	}
 };
@@ -158,35 +145,11 @@ public:
 	}
 };
 
-/*!
- * Exception to be thrown when the dimension of the vector containing the activation weights does not match
- * the dimension of the vector containing the names of the activation places.
- */
-class DLL_PUBLIC ActivationWeightDimensionException : public PTN_Exception
-{
-public:
-	ActivationWeightDimensionException()
-	: PTN_Exception("The number of activation weights must be the same as the number of activation places.")
-	{}
-};
-
-/*!
- * Exception to be thrown when the dimension of the vector containing the destination weights does not match
- * the dimension of the vector containing the names of the destination places.
- */
-class DLL_PUBLIC DestinationWeightDimensionException : public PTN_Exception
-{
-public:
-	DestinationWeightDimensionException()
-	: PTN_Exception("The number of destination weights must be the same as the number of destination places.")
-	{}
-};
-
 //! Exception to be thrown when the weight value is 0.
 class DLL_PUBLIC ZeroValueWeightException : public PTN_Exception
 {
 public:
-	ZeroValueWeightException() 
+	ZeroValueWeightException()
 	: PTN_Exception("Weights cannot be 0.")
 	{
 	}

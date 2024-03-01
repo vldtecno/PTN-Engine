@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,23 @@
 #include "Mocks/Dispatcher/RoundRobinPetriNet.h"
 #include "Mocks/Dispatcher/WeightedPetriNet.h"
 #include <cmath>
-#include <thread>
 
 using namespace std;
 using namespace std::chrono;
 
-FixturePetriNet::FixturePetriNet()
-{
-}
+FixturePetriNet::FixturePetriNet() = default;
 
-void FixturePetriNet::testRoundRobinState(const size_t expectedTokens[s_numberOfRoundRobinPlaces])
+void FixturePetriNet::testRoundRobinState(
+const array<size_t, s_numberOfRoundRobinPlaces> &expectedTokens) const
 {
-	size_t tokens[s_numberOfRoundRobinPlaces];
+	array<size_t, s_numberOfRoundRobinPlaces> tokens;
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
 	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (RoundRobinPetriNet *roundRobinPetriNet = dynamic_cast<RoundRobinPetriNet *>(dispatcherPetriNet))
+	if (const auto *roundRobinPetriNet = dynamic_cast<RoundRobinPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = roundRobinPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = roundRobinPetriNet->getNumberOfTokens("WaitPackage");
@@ -58,16 +56,16 @@ void FixturePetriNet::testRoundRobinState(const size_t expectedTokens[s_numberOf
 	}
 }
 
-void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOfFreeChoicePlaces])
+void FixturePetriNet::testFreeChoiceState(const array<size_t, s_numberOfFreeChoicePlaces> &expectedTokens) const
 {
-	size_t tokens[s_numberOfFreeChoicePlaces];
+	array<size_t, s_numberOfFreeChoicePlaces> tokens;
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
 	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (FreeChoicePetriNet *freeChoicePetriNet = dynamic_cast<FreeChoicePetriNet *>(dispatcherPetriNet))
+	if (const auto *freeChoicePetriNet = dynamic_cast<FreeChoicePetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = freeChoicePetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = freeChoicePetriNet->getNumberOfTokens("WaitPackage");
@@ -92,24 +90,24 @@ void FixturePetriNet::testFreeChoiceState(const size_t expectedTokens[s_numberOf
 
 	EXPECT_TRUE(tokens[3] > 0 || tokens[5] > 0) << tokens[3] << " " << tokens[5];
 
-	float bucket1 = tokens[3];
-	float bucket2 = tokens[5];
+	auto bucket1 = static_cast<float>(tokens[3]);
+	auto bucket2 = static_cast<float>(tokens[5]);
 
 	float metric = abs(bucket1 - bucket2) / (bucket1 + bucket2);
 
 	EXPECT_TRUE(metric < 0.1f) << metric;
 }
 
-void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWeightedPlaces])
+void FixturePetriNet::testWeightedState(const array<size_t, s_numberOfWeightedPlaces> &expectedTokens) const
 {
-	size_t tokens[s_numberOfWeightedPlaces];
+	array<size_t, s_numberOfWeightedPlaces> tokens;
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
 	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (WeightedPetriNet *weightedPetriNet = dynamic_cast<WeightedPetriNet *>(dispatcherPetriNet))
+	if (const auto *weightedPetriNet = dynamic_cast<WeightedPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = weightedPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = weightedPetriNet->getNumberOfTokens("WaitPackage");
@@ -124,16 +122,16 @@ void FixturePetriNet::testWeightedState(const size_t expectedTokens[s_numberOfWe
 	}
 }
 
-void FixturePetriNet::testInhibitedState(const size_t expectedTokens[s_numberOfInhibitedNetPlaces])
+void FixturePetriNet::testInhibitedState(const array< size_t, s_numberOfInhibitedNetPlaces> &expectedTokens) const
 {
-	size_t tokens[s_numberOfInhibitedNetPlaces];
+	array < size_t, s_numberOfInhibitedNetPlaces> tokens;
 
 	// TODO
 	// Dangerous(ugly) cast necessary only for testing. This does not need to exist within a normal use case.
 	// Nonetheless it would be nice to fix it.
 	IDispatcherPetriNet *dispatcherPetriNet = m_dispatcher.m_pPetriNet.get();
 
-	if (InhibitedPetriNet *weightedPetriNet = dynamic_cast<InhibitedPetriNet *>(dispatcherPetriNet))
+	if (const auto *weightedPetriNet = dynamic_cast<InhibitedPetriNet *>(dispatcherPetriNet))
 	{
 		tokens[0] = weightedPetriNet->getNumberOfTokens("InputWaitPackage");
 		tokens[1] = weightedPetriNet->getNumberOfTokens("P1");

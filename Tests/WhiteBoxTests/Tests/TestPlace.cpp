@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
-
 #include "Fixtures/FixtureTestPlace.h"
-#include "limits.h"
-
+#include "gtest/gtest.h"
 
 TEST_F(FixtureTestPlace, InputPlace)
 {

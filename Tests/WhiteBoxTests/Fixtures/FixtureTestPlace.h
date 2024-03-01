@@ -19,11 +19,9 @@
 #pragma once
 
 #include "gtest/gtest.h"
-
 #include "Mocks/Controller.h"
 #include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
-
 
 //! Fixture to test places.
 class FixtureTestPlace : public ::testing::Test
@@ -41,22 +39,22 @@ public:
 	//! Test input places specifics.
 	void inputPlace();
 
-	/*!
-	 * Test entering a place with a specific number of tokens.
-	 * \param tokens Number of tokens.
-	 */
+	//!
+	//! Test entering a place with a specific number of tokens.
+	//! \param tokens Number of tokens.
+	//!
 	void enterPlace(const size_t tokens);
 
-	/*!
-	 * Test exiting a place with a specific number of tokens.
-	 * \param tokens Number of tokens.
-	 */
+	//!
+	//! Test exiting a place with a specific number of tokens.
+	//! \param tokens Number of tokens.
+	//!
 	void exitPlace(const size_t tokens);
 
 protected:
 	Controller m_controller;
 
-	ptne::PTN_EngineImp m_ptnEngine;
+	ptne::PTN_EngineImp m_ptnEngine{ ptne::PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP };
 
 	//! A PTN Engine place.
 	ptne::Place m_place;

@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2018 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,18 @@
  */
 
 #include "View/MessagesMenuView.h"
-
 #include <iostream>
 
 using namespace std;
 
-void MessagesMenuView::showMessagesList(const MessageList &messageList, const size_t selectedMessage)
+MessagesMenuView::MessagesMenuView(MessageList& messagesList):
+m_messageList(messagesList)
 {
-	for (size_t i = 0; i < messageList.size(); ++i)
+}
+
+void MessagesMenuView::showMessagesList(const size_t selectedMessage) const
+{
+	for (size_t i = 0; i < m_messageList.size(); ++i)
 	{
 		if (i == selectedMessage)
 		{
@@ -34,11 +38,11 @@ void MessagesMenuView::showMessagesList(const MessageList &messageList, const si
 		{
 			cout << "  ";
 		}
-		cout << i << " - " << messageList.getItem(i).m_title << endl;
+		cout << i << " - " << m_messageList.getItem(i).m_title << endl;
 	}
 }
 
-void MessagesMenuView::displayMessage(const Message &message)
+void MessagesMenuView::displayMessage(const Message &message) const
 {
 	cout << "TITLE:" << endl;
 	cout << message.m_title << endl << endl;
