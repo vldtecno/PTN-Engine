@@ -38,7 +38,7 @@ void FixtureTestTransition::createTransition(const vector<size_t> &inputTokens,
 
 	for (size_t i : outputTokens)
 	{
-		auto newPlace = make_shared<Place>(m_ptnEngine, "", i, nullptr, nullptr);
+		auto newPlace = make_shared<Place>(m_ptnEngine, PlaceProperties{ .initialNumberOfTokens = i});
 		outputPlaces.push_back(newPlace);
 		wOutputPlaces.push_back(newPlace);
 	}
@@ -142,7 +142,7 @@ vector<SharedPtrPlace> FixtureTestTransition::createPlaces(const vector<size_t> 
 	vector<SharedPtrPlace> inputPlaces;
 	for (size_t i : inputTokens)
 	{
-		auto newPlace = make_shared<Place>(m_ptnEngine, "", i, nullptr, nullptr);
+		auto newPlace = make_shared<Place>(m_ptnEngine, PlaceProperties{ .initialNumberOfTokens = i });
 		inputPlaces.push_back(newPlace);
 	}
 	return inputPlaces;

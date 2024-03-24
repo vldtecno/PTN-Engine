@@ -110,13 +110,10 @@ namespace ptne
 {
 void XML_FileImporter::_import(const string &filePath, PTN_Engine &ptnEngine)
 {
-	xml_parse_result result = m_document.load_file(filePath.c_str());
-
-	if (!result)
+	if (const auto &result = m_document.load_file(filePath.c_str()); !result)
 	{
 		throw PTN_Exception(result.description());
 	}
-
 	IFileImporter::_import(ptnEngine);
 }
 
@@ -132,15 +129,13 @@ vector<PlaceProperties> XML_FileImporter::importPlaces() const
 	{
 		PlaceProperties placeProperties;
 		bool isInput = false;
-		const string isInputStr = getAttributeValue(place, "input");
-		if (!isInputStr.empty())
+		if (const string isInputStr = getAttributeValue(place, "input"); !isInputStr.empty())
 		{
-			isInput = getAttributeValue(place, "input") == "true" ? true : false;
+			isInput = isInputStr == "true" ? true : false;
 		}
 
-		size_t numberOfTokens = 0;
-		const string numberOfTokensStr = getAttributeValue(place, "tokens");
-		if (!numberOfTokensStr.empty())
+		size_t numberOfTokens = 0;		
+		if (const string numberOfTokensStr = getAttributeValue(place, "tokens"); !numberOfTokensStr.empty())
 		{
 			numberOfTokens = static_cast<size_t>(atol(numberOfTokensStr.c_str()));
 		}
@@ -158,6 +153,7 @@ vector<PlaceProperties> XML_FileImporter::importPlaces() const
 
 vector<TransitionProperties> XML_FileImporter::importTransitions() const
 {
+	using enum ArcProperties::Type;
 	vector<TransitionProperties> transitionInfoCollection;
 	for (xml_node transition : m_document.child("PTN-Engine").child("Transitions"))
 	{
@@ -165,12 +161,9 @@ vector<TransitionProperties> XML_FileImporter::importTransitions() const
 
 		const auto activationConditions = collectTransitionAttributes(transition, "ActivationConditions");
 		transitionProperties.name = getNodeValue<string>("Name", transition);
-		transitionProperties.activationArcs = collectArcAttributes(transition, "ActivationPlaces",
-																   ArcProperties::Type::ACTIVATION);
-		transitionProperties.destinationArcs = collectArcAttributes(transition, "DestinationPlaces",
-																	ArcProperties::Type::DESTINATION);
-		transitionProperties.inhibitorArcs = collectArcAttributes(transition, "InhibitorPlaces",
-																  ArcProperties::Type::INHIBITOR);;
+		transitionProperties.activationArcs = collectArcAttributes(transition, "ActivationPlaces", ACTIVATION);
+		transitionProperties.destinationArcs = collectArcAttributes(transition, "DestinationPlaces", DESTINATION);
+		transitionProperties.inhibitorArcs = collectArcAttributes(transition, "InhibitorPlaces", INHIBITOR);
 		transitionProperties.additionalConditionsNames = activationConditions;
 		transitionProperties.requireNoActionsInExecution = getNodeValue<bool>("RequireNoActionsInExecution", transition);
 		transitionInfoCollection.emplace_back(transitionProperties);
@@ -190,8 +183,7 @@ vector<ArcProperties> XML_FileImporter::importArcs() const
 		arcProperties.weight = getNodeValue<size_t>("Weight", arc);
 
 		using enum ArcProperties::Type;
-		auto typeStr = getNodeValue<string>("Type", arc);
-		if (typeStr == "Activation")
+		if (auto typeStr = getNodeValue<string>("Type", arc); typeStr == "Activation")
 		{
 			arcProperties.type = ACTIVATION;
 		}
@@ -211,7 +203,6 @@ vector<ArcProperties> XML_FileImporter::importArcs() const
 		{
 			throw PTN_Exception("Type string not supported");
 		}
-
 		arcInfoCollection.emplace_back(arcProperties);
 	}
 	return arcInfoCollection;

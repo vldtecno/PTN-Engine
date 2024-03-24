@@ -35,39 +35,8 @@ class Place final
 public:
 	using ActionFunction = std::function<void(void)>;
 
-	//!
-	//! Place constructor.
-	//! \param initialNumberOfTokens The number of tokens the place contains originally.
-	//! \param onEnterAction The action to be performed when a token enters the place.
-	//! \param onExitAction The action to be performed when a token leaves the place.
-	//! \param input Flag that marks the place as an input place.
-	//!
 	Place(IPTN_EnginePlace &parent,
-		  const std::string &name,
-		  const size_t initialNumberOfTokens,
-		  const ActionFunction &onEnterAction,
-		  const ActionFunction &onExitAction,
-		  const bool input = false);
-
-	//!
-	//! \brief Place
-	//! \param parent
-	//! \param name
-	//! \param initialNumberOfTokens
-	//! \param onEnterActionName
-	//! \param onEnterAction
-	//! \param onExitActionName
-	//! \param onExitAction
-	//! \param input
-	//!
-	Place(IPTN_EnginePlace &parent,
-		  const std::string &name,
-		  const size_t initialNumberOfTokens,
-		  const std::string &onEnterActionName,
-		  const ActionFunction &onEnterAction,
-		  const std::string &onExitActionName,
-		  const ActionFunction &onExitAction,
-		  const bool input = false);
+		  const PlaceProperties &placeProperties);
 
 	~Place() = default;
 	Place(const Place &) = delete;

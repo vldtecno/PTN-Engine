@@ -113,7 +113,6 @@ void Controller::setStateMachine(shared_ptr<IMenuStateMachine> stateMachine)
 	m_menuStateMachine = stateMachine;
 }
 
-
 bool Controller::justReturnTrue() const
 {
 	return true;

@@ -22,11 +22,12 @@ using namespace ptne;
 using std::bind_front;
 
 FixtureTestPlace::FixtureTestPlace()
-: m_place(m_ptnEngine,
-          "",
-          size_t(0),
-          bind_front(&Controller::onEnter, &m_controller),
-          bind_front(&Controller::onExit, &m_controller))
+: m_place(
+  m_ptnEngine,
+  PlaceProperties{ .name = "", 
+	.initialNumberOfTokens = 0, 
+	.onEnterAction = bind_front(&Controller::onEnter, &m_controller),
+    .onExitAction = bind_front(&Controller::onExit, &m_controller)})
 {
 	m_ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 }
@@ -68,8 +69,9 @@ void FixtureTestPlace::exitPlace()
 
 void FixtureTestPlace::inputPlace()
 {
-	ptne::Place inputPlace(m_ptnEngine, "", size_t(0), bind_front(&Controller::onEnter, m_controller),
-						   bind_front(&Controller::onExit, m_controller));
+	ptne::Place inputPlace(m_ptnEngine, 
+		PlaceProperties{ .onEnterAction = bind_front(&Controller::onEnter, m_controller),
+		  .onExitAction = bind_front(&Controller::onExit, m_controller) });
 	EXPECT_EQ(false, inputPlace.isInputPlace());
 }
 

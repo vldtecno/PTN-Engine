@@ -26,12 +26,13 @@
 namespace ptne
 {
 using namespace std;
+using enum PTN_Engine::ACTIONS_THREAD_OPTION;
 
 PTN_EngineImp::PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 : m_actionsThreadOption(actionsThreadOption)
 , m_eventLoop(*this)
 {
-	if (m_actionsThreadOption == PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE)
+	if (m_actionsThreadOption == JOB_QUEUE)
 	{
 		m_jobQueue = make_unique<JobQueue>();
 	}
@@ -70,28 +71,21 @@ void PTN_EngineImp::createTransition(const TransitionProperties &transitionPrope
 					 transitionProperties.requireNoActionsInExecution);
 }
 
-void PTN_EngineImp::createPlace(const PlaceProperties &placeProperties)
+void PTN_EngineImp::createPlace(PlaceProperties placeProperties)
 {
 	ActionFunction onEnterAction = placeProperties.onEnterAction;
 	if (!placeProperties.onEnterActionFunctionName.empty())
 	{
-		onEnterAction = m_actions.getItem(placeProperties.onEnterActionFunctionName);
+		placeProperties.onEnterAction = m_actions.getItem(placeProperties.onEnterActionFunctionName);
 	}
 
 	ActionFunction onExitAction = placeProperties.onExitAction;
 	if (!placeProperties.onExitActionFunctionName.empty())
 	{
-		onExitAction = m_actions.getItem(placeProperties.onExitActionFunctionName);
+		placeProperties.onExitAction = m_actions.getItem(placeProperties.onExitActionFunctionName);
 	}
 
-	auto place = make_shared<Place>(*this,
-									placeProperties.name,
-									placeProperties.initialNumberOfTokens,
-									placeProperties.onEnterActionFunctionName,
-									onEnterAction,
-									placeProperties.onExitActionFunctionName,
-									onExitAction,
-									placeProperties.input);
+	auto place = make_shared<Place>(*this, placeProperties);
 	m_places.insert(place);
 }
 
@@ -140,11 +134,11 @@ void PTN_EngineImp::setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTI
 	{
 		return;
 	}
-	if (actionsThreadOption == PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE && m_jobQueue == nullptr)
+	if (actionsThreadOption == JOB_QUEUE && m_jobQueue == nullptr)
 	{
 		m_jobQueue = make_unique<JobQueue>();
 	}
-	else if (actionsThreadOption != PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE && m_jobQueue != nullptr)
+	else if (actionsThreadOption != JOB_QUEUE && m_jobQueue != nullptr)
 	{
 		m_jobQueue.reset();
 	}
@@ -212,7 +206,7 @@ PTN_Engine::EventLoopSleepDuration PTN_EngineImp::getEventLoopSleepDuration() co
 	return m_eventLoop.getSleepDuration();
 }
 
-void PTN_EngineImp::addArc(const ArcProperties &arcProperties)
+void PTN_EngineImp::addArc(const ArcProperties &arcProperties) const
 {
 	if (isEventLoopRunning())
 	{
@@ -317,7 +311,7 @@ PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &condit
 
 void PTN_EngineImp::addJob(const ActionFunction &actionFunction)
 {
-	if (m_actionsThreadOption != PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE || m_jobQueue == nullptr ||
+	if (m_actionsThreadOption != JOB_QUEUE || m_jobQueue == nullptr ||
 		!m_jobQueue->isActive())
 	{
 		throw PTN_Exception("addJob incorrectly called");

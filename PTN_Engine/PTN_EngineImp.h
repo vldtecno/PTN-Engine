@@ -54,7 +54,7 @@ class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
 public:
 	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
 
-	~PTN_EngineImp();
+	~PTN_EngineImp() override;
 	PTN_EngineImp(const PTN_EngineImp &) = delete;
 	PTN_EngineImp(PTN_EngineImp &&) = delete;
 	PTN_EngineImp &operator=(const PTN_EngineImp &) = delete;
@@ -80,7 +80,7 @@ public:
 	//! \brief createPlace
 	//! \param placeProperties
 	//!
-	void createPlace(const PlaceProperties &placeProperties);
+	void createPlace(PlaceProperties placeProperties);
 
 	//!
 	//! \brief isEventLoopRunning
@@ -190,7 +190,7 @@ public:
 	//! \brief addArc
 	//! \param arcProperties
 	//!
-	void addArc(const ArcProperties &arcProperties);
+	void addArc(const ArcProperties &arcProperties) const;
 
 	//!
 	//! \brief addArc

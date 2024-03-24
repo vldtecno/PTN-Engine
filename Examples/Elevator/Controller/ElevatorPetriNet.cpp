@@ -68,7 +68,7 @@ void ElevatorPetriNet::destinationButton()
 	incrementInput("DestinationButton");
 }
 
-void ElevatorPetriNet::incrementInput(const string &inputPlace, const bool debug)
+void ElevatorPetriNet::incrementInput(const string &inputPlace, const bool)
 {
 	incrementInputPlace(inputPlace);
 }

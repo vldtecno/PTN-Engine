@@ -27,38 +27,16 @@ namespace ptne
 {
 using namespace std;
 
-Place::Place(IPTN_EnginePlace &parent,
-             const string &name,
-             const size_t initialNumberOfTokens,
-             const ActionFunction &onEnterAction,
-             const ActionFunction &onExitAction,
-             const bool input)
+Place::Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties)
 : m_ptnEngine(parent)
-, m_name(name)
-, m_onEnterAction(onEnterAction)
-, m_onExitAction(onExitAction)
-, m_numberOfTokens(initialNumberOfTokens)
-, m_isInputPlace(input)
-{
-}
-
-Place::Place(IPTN_EnginePlace &parent,
-             const string &name,
-             const size_t initialNumberOfTokens,
-             const string &onEnterActionName,
-             const ActionFunction &onEnterAction,
-             const string &onExitActionName,
-             const ActionFunction &onExitAction,
-             const bool input)
-: m_ptnEngine(parent)
-, m_name(name)
-, m_onEnterActionName(onEnterActionName)
-, m_onEnterAction(onEnterAction)
-, m_onExitActionName(onExitActionName)
-, m_onExitAction(onExitAction)
-, m_numberOfTokens(initialNumberOfTokens)
-, m_isInputPlace(input)
-{
+, m_name(placeProperties.name)
+, m_onEnterActionName(placeProperties.onEnterActionFunctionName)
+, m_onEnterAction(placeProperties.onEnterAction)
+, m_onExitActionName(placeProperties.onExitActionFunctionName)
+, m_onExitAction(placeProperties.onExitAction)
+, m_numberOfTokens(placeProperties.initialNumberOfTokens)
+, m_isInputPlace(placeProperties.input)
+{	
 }
 
 string Place::getName() const

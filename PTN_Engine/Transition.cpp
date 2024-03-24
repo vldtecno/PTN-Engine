@@ -213,9 +213,10 @@ array<vector<ArcProperties>,3> Transition::getArcsProperties() const
 		return arcProperties;
 	};
 
-	arcsProperties[0] = arcPropertiesFromArcs(m_activationArcs, ArcProperties::Type::ACTIVATION);
-	arcsProperties[1] = arcPropertiesFromArcs(m_destinationArcs, ArcProperties::Type::DESTINATION);
-	arcsProperties[2] = arcPropertiesFromArcs(m_inhibitorArcs, ArcProperties::Type::INHIBITOR);
+	using enum ArcProperties::Type;
+	arcsProperties[0] = arcPropertiesFromArcs(m_activationArcs, ACTIVATION);
+	arcsProperties[1] = arcPropertiesFromArcs(m_destinationArcs, DESTINATION);
+	arcsProperties[2] = arcPropertiesFromArcs(m_inhibitorArcs, INHIBITOR);
 
 	return arcsProperties;
 }
@@ -236,29 +237,30 @@ void Transition::addPlace(const shared_ptr<Place> &place, const ArcProperties::T
 		}
 	};
 
+	using enum ArcProperties::Type;
 	switch (type)
 	{
 	default:
 	{
 		throw PTN_Exception("Unexpected type");
 	}
-	case ArcProperties::Type::ACTIVATION:
+	case ACTIVATION:
 	{
 		addArcTo(m_activationArcs);
 		break;
 	}
-	case ArcProperties::Type::BIDIRECTIONAL:
+	case BIDIRECTIONAL:
 	{
 		addArcTo(m_activationArcs);
 		addArcTo(m_destinationArcs);
 		break;
 	}
-	case ArcProperties::Type::DESTINATION:
+	case DESTINATION:
 	{
 		addArcTo(m_destinationArcs);
 		break;
 	}
-	case ArcProperties::Type::INHIBITOR:
+	case INHIBITOR:
 	{
 		addArcTo(m_inhibitorArcs);
 		break;
@@ -282,29 +284,30 @@ void Transition::removePlace(const shared_ptr<Place> &place, const ArcProperties
 		}
 	};
 
+	using enum ArcProperties::Type;
 	switch (type)
 	{
 	default:
 	{
 		throw PTN_Exception("Unexpected type");
 	}
-	case ArcProperties::Type::ACTIVATION:
+	case ACTIVATION:
 	{
 		removePlaceFrom(m_activationArcs);
 		break;
 	}
-	case ArcProperties::Type::BIDIRECTIONAL:
+	case BIDIRECTIONAL:
 	{
 		removePlaceFrom(m_activationArcs);
 		removePlaceFrom(m_destinationArcs);
 		break;
 	}
-	case ArcProperties::Type::DESTINATION:
+	case DESTINATION:
 	{
 		removePlaceFrom(m_destinationArcs);
 		break;
 	}
-	case ArcProperties::Type::INHIBITOR:
+	case INHIBITOR:
 	{
 		removePlaceFrom(m_inhibitorArcs);
 		break;
@@ -339,7 +342,7 @@ bool Transition::checkAdditionalConditions() const
 		}
 		else
 		{
-			if (!(activationCondition)())
+			if (!activationCondition())
 			{
 				return false;
 			}
@@ -355,7 +358,6 @@ bool Transition::noActionsInExecution() const
 		const WeakPtrPlace &activationPlace = activationArc.place;
 
 		SharedPtrPlace spPlace = lockWeakPtr(activationPlace);
-
 		if (spPlace->isOnEnterActionInExecution())
 		{
 			return false;

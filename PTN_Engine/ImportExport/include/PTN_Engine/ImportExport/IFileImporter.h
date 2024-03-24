@@ -41,7 +41,6 @@ public:
 	virtual void _import(const std::string &filePath, PTN_Engine &ptnEngine) = 0;
 
 protected:
-
 	void _import(PTN_Engine &ptnEngine) const;
 
 private:
