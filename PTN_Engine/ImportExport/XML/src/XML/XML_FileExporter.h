@@ -25,52 +25,47 @@ namespace ptne
 {
 
 //!
-//! \brief The XML_Exporter class
+//! \brief The XML_FileExporter class implements the export of a PTN_Engine object to an xml file.
 //!
 class XML_FileExporter : public IFileExporter
 {
 public:
 	~XML_FileExporter() override = default;
+	XML_FileExporter() = default;
+	XML_FileExporter(const XML_FileExporter &) = delete;
+	XML_FileExporter(XML_FileExporter &&) = delete;
+	XML_FileExporter &operator=(const XML_FileExporter &) = delete;
+	XML_FileExporter &operator=(XML_FileExporter &&) = delete;
 
+	//!
+	//! \brief _export Exports a PTN_Engine object to a xml file.
+	//! \param ptnEngine - the object to be exported.
+	//! \param filePath - the file path of the new xml file.
+	//!
 	void _export(const PTN_Engine &ptnEngine, const std::string &filePath) override;
 
 private:
-
-	//!
-	//! \brief exportActionsThreadOption
-	//! \param actionsThreadOption
-	//!
 	void exportActionsThreadOption(const std::string &actionsThreadOption) override;
 
-	//!
-	//! \brief exportPlace
-	//! \param placeProperties
-	//!
 	void exportPlace(const PlaceProperties &placeProperties) override;
 
-	//!
-	//! \brief exportTransition
-	//! \param transitionProperties
-	//!
 	void exportTransition(const TransitionProperties &transitionProperties) override;
 
-	//!
-	//! \brief exportArc
-	//! \param arcPropereties
-	//!
 	void exportArc(const std::vector<ArcProperties> &arcPropereties) override;
 
-	//!
-	//! \brief saveFile
-	//! \param filePath
-	//!
 	void saveFile() const;
 
-	pugi::xml_node m_rootNode;
-	pugi::xml_document m_document;
-	pugi::xml_node m_placesNode;
-	pugi::xml_node m_transitionsNode;
 	pugi::xml_node m_arcsNode;
+
+	pugi::xml_document m_document;
+
 	std::string m_filePath;
+
+	pugi::xml_node m_placesNode;
+
+	pugi::xml_node m_rootNode;
+
+	pugi::xml_node m_transitionsNode;
 };
+
 } // namespace ptne

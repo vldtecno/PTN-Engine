@@ -112,7 +112,7 @@ vector<PlaceProperties> PlacesManager::getPlacesProperties() const
 	return placesProperties;
 }
 
-vector<WeakPtrPlace> PlacesManager::getPlacesFromNames(const vector<string> &placesNames) const
+vector<WeakPtrPlace> PlacesManager::getPlaces(const vector<string> &placesNames) const
 {
 	shared_lock placesGuard(m_itemsMutex);
 

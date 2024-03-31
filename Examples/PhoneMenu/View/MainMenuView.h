@@ -22,6 +22,13 @@
 class MainMenuView
 {
 public:
+	~MainMenuView() = default;
+	MainMenuView() = default;
+	MainMenuView(const MainMenuView &) = delete;
+	MainMenuView(MainMenuView &&) = delete;
+	MainMenuView &operator=(const MainMenuView &) = delete;
+	MainMenuView &operator=(MainMenuView &&) = delete;
+
 	//! Print the menu on screen.
 	void showMenu() const;
 

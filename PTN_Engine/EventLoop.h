@@ -33,21 +33,20 @@ class IPTN_EngineEL;
 class Transition;
 
 //!
-//! \brief The EventLoop class manages an event loop thread, where all the events are passed to the petri net
-//! engine.
+//! \brief The EventLoop class manages an event loop thread.
 //!
 class EventLoop
 {
 public:
 	using SleepDuration = std::chrono::duration<long, std::ratio<1, 1000>>;
 
+	~EventLoop();
+
 	//!
 	//! \brief EventLoop
 	//! \param ptnEngineInternal
 	//!
 	explicit EventLoop(IPTN_EngineEL &ptnEngineInternal);
-
-	~EventLoop();
 
 	EventLoop(const EventLoop &) = delete;
 	EventLoop(EventLoop &&) = delete;
@@ -56,7 +55,7 @@ public:
 
 	//!
 	//! \brief Inform if the event loop is running.
-	//! \return True if the event loop thread is running.
+	//! \return true if the event loop thread is running.
 	//!
 	bool isRunning() const;
 
@@ -100,26 +99,26 @@ private:
 	//! Reference to the petri net engine.
 	IPTN_EngineEL &m_ptnEngine;
 
-	//! Flag if the event loop thread is running.
-	std::atomic<bool> m_eventLoopThreadRunning = false;
-
-	//! Mutex protecting the event notifier condition variable m_eventNotifier.
-	mutable std::mutex m_eventNotifierMutex;
-
-	//! Condition variable to wake up the event loop thread when some event happens.
-	std::condition_variable m_eventNotifier;
-
-	//! Mutex protecting m_sleepDuration.
-	mutable std::shared_mutex m_sleepDurationMutex;
-
-	//! While idle, watchdog timer period.
-	SleepDuration m_sleepDuration = std::chrono::milliseconds(100);
+	//! Barrier to synchronize the event loop thread.
+	std::unique_ptr<std::barrier<>> m_barrier = nullptr;
 
 	//! Event loop thread.
 	std::jthread m_eventLoopThread;
 
-	//! Barrier to synchronize the event loop thread.
-	std::unique_ptr<std::barrier<>> m_barrier = nullptr;
+	//! Flag if the event loop thread is running.
+	std::atomic<bool> m_eventLoopThreadRunning = false;
+
+	//! Condition variable to wake up the event loop thread when some event happens.
+	std::condition_variable m_eventNotifier;
+
+	//! Mutex protecting the event notifier condition variable m_eventNotifier.
+	mutable std::mutex m_eventNotifierMutex;
+
+	//! While idle, watchdog timer period.
+	SleepDuration m_sleepDuration = std::chrono::milliseconds(100);
+
+	//! Mutex protecting m_sleepDuration.
+	mutable std::shared_mutex m_sleepDurationMutex;
 };
 
 } // namespace ptne

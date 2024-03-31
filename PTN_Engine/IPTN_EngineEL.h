@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,18 @@ namespace ptne
 {
 
 //!
-//! \brief The IPTN_EngineEL class
+//! \brief PTN_Engine interface to be provided to the event loop.
 //!
 class IPTN_EngineEL
 {
 public:
 	virtual ~IPTN_EngineEL() = default;
+
 	virtual bool executeInt(const bool log = false, std::ostream &o = std::cout) = 0;
-	virtual bool getNewInputReceived() const = 0;
+
 	virtual PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const = 0;
+
+	virtual bool getNewInputReceived() const = 0;
 };
 
 } // namespace ptne

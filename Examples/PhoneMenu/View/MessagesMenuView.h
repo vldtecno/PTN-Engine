@@ -22,12 +22,17 @@
 #include "Model/Message.h"
 
 //! View of the messages menu.
-class MessagesMenuView
+class MessagesView
 {
 public:
 	using MessageList = List<Message>;
 
-	MessagesMenuView(MessageList& messagesList);
+	~MessagesView() = default;
+	explicit MessagesView(MessageList &messagesList);
+	MessagesView(const MessagesView &) = delete;
+	MessagesView(MessagesView &&) = delete;
+	MessagesView &operator=(const MessagesView &) = delete;
+	MessagesView &operator=(MessagesView &&) = delete;
 
 	//!
 	//! Show the message list on screen.

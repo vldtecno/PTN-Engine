@@ -22,13 +22,12 @@
 
 namespace ptne::utility
 {
+
 template <typename T, class E>
 void detectRepeated(std::vector<std::weak_ptr<T>> items)
 {
 	auto equals = [](const std::weak_ptr<T> &t, const std::weak_ptr<T> &u)
-	{
-		return !t.owner_before(u) && !u.owner_before(t);
-	};
+	{ return !t.owner_before(u) && !u.owner_before(t); };
 
 	std::ranges::sort(items.begin(), items.end(), std::owner_less<std::weak_ptr<T>>());
 
@@ -47,4 +46,5 @@ void detectRepeatedNames(std::vector<T> items)
 		throw E();
 	}
 }
+
 } // namespace ptne::utility

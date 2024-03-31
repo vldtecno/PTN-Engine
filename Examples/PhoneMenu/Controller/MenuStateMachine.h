@@ -28,7 +28,13 @@ class Controller;
 class MenuStateMachine : public IMenuStateMachine
 {
 public:
-	void setControllerFunctions(Controller &menuController) override;
+	~MenuStateMachine() override = default;
+	MenuStateMachine() = default;
+	MenuStateMachine(const MenuStateMachine &) = delete;
+	MenuStateMachine(MenuStateMachine &&) = delete;
+	MenuStateMachine &operator=(MenuStateMachine &) = delete;
+	MenuStateMachine &operator=(MenuStateMachine &&) = delete;
+
 
 	//! Press A key event.
 	void pressA() override;
@@ -38,4 +44,6 @@ public:
 
 	//! Press C key event.
 	void pressC() override;
+
+	void setControllerFunctions(Controller &menuController) override;
 };

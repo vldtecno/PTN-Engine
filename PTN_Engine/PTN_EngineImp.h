@@ -33,6 +33,7 @@
 
 namespace ptne
 {
+
 class IConditionFunctor;
 class IActionFunctor;
 class JobQueue;
@@ -44,54 +45,88 @@ using WeakPtrPlace = std::weak_ptr<Place>;
 
 
 //! Implements the Petri net logic.
-//!
-//! Implements the Petri net logic.
-//! Used by the PTN_Engine class.
-//! \sa PTN_Engine
-//!
 class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
 {
 public:
-	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
-
 	~PTN_EngineImp() override;
+	explicit PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
 	PTN_EngineImp(const PTN_EngineImp &) = delete;
 	PTN_EngineImp(PTN_EngineImp &&) = delete;
 	PTN_EngineImp &operator=(const PTN_EngineImp &) = delete;
 	PTN_EngineImp &operator=(PTN_EngineImp &&) = delete;
 
 	//!
+	//! \brief Add job to job queue.
+	//! \param Function to be executed in the job queue.
+	//!
+	void addJob(const ActionFunction &actionFunction) override;
+
+	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const override;
+
+	//!
+	//! \brief Indicates if there are new tokens in any input places.
+	//! \return True of there is a new token in an input place.
+	//!
+	bool getNewInputReceived() const override;
+
+	void addArc(const ArcProperties &arcProperties) const;
+
+	//!
 	//! Clear the token counter from all input places.
 	//!
 	void clearInputPlaces();
 
-	//!
-	//! \brief clearNet
-	//!
 	void clearNet();
 
-	//!
-	//! \brief createTransition
-	//! \param transitionProperties
-	//!
+	void createPlace(PlaceProperties placeProperties);
+
 	void createTransition(const TransitionProperties &transitionProperties);
 
 	//!
-	//! \brief createPlace
-	//! \param placeProperties
+	//! \brief Gets the transitions that are currently enabled.
+	//! \return Weak pointers to the transitions that are enabled.
 	//!
-	void createPlace(PlaceProperties placeProperties);
+	std::vector<std::weak_ptr<Transition>> enabledTransitions() const;
 
 	//!
-	//! \brief isEventLoopRunning
-	//! \return
+	//! Start the petri net event loop.
+	//! \param log Flag logging the state of the net on or off.
+	//! \param o Log output stream.
 	//!
+	void execute(const bool log = false, std::ostream &o = std::cout);
+
+	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
+
+	//!
+	//! \brief Gets the current sleep time set in the event loop.
+	//! \return The sleep time of the event loop.
+	//!
+	PTN_Engine::EventLoopSleepDuration getEventLoopSleepDuration() const;
+
+	//!
+	//! Return the number of tokens in a given place.
+	//! \param place The name of the place to get the number of tokens from.
+	//! \return The number of tokens present in the place.
+	//!
+	size_t getNumberOfTokens(const std::string &place) const;
+
+	std::vector<PlaceProperties> getPlacesProperties() const;
+
+	std::vector<TransitionProperties> getTransitionsProperties() const;
+
+	//!
+	//! Add a token in an input place.
+	//! \param place Name of the place to be incremented.
+	//!
+	void incrementInputPlace(const std::string &place);
+
 	bool isEventLoopRunning() const;
 
 	//!
-	//! \brief Stop the execution loop.
+	//! Print the petri net places and number of tokens.
+	//! \param o Output stream.
 	//!
-	void stop() noexcept;
+	void printState(std::ostream &o) const;
 
 	//!
 	//! Register an action to be called by the Petri net.
@@ -107,72 +142,10 @@ public:
 	//!
 	void registerCondition(const std::string &name, const ConditionFunction &condition);
 
-	//!
-	//! Return the number of tokens in a given place.
-	//! \param place The name of the place to get the number of tokens from.
-	//! \return The number of tokens present in the place.
-	//!
-	size_t getNumberOfTokens(const std::string &place) const;
-
-	//!
-	//! Add a token in an input place.
-	//! \param place Name of the place to be incremented.
-	//!
-	void incrementInputPlace(const std::string &place);
+	void removeArc(const ArcProperties &arcProperties) const;
 
 	//! Specify the thread where the actions should be run.
 	void setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
-
-	//!
-	//! \brief getActionsThreadOption
-	//! \return
-	//!
-	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const override;
-
-	//!
-	//! Start the petri net event loop.
-	//! \param log Flag logging the state of the net on or off.
-	//! \param o Log output stream.
-	//!
-	void execute(const bool log = false, std::ostream &o = std::cout);
-
-	//!
-	//! \brief executeInt
-	//! \param log
-	//! \param o
-	//! \return
-	//!
-	bool executeInt(const bool log = false, std::ostream &o = std::cout) override;
-
-	//!
-	//! \brief Add job to job queue.
-	//! \param Function to be executed in the job queue.
-	//!
-	void addJob(const ActionFunction &actionFunction) override;
-
-	//!
-	//! \brief Indicates if there are new tokens in any input places.
-	//! \return True of there is a new token in an input place.
-	//!
-	bool getNewInputReceived() const override;
-
-	//!
-	//! \brief Flags or clears flag of new tokens in input places.
-	//! \param newInputReceived - The new value for the new input received flag.
-	//!
-	void setNewInputReceived(const bool newInputReceived);
-
-	//!
-	//! \brief Gets the transitions that are currently enabled.
-	//! \return Weak pointers to the transitions that are enabled.
-	//!
-	std::vector<std::weak_ptr<Transition>> enabledTransitions() const;
-
-	//!
-	//! Print the petri net places and number of tokens.
-	//! \param o Output stream.
-	//!
-	void printState(std::ostream &o) const;
 
 	//!
 	//! \brief Set the sleep duration of the event loop.
@@ -181,51 +154,33 @@ public:
 	void setEventLoopSleepDuration(const PTN_Engine::EventLoopSleepDuration sleepDuration);
 
 	//!
-	//! \brief Gets the current sleep time set in the event loop.
-	//! \return The sleep time of the event loop.
+	//! \brief Flags or clears flag of new tokens in input places.
+	//! \param newInputReceived - The new value for the new input received flag.
 	//!
-	PTN_Engine::EventLoopSleepDuration getEventLoopSleepDuration() const;
+	void setNewInputReceived(const bool newInputReceived);
 
-	//!
-	//! \brief addArc
-	//! \param arcProperties
-	//!
-	void addArc(const ArcProperties &arcProperties) const;
-
-	//!
-	//! \brief addArc
-	//! \param arcProperties
-	//!
-	void removeArc(const ArcProperties &arcProperties) const;
-
-	//!
-	//! \brief getPlacesProperties
-	//! \return
-	//!
-	std::vector<PlaceProperties> getPlacesProperties() const;
-
-	//!
-	//! \brief getTransitionsProperties
-	//! \return
-	//!
-	std::vector<TransitionProperties> getTransitionsProperties() const;
-
-	//!
-	//! \brief getArcsProperties
-	//! \return
-	//!
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
+	void stop() noexcept;
 
 private:
+	bool executeInt(const bool log = false, std::ostream &o = std::cout) override;
+
 	//!
-	//! Create a new transition
-	//! \param name Name and identifier of the transition
-	//! \param activationPlaces A vector with the names of the activation places.
-	//! \param activationWeights A vector with the weights of each activation place.
-	//! \param destinationPlaces A vector with the names of the destination places.
-	//! \param destinationWeights A vector with the weights of each destination place.
-	//! \param inhibitorPlaces Places that cannot have tokens to fire the transition.
-	//! \param additionalConditions A vector with names to additional conditions.
+	//! \brief createAnonymousConditions - Create activation conditions without proiding a name.
+	//! \param conditions
+	//! \return
+	//!
+	std::vector<std::pair<std::string, ConditionFunction>>
+	createAnonymousConditions(const std::vector<ConditionFunction> &conditions) const;
+
+	//!
+	//! \brief Create a new transition in the petri net.
+	//! \param name - name of the transition
+	//! \param activationArcs
+	//! \param destinationArcs
+	//! \param inhibitorArcs
+	//! \param additionalConditions - boolean functions that provide additional conditions, necessary to fire a
+	//! transition. \param requireNoActionsInExecution - flag that determines if the on enter actions of each
+	//! activation place, must have finished before fireing the transition.
 	//!
 	void createTransition(const std::string &name,
 						  const std::vector<ArcProperties> &activationArcs,
@@ -234,40 +189,30 @@ private:
 						  const std::vector<std::pair<std::string, ConditionFunction>> &additionalConditions,
 						  const bool requireNoActionsInExecution);
 
-	//!
-	//! \brief createAnonymousConditions
-	//! \param conditions
-	//! \return
-	//!
-	std::vector<std::pair<std::string, ConditionFunction>>
-	createAnonymousConditions(const std::vector<ConditionFunction> &conditions) const;
-
-	//! Container with all the transitions in the Petri net.
-	TransitionsManager m_transitions;
-
-	//! Container with all the places in the Petri net.
-	PlacesManager m_places;
-
 	//! Container with all the actions available to this Petri net.
 	ManagedContainer<ActionFunction> m_actions;
-
-	//! Conditions that can be used by the Petri net.
-	ManagedContainer<ConditionFunction> m_conditions;
-
-	//! Flag reporting a new input event.
-	std::atomic<bool> m_newInputReceived = false;
-
-	//! Mutex to synchronize m_actionsThreadOption.
-	mutable std::shared_mutex m_actionsThreadOptionMutex;
 
 	//! Determines how the actions will be executed.
 	PTN_Engine::ACTIONS_THREAD_OPTION m_actionsThreadOption;
 
-	//! Job queue to dispatch actions.
-	std::unique_ptr<JobQueue> m_jobQueue;
+	//! Mutex to synchronize m_actionsThreadOption.
+	mutable std::shared_mutex m_actionsThreadOptionMutex;
+
+	//! Conditions that can be used by the Petri net.
+	ManagedContainer<ConditionFunction> m_conditions;
 
 	//! Loop that processes events and executes the Petri net.
 	EventLoop m_eventLoop;
+
+	//! Job queue to dispatch actions.
+	std::unique_ptr<JobQueue> m_jobQueue;
+
+	//! Flag reporting a new input event.
+	std::atomic<bool> m_newInputReceived = false;
+
+	PlacesManager m_places;
+
+	TransitionsManager m_transitions;
 };
 
 } // namespace ptne

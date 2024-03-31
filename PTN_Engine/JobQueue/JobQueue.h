@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2023 Eduardo Valgôde
+ * Copyright (c) 2023-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,15 @@
 
 namespace ptne
 {
+
 //!
 //! \brief Manages a thread that accepts tasks to be executed in sequence.
 //!
 class JobQueue
 {
 public:
-	JobQueue() = default;
 	~JobQueue() = default;
+	JobQueue() = default;
 	JobQueue(const JobQueue &) = delete;
 	JobQueue(JobQueue &&) = delete;
 	JobQueue &operator=(const JobQueue &) = delete;
@@ -41,6 +42,12 @@ public:
 
 	//! Activate the job queue.
 	void activate();
+
+	//!
+	//! \brief Adds a job to the job queue.
+	//! \param Function/job to be executed.
+	//!
+	void addJob(const ActionFunction &actionFunction);
 
 	//! Deactivate the job queue.
 	void deactivate();
@@ -50,12 +57,6 @@ public:
 	//! \return True if the job queue is active.
 	//!
 	bool isActive() const;
-
-	//!
-	//! \brief Adds a job to the job queue.
-	//! \param Function/job to be executed.
-	//!
-	void addJob(const ActionFunction &actionFunction);
 
 	//!
 	//! \brief Run the job queue. Should be executed in its own thread.

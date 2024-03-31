@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2017-2023 Eduardo Valgôde
+ * Copyright (c) 2017-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,12 @@ class ElevatorController
 	friend class ElevatorPetriNet;
 
 public:
-	//! Constructor.
+	~ElevatorController() = default;
 	ElevatorController();
+	ElevatorController(const ElevatorController &) = delete;
+	ElevatorController(ElevatorController &&) = delete;
+	ElevatorController &operator=(ElevatorController &) = delete;
+	ElevatorController &operator=(ElevatorController &&) = delete;
 
 	//! Command to open elevator doors.
 	void openDoors();
@@ -55,12 +59,6 @@ public:
 
 private:
 	mutable std::shared_mutex m_mutex;
-
-	//! Base (nested) class for a Petri net based state machine.
-	class IControllerPetriNet;
-
-	//! One concrete (nested) class of a Petri net based state machine.
-	class MenuStateMachine;
 
 	using PtrPetriNet = std::unique_ptr<IElevatorPetriNet>;
 

@@ -132,13 +132,13 @@ bool Transition::isActive() const
 		   checkAdditionalConditions();
 }
 
-vector<Arc> Transition::getActivationPlaces() const
+vector<Arc> Transition::getActivationArcs() const
 {
 	shared_lock guard(m_mutex);
 	return m_activationArcs;
 }
 
-vector<Arc> Transition::getDestinationPlaces() const
+vector<Arc> Transition::getDestinationArcs() const
 {
 	shared_lock guard(m_mutex);
 	return m_destinationArcs;
@@ -221,7 +221,7 @@ array<vector<ArcProperties>,3> Transition::getArcsProperties() const
 	return arcsProperties;
 }
 
-void Transition::addPlace(const shared_ptr<Place> &place, const ArcProperties::Type type, const size_t weight)
+void Transition::addArc(const shared_ptr<Place> &place, const ArcProperties::Type type, const size_t weight)
 {
 	unique_lock guard(m_mutex);
 
@@ -268,7 +268,7 @@ void Transition::addPlace(const shared_ptr<Place> &place, const ArcProperties::T
 	}
 }
 
-void Transition::removePlace(const shared_ptr<Place> &place, const ArcProperties::Type type)
+void Transition::removeArc(const shared_ptr<Place> &place, const ArcProperties::Type type)
 {
 	unique_lock guard(m_mutex);
 

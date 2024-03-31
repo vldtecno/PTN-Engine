@@ -28,10 +28,17 @@ class Controller;
 class XMLMenuStateMachine : public IMenuStateMachine
 {
 public:
-	void setControllerFunctions(Controller &menuController) override;
+	~XMLMenuStateMachine() override = default;
+	XMLMenuStateMachine() = default;
+	XMLMenuStateMachine(const XMLMenuStateMachine &) = delete;
+	XMLMenuStateMachine(XMLMenuStateMachine &&) = delete;
+	XMLMenuStateMachine &operator=(XMLMenuStateMachine &) = delete;
+	XMLMenuStateMachine &operator=(XMLMenuStateMachine &&) = delete;
+
 	void pressA() override;
 	void pressB() override;
 	void pressC() override;
+	void setControllerFunctions(Controller &menuController) override;
 
 	void exportStateMachine(const std::string &filePath) const;
 	void importStateMachine(const std::string &filePath);

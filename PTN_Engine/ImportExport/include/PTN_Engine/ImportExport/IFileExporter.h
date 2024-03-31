@@ -18,16 +18,17 @@
 
 #pragma once
 
-#include "PTN_Engine/Utilities/Explicit.h"
 #include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/Utilities/Explicit.h"
 #include <vector>
 
 namespace ptne
 {
+
 class PTN_Engine;
 
 //!
-//! \brief The IExporter class
+//! \brief The IFileExporter class is an interface for all PTN_Engine file exporters.
 //!
 class DLL_PUBLIC IFileExporter
 {
@@ -35,8 +36,9 @@ public:
 	virtual ~IFileExporter() = default;
 
 	//!
-	//! \brief _export
-	//! \param ptnEngine
+	//! \brief Export a PTN_Engine object to a file.
+	//! \param ptnEngine - the PTN_Engine object that should be exported.
+	//! \param filePath - the file path that will contain the exported PTN_Engine object.
 	//!
 	virtual void _export(const PTN_Engine &ptnEngine, const std::string &filePath) = 0;
 
@@ -44,28 +46,12 @@ protected:
 	void _export(const PTN_Engine &ptnEngine);
 
 private:
-	//!
-	//! \brief exportActionsThreadOption
-	//! \param actionsThreadOption
-	//!
 	virtual void exportActionsThreadOption(const std::string &actionsThreadOption) = 0;
 
-	//!
-	//! \brief exportPlace
-	//! \param placeProperties
-	//!
 	virtual void exportPlace(const PlaceProperties &placeProperties) = 0;
 
-	//!
-	//!\brief exportTransition
-	//!\param transitionPropereties
-	//!
 	virtual void exportTransition(const TransitionProperties &transitionPropereties) = 0;
 
-	//!
-	//! \brief exportArc
-	//! \param arcPropereties
-	//!
 	virtual void exportArc(const std::vector<ArcProperties> &arcPropereties) = 0;
 };
 

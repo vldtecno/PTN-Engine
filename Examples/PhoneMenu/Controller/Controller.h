@@ -38,13 +38,18 @@ public:
 	using MessageList = List<Message>;
 	using CallList = List<Call>;
 
+	~Controller();
+
 	Controller(MainMenuView &mainMenuView,
-			   MessagesMenuView &messagesMenu,
+			   MessagesView &messagesMenu,
 			   CallLogView &callLogView,
 			   MessageList &m_messageList,
 			   CallList &m_callLog);
 
-	~Controller();
+	Controller(const Controller &) = delete;
+	Controller(Controller &&) = delete;
+	Controller &operator=(Controller &) = delete;
+	Controller &operator=(Controller &&) = delete;
 
 	void execute();
 
@@ -97,7 +102,7 @@ private:
 	MainMenuView &m_mainMenuView;
 
 	//! A view of the messages.
-	MessagesMenuView &m_messagesMenuView;
+	MessagesView &m_messagesMenuView;
 
 	//! A view of the call logs.
 	CallLogView &m_callLogView;

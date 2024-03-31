@@ -29,27 +29,26 @@ template <typename T>
 class ManagerBase
 {
 protected:
-	ManagerBase() = default;
 	~ManagerBase() = default;
+	ManagerBase() = default;
 	ManagerBase(const ManagerBase &) = delete;
 	ManagerBase(ManagerBase &&) = delete;
 	ManagerBase &operator=(const ManagerBase &) = delete;
 	ManagerBase &operator=(const ManagerBase &&) = delete;
 
 	//!
-	//! \brief contains
-	//! \param name
-	//! \return
+	//! \brief Removes all places from the container.
 	//!
+	void clear()
+	{
+		m_items.clear();
+	}
+
 	bool contains(const std::string &itemName) const
 	{
 		return m_items.contains(itemName);
 	}
 
-	//!
-	//! \brief insert
-	//! \param item
-	//!
 	void insert(const std::shared_ptr<T> &item)
 	{
 		const auto &itemName = item->getName();
@@ -60,19 +59,6 @@ protected:
 		m_items[itemName] = item;
 	}
 
-	//!
-	//! \brief Removes all places from the container.
-	//!
-	void clear()
-	{
-		m_items.clear();
-	}
-
-	//!
-	//! \brief getPlace
-	//! \param itemName
-	//! \return
-	//!
 	std::shared_ptr<T> getItem(const std::string &itemName) const
 	{
 		if (!m_items.contains(itemName))
@@ -82,9 +68,6 @@ protected:
 		return m_items.at(itemName);
 	}
 
-	//!
-	//! \brief Vector with the items.
-	//!
 	std::unordered_map<std::string, std::shared_ptr<T>> m_items;
 };
 

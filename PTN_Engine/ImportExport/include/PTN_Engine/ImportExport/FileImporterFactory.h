@@ -1,7 +1,7 @@
 /*
  * This file is part of PTN Engine
  *
- * Copyright (c) 2019 Eduardo Valgôde
+ * Copyright (c) 2019-2024 Eduardo Valgôde
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,26 @@
 
 namespace ptne
 {
+
 class IFileImporter;
 
-class DLL_PUBLIC ImporterFactory
+//!
+//! \brief The FileImporterFactory class provides different types of file importers.
+//!
+class DLL_PUBLIC FileImporterFactory
 {
 public:
-    static std::unique_ptr<IFileImporter> createXMLFileImporter();
+	FileImporterFactory() = default;
+	FileImporterFactory(const FileImporterFactory &) = delete;
+	FileImporterFactory(FileImporterFactory &&) = delete;
+	FileImporterFactory &operator=(const FileImporterFactory &) = delete;
+	FileImporterFactory &operator=(FileImporterFactory &&) = delete;
+
+	//!
+	//! \brief createXMLFileImporter - creates a xml file importer
+	//! \return IFileImporter containing a XMLFileImporter.
+	//!
+	static std::unique_ptr<IFileImporter> createXMLFileImporter();
 };
 
 } // namespace ptne

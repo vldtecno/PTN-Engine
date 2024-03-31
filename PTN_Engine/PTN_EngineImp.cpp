@@ -225,7 +225,7 @@ void PTN_EngineImp::addArc(const ArcProperties &arcProperties) const
 	}
 
 	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
-	spTransition->addPlace(spPlace, arcProperties.type, arcProperties.weight);
+	spTransition->addArc(spPlace, arcProperties.type, arcProperties.weight);
 }
 
 void PTN_EngineImp::removeArc(const ArcProperties &arcProperties) const
@@ -247,7 +247,7 @@ void PTN_EngineImp::removeArc(const ArcProperties &arcProperties) const
 	}
 
 	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
-	spTransition->removePlace(spPlace, arcProperties.type);
+	spTransition->removeArc(spPlace, arcProperties.type);
 }
 
 vector<PlaceProperties> PTN_EngineImp::getPlacesProperties() const

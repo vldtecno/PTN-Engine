@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/ImportExport/ImporterFactory.h"
+#include "PTN_Engine/ImportExport/FileImporterFactory.h"
 #include "XML/XML_FileImporter.h"
 
 namespace ptne
 {
 using namespace std;
 
-unique_ptr<IFileImporter> ImporterFactory::createXMLFileImporter()
+unique_ptr<IFileImporter> FileImporterFactory::createXMLFileImporter()
 {
     return make_unique<XML_FileImporter>();
 }

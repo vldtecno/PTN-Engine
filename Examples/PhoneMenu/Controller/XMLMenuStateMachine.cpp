@@ -20,8 +20,8 @@
 #include "Controller/Controller.h"
 #include "PTN_Engine/ImportExport/IFileExporter.h"
 #include "PTN_Engine/ImportExport/IFileImporter.h"
-#include "PTN_Engine/ImportExport/ExporterFactory.h"
-#include "PTN_Engine/ImportExport/ImporterFactory.h"
+#include "PTN_Engine/ImportExport/FileExporterFactory.h"
+#include "PTN_Engine/ImportExport/FileImporterFactory.h"
 
 using namespace ptne;
 using namespace std;
@@ -55,13 +55,13 @@ void XMLMenuStateMachine::pressC()
 
 void XMLMenuStateMachine::exportStateMachine(const string &filePath) const
 {
-	unique_ptr<IFileExporter> xmlExporter = ExporterFactory::createXMLFileExporter();
+	unique_ptr<IFileExporter> xmlExporter = FileExporterFactory::createXMLFileExporter();
 	xmlExporter->_export(*this, filePath);
 }
 
 void XMLMenuStateMachine::importStateMachine(const string &filePath)
 {
-	unique_ptr<IFileImporter> xmlImporter = ImporterFactory::createXMLFileImporter();
+	unique_ptr<IFileImporter> xmlImporter = FileImporterFactory::createXMLFileImporter();
 	clearNet();
 	xmlImporter->_import(filePath, *this);
 }

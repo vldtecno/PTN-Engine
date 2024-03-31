@@ -26,31 +26,23 @@ template <class T>
 class List
 {
 public:
+	~List() = default;
 	List() = default;
+	List(const List &) = delete;
+	List(List &&) = delete;
+	List &operator=(const List &) = delete;
+	List &operator=(List &&) = delete;
 
-	//!
-	//! \brief Add an item to the list.
-	//! \param item Item.
-	//!
 	void addItem(const T &item)
 	{
 		m_items.push_back(item);
 	}
 
-	//!
-	//! \brief The number of elements.
-	//! \return Number of elements.
-	//!
 	size_t size() const
 	{
 		return m_items.size();
 	}
 
-	//!
-	//! \brief Get an item from the list.
-	//! \param i Index of the selected item.
-	//! \return A copy of the item.
-	//!
 	T getItem(const size_t i) const
 	{
 		if (i < m_items.size())
@@ -61,6 +53,5 @@ public:
 	}
 
 private:
-	//! Collection of items.
 	std::vector<T> m_items;
 };

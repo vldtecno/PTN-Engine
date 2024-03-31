@@ -25,7 +25,7 @@ class Controller;
 class IMenuStateMachine : public ptne::PTN_Engine
 {
 public:
-	virtual void setControllerFunctions(Controller &menuController) = 0;
+	virtual ~IMenuStateMachine() = default;
 
 	//! Press A key event.
 	virtual void pressA() = 0;
@@ -35,4 +35,6 @@ public:
 
 	//! Press C key event.
 	virtual void pressC() = 0;
+
+	virtual void setControllerFunctions(Controller &menuController) = 0;
 };

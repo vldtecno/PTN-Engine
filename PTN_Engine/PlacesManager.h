@@ -18,13 +18,14 @@
 
 #pragma once
 
+#include "PTN_Engine/ManagerBase.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Place.h"
-#include "PTN_Engine/ManagerBase.h"
 #include <shared_mutex>
 
 namespace ptne
 {
+
 using SharedPtrPlace = std::shared_ptr<Place>;
 using WeakPtrPlace = std::weak_ptr<Place>;
 
@@ -34,48 +35,24 @@ using WeakPtrPlace = std::weak_ptr<Place>;
 class PlacesManager : private ManagerBase<Place>
 {
 public:
-	//!
-	//! \brief contains
-	//! \param itemName
-	//! \return
-	//!
-	bool contains(const std::string &itemName) const;
+	~PlacesManager() = default;
+	PlacesManager() = default;
+	PlacesManager(const PlacesManager &) = delete;
+	PlacesManager(PlacesManager &&) = delete;
+	PlacesManager &operator=(PlacesManager &) = delete;
+	PlacesManager &operator=(PlacesManager &&) = delete;
 
 	//!
-	//! \brief Insert a new transition.
-	//! \param place
-	//!
-	void insert(const std::shared_ptr<Place> &place);
-
-	//!
-	//! \brief clear
+	//! \brief Removes all places.
 	//!
 	void clear();
 
 	//!
-	//! \brief getPlace
-	//! \param placeName
-	//! \return
-	//!
-	std::shared_ptr<Place> getPlace(const std::string &placeName) const;
-
-	//!
-	//! \brief clearInputPlaces
+	//! \brief Sets the number of tokens in the input places to 0.
 	//!
 	void clearInputPlaces() const;
 
-	//!
-	//! \brief Translates a vector of names of places to a vector of weak pointers to those places.
-	//! \param names Names of the places.
-	//! \return Vector of weakt_ptr for each place given in "names".
-	//!
-	std::vector<WeakPtrPlace> getPlacesFromNames(const std::vector<std::string> &placesNames) const;
-
-	//!
-	//! Print the petri net places and number of tokens.
-	//! \param o Output stream.
-	//!
-	void printState(std::ostream &o) const;
+	bool contains(const std::string &itemName) const;
 
 	//!
 	//! \brief Gets the number of tokens in a given place.
@@ -84,17 +61,25 @@ public:
 	//!
 	size_t getNumberOfTokens(const std::string &place) const;
 
+	std::shared_ptr<Place> getPlace(const std::string &placeName) const;
+
+	std::vector<WeakPtrPlace> getPlaces(const std::vector<std::string> &placesNames) const;
+
+	std::vector<PlaceProperties> getPlacesProperties() const;
+
 	//!
 	//! \brief Increment the number of tokens in an input place.
 	//! \param place - Identifier of the input place to increment.
 	//!
 	void incrementInputPlace(const std::string &place);
 
+	void insert(const std::shared_ptr<Place> &place);
+
 	//!
-	//! \brief getPlacesProperties
-	//! \return
+	//! Print the petri net places and number of tokens.
+	//! \param o Output stream.
 	//!
-	std::vector<PlaceProperties> getPlacesProperties() const;
+	void printState(std::ostream &o) const;
 
 private:
 	//!
@@ -104,7 +89,6 @@ private:
 
 	//!
 	//! \brief Vector with the input places.
-	//! Insertions on construction. Otherwise (should remain) unchanged.
 	//!
 	std::vector<WeakPtrPlace> m_inputPlaces;
 };

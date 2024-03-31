@@ -28,13 +28,17 @@ class ElevatorController;
 class ElevatorPetriNet : public IElevatorPetriNet, private ptne::PTN_Engine
 {
 public:
+	~ElevatorPetriNet() override;
+
 	//!
 	//! Constructor.
 	//! \param ptrDispatcher Shared pointer to the controller.
 	//!
 	explicit ElevatorPetriNet(ElevatorController &elevatorController);
-
-	~ElevatorPetriNet() override;
+	ElevatorPetriNet(const ElevatorPetriNet &) = delete;
+	ElevatorPetriNet(ElevatorPetriNet &&) = delete;
+	ElevatorPetriNet &operator=(ElevatorPetriNet &) = delete;
+	ElevatorPetriNet &operator=(ElevatorPetriNet &&) = delete;
 
 	// Events
 

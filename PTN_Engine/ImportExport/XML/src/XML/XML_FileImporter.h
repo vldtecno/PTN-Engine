@@ -24,47 +24,39 @@
 
 namespace ptne
 {
+
 class PTN_Engine;
 
 //!
-//! \brief The XML_Importer class
+//! \brief The XML_FileImporter class implements the import of a PTN_Engine object from an xml file.
 //!
-class XML_FileImporter : public IFileImporter//, public IFileImporter
+class XML_FileImporter : public IFileImporter //, public IFileImporter
 {
 public:
 	~XML_FileImporter() override = default;
+	XML_FileImporter() = default;
+	XML_FileImporter(const XML_FileImporter &) = delete;
+	XML_FileImporter(XML_FileImporter &&) = delete;
+	XML_FileImporter &operator=(const XML_FileImporter &) = delete;
+	XML_FileImporter &operator=(XML_FileImporter &&) = delete;
 
-	void _import(const std::string& filePath, PTN_Engine &ptnEngine) override;
+	//!
+	//! \brief _import Imports a PTN_Engine object from an xml file.
+	//! \param filePath - file path to the xml file with the PTN_Engine object.
+	//! \param ptnEngine - PTN_Engine object to be populated.
+	//!
+	void _import(const std::string &filePath, PTN_Engine &ptnEngine) override;
 
 private:
-
-	//!
-	//! \brief importActionsThreadOption
-	//! \return
-	//!
 	std::string importActionsThreadOption() const override;
 
-	//!
-	//! \brief importPlaces
-	//! \return
-	//!
-	std::vector<PlaceProperties> importPlaces() const override;
-
-	//!
-	//! \brief importTransitions
-	//! \return
-	//!
-	std::vector<TransitionProperties> importTransitions() const override;
-
-	//!
-	//! \brief importArcs
-	//! \return
-	//!
 	std::vector<ArcProperties> importArcs() const override;
 
-	//!
-	//! \brief m_document
-	//!
+	std::vector<PlaceProperties> importPlaces() const override;
+
+	std::vector<TransitionProperties> importTransitions() const override;
+
 	pugi::xml_document m_document;
 };
+
 } // namespace ptne

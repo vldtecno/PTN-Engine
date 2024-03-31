@@ -24,13 +24,15 @@ namespace ptne
 {
 
 //!
-//! \brief The IPTN_EnginePlace class
+//! \brief PTN_Engine interface to be provided to the Places.
 //!
 class IPTN_EnginePlace
 {
 public:
 	virtual ~IPTN_EnginePlace() = default;
+
 	virtual PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const = 0;
+
 	virtual void addJob(const ActionFunction &actionFunction) = 0;
 };
 

@@ -25,12 +25,13 @@
 class CallLogView
 {
 public:
-	CallLogView(List<Call> &callLog);
+	~CallLogView() = default;
+	explicit CallLogView(List<Call> &callLog);
+	CallLogView(const CallLogView &) = delete;
+	CallLogView(CallLogView &&) = delete;
+	CallLogView &operator=(const CallLogView &) = delete;
+	CallLogView &operator=(CallLogView &&) = delete;
 
-	//!
-	//! Print the call logs on screen.
-	//! \param callLog List of calls.
-	//!
 	void viewCallLog() const;
 
 private:

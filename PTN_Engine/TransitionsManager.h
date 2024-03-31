@@ -20,35 +20,33 @@
 
 #pragma once
 
-#include "PTN_Engine/Transition.h"
 #include "PTN_Engine/ManagerBase.h"
+#include "PTN_Engine/Transition.h"
 #include <shared_mutex>
 
 namespace ptne
 {
+
 using SharedPtrTransition = std::shared_ptr<Transition>;
+using WeakPtrTransition = std::weak_ptr<Transition>;
 
 //!
-//! \brief The TransitionsManager class
+//! \brief The TransitionsManager contains and manages all the transitions.
 //!
 class TransitionsManager : private ManagerBase<Transition>
 {
 public:
-	//!
-	//! \brief contains
-	//! \param itemName
-	//! \return
-	//!
-	bool contains(const std::string &itemName) const;
+	~TransitionsManager() = default;
+	TransitionsManager() = default;
+	TransitionsManager(const TransitionsManager &) = delete;
+	TransitionsManager(TransitionsManager &&) = delete;
+	TransitionsManager &operator=(const TransitionsManager &) = delete;
+	TransitionsManager &operator=(TransitionsManager &&) = delete;
+
+	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
 
 	//!
-	//! \brief Insert a new transition.
-	//! \param transition
-	//!
-	void insert(std::shared_ptr<Transition> transition);
-
-	//!
-	//! \brief clear
+	//! \brief Remove all transitions from the container.
 	//!
 	void clear();
 
@@ -56,38 +54,20 @@ public:
 	//! \brief collectEnabledTransitionsRandomly
 	//! \return A vector of weak pointers to the enabled transitions.
 	//!
-	std::vector<std::weak_ptr<Transition>> collectEnabledTransitionsRandomly() const;
+	std::vector<WeakPtrTransition> collectEnabledTransitionsRandomly() const;
 
-	//!
-	//! \brief hasTransition
-	//! \param name
-	//! \return
-	//!
-	bool hasTransition(const std::string &name) const;
+	bool contains(const std::string &itemName) const;
 
-	//!
-	//! \brief getTransition
-	//! \param transitionName
-	//! \return
-	//!
 	SharedPtrTransition getTransition(const std::string &transitionName) const;
 
-	//!
-	//! \brief getTransitionsProperties
-	//! \return
-	//!
 	std::vector<TransitionProperties> getTransitionsProperties() const;
 
-	//!
-	//! \brief getArcsProperties
-	//! \return
-	//!
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
+	bool hasTransition(const std::string &name) const;
+
+	void insert(std::shared_ptr<Transition> transition);
 
 private:
-	//!
 	//! Shared mutex to synchronize the access to the items(readers-writer lock).
-	//!
 	mutable std::shared_mutex m_itemsMutex;
 };
 

@@ -21,7 +21,7 @@
 using namespace std;
 
 Controller::Controller(MainMenuView &mainMenuView,
-                       MessagesMenuView &messagesMenuView,
+                       MessagesView &messagesMenuView,
                        CallLogView &callLogView,
                        MessageList &messageList,
                        CallList &callLog)

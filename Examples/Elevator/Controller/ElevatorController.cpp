@@ -26,6 +26,7 @@ using namespace std;
 
 namespace
 {
+
 void printFloorList(const unordered_set<int> &floors)
 {
 	if (floors.empty())
@@ -39,6 +40,7 @@ void printFloorList(const unordered_set<int> &floors)
 	}
 	cout << endl;
 }
+
 } // namespace
 
 ElevatorController::ElevatorController()

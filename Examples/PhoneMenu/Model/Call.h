@@ -23,6 +23,9 @@
 class Call
 {
 public:
+	~Call() = default;
+
 	std::string m_date;
+
 	std::string m_number;
 };

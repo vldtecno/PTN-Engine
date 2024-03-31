@@ -17,7 +17,6 @@
 #pragma once
 
 #include "PTN_Engine/PTN_Engine.h"
-#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
 #include <algorithm>
 #include <mutex>
@@ -25,6 +24,7 @@
 
 namespace ptne
 {
+
 //!
 //! \brief The ManagedContainer class
 //!
@@ -32,12 +32,13 @@ template <typename T>
 class ManagedContainer
 {
 public:
-	ManagedContainer() = default;
 	~ManagedContainer() = default;
+	ManagedContainer() = default;
 	ManagedContainer(const ManagedContainer &) = delete;
 	ManagedContainer(ManagedContainer &&) = delete;
 	ManagedContainer &operator=(const ManagedContainer &) = delete;
 	ManagedContainer &operator=(const ManagedContainer &&) = delete;
+
 
 	//!
 	//! \brief Add item to container.
@@ -83,7 +84,7 @@ public:
 	}
 
 	//!
-	//! \brief getItems gets copies of the items based on their identifying names.
+	//! \brief Gets copies of the items based on their identifying names.
 	//!        Invalid names result in a InvalidFunctionNameException.
 	//! \throws InvalidFunctionNameException
 	//! \param names of the items
@@ -94,28 +95,29 @@ public:
 		std::shared_lock lock(m_mutex);
 		std::vector<std::pair<std::string, T>> items;
 		std::ranges::for_each(names.cbegin(), names.cend(),
-				 [&](const std::string &name)
-				 {
-					 if (name.empty())
-					 {
-						throw InvalidFunctionNameException(name);
-					 }
+							  [&](const std::string &name)
+							  {
+								  if (name.empty())
+								  {
+									  throw InvalidFunctionNameException(name);
+								  }
 
-					 if (!m_items.contains(name))
-					 {
-						throw InvalidFunctionNameException(name);
-					 }
-					 items.push_back(std::pair<std::string, ConditionFunction>(name, m_items.at(name)));
-				 });
+								  if (!m_items.contains(name))
+								  {
+									  throw InvalidFunctionNameException(name);
+								  }
+								  items.push_back(
+								  std::pair<std::string, ConditionFunction>(name, m_items.at(name)));
+							  });
 		return items;
 	}
 
 private:
-	//! Protects concurrent access to m_items.
-	mutable std::shared_mutex m_mutex;
-
 	//! An unordered map of items identified by a string.
 	std::unordered_map<std::string, T> m_items;
+
+	//! Protects concurrent access to m_items.
+	mutable std::shared_mutex m_mutex;
 };
 
 } // namespace ptne

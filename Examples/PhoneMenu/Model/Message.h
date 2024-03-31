@@ -24,6 +24,9 @@
 class Message
 {
 public:
+	~Message() = default;
+
 	std::string m_title;
+
 	std::string m_body;
 };

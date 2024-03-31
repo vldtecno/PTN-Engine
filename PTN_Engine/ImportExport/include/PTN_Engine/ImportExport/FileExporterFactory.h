@@ -23,12 +23,26 @@
 
 namespace ptne
 {
+
 class IFileExporter;
 
-class DLL_PUBLIC ExporterFactory
+//!
+//! \brief The FileExporterFactory class provides different types of file exporters.
+//!
+class DLL_PUBLIC FileExporterFactory
 {
 public:
-    static std::unique_ptr<IFileExporter> createXMLFileExporter();
+	FileExporterFactory() = default;
+	FileExporterFactory(const FileExporterFactory &) = delete;
+	FileExporterFactory(FileExporterFactory &&) = delete;
+	FileExporterFactory &operator=(const FileExporterFactory &) = delete;
+	FileExporterFactory &operator=(FileExporterFactory &&) = delete;
+
+	//!
+	//! \brief createXMLFileExporter - creates a xml file exporter
+	//! \return IFileExporter containing a XMLFileExporter
+	//!
+	static std::unique_ptr<IFileExporter> createXMLFileExporter();
 };
 
 } // namespace ptne

@@ -30,6 +30,9 @@
 
 using namespace std;
 
+using MessagesModel = List<Message>;
+using CallLogModel = List<Call>;
+
 static void programLoop(Controller &controller)
 {
 	bool exit = false;
@@ -65,19 +68,19 @@ static void programLoop(Controller &controller)
 	} while (!exit);
 }
 
-void populateMessageList(List<Message> &messageList)
+void populateMessagesModel(List<Message> &messagesModel)
 {
-	messageList.addItem(Message("Hi...", "Hi John, don't forget to water the plants."));
-	messageList.addItem(Message("Is...", "Is this thing working?"));
-	messageList.addItem(Message("Please...", "Please top up your phone."));
+	messagesModel.addItem(Message("Hi...", "Hi John, don't forget to water the plants."));
+	messagesModel.addItem(Message("Is...", "Is this thing working?"));
+	messagesModel.addItem(Message("Please...", "Please top up your phone."));
 }
 
-void populateCallLog(List<Call> &callLog)
+void populateCallLogModel(List<Call> &callModel)
 {
-	callLog.addItem(Call("10:05:03 29-JUN-2018", "John Doe"));
-	callLog.addItem(Call("09:35:50 29-JUN-2018", "Sally Smith"));
-	callLog.addItem(Call("09:12:01 29-JUN-2018", "Dick Jones"));
-	callLog.addItem(Call("08:59:47 29-JUN-2018", "Harry Brown"));
+	callModel.addItem(Call("10:05:03 29-JUN-2018", "John Doe"));
+	callModel.addItem(Call("09:35:50 29-JUN-2018", "Sally Smith"));
+	callModel.addItem(Call("09:12:01 29-JUN-2018", "Dick Jones"));
+	callModel.addItem(Call("08:59:47 29-JUN-2018", "Harry Brown"));
 }
 
 void runLoop(Controller &controller)
@@ -91,18 +94,18 @@ void runLoop(Controller &controller)
 int main(int, char **)
 {
 	// Create data
-	List<Message> messageList;
-	populateMessageList(messageList);
-	List<Call> callLog;
-	populateCallLog(callLog);
+	MessagesModel messagesModel;
+	populateMessagesModel(messagesModel);
+	CallLogModel callLogModel;
+	populateCallLogModel(callLogModel);
 
 	// Create views
 	MainMenuView mainMenuView;
-	MessagesMenuView messagesMenuView(messageList);
-	CallLogView callLogView(callLog);
+	MessagesView messagesMenuView(messagesModel);
+	CallLogView callLogView(callLogModel);
 
 	// Create the controller
-	Controller controller(mainMenuView, messagesMenuView, callLogView, messageList, callLog);
+	Controller controller(mainMenuView, messagesMenuView, callLogView, messagesModel, callLogModel);
 
 	// Set a state machine in the controller
 	controller.setStateMachine(make_shared<MenuStateMachine>());

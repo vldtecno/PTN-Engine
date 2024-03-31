@@ -18,16 +18,17 @@
 
 #pragma once
 
-#include "PTN_Engine/Utilities/Explicit.h"
 #include "PTN_Engine/PTN_Engine.h"
+#include "PTN_Engine/Utilities/Explicit.h"
 #include <vector>
 
 namespace ptne
 {
+
 class PTN_Engine;
 
 //!
-//! \brief The IImporter class
+//! \brief The IFileImporter class is an interface class for all PTN_Engine file importers.
 //!
 class DLL_PUBLIC IFileImporter
 {
@@ -35,8 +36,9 @@ public:
 	virtual ~IFileImporter() = default;
 
 	//!
-	//! \brief import
-	//! \param ptnEngine
+	//! \brief Import a PTN_Engine object from a file.
+	//! \param filePath - the file path where the PTN_Engine should be imported from.
+	//! \param ptnEngine - the PTN_Object where the contents from the file will be inserted.
 	//!
 	virtual void _import(const std::string &filePath, PTN_Engine &ptnEngine) = 0;
 
@@ -44,28 +46,9 @@ protected:
 	void _import(PTN_Engine &ptnEngine) const;
 
 private:
-	//!
-	//! \brief importActionsThreadOption
-	//! \return
-	//!
 	virtual std::string importActionsThreadOption() const = 0;
-
-	//!
-	//! \brief importPlaces
-	//! \return
-	//!
 	virtual std::vector<PlaceProperties> importPlaces() const = 0;
-
-	//!
-	//! \brief importTransitions
-	//! \return
-	//!
 	virtual std::vector<TransitionProperties> importTransitions() const = 0;
-
-	//!
-	//! \brief importArcs
-	//! \return
-	//!
 	virtual std::vector<ArcProperties> importArcs() const = 0;
 };
 
