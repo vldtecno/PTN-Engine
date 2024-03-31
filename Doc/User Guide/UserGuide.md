@@ -8,7 +8,7 @@ This is a step by step guide of how to integrate the *PTN Engine* in your progra
 
 For further details you can read the code of the examples included in this distribution.
 
-### 1 - Build the *PTN Engine*
+### 1 - Build the PTN Engine
 
 You can generate a build configuration for *PTN Engine* running the provided
 CMake scripts. These support GCC and Visual C++. Other compilers are not yet supported, so if you want to use a different compiler you will have to change or write the build scripts yourself.
