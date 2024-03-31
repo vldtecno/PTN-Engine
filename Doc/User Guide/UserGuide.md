@@ -21,7 +21,7 @@ In your own project configure your build to link against these libraries and inc
 
 ### Step by step guide
 
-#### 2 - Create your own *PTN Engine* instance.
+#### 2 - Create your own PTN Engine instance.
 
 Create a PTN_Engine and select on of the ACTIONS_THREAD_OPTION options available.
 Example:
