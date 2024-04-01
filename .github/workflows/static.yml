@@ -65,11 +65,11 @@ jobs:
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: InstallCoverageReportDependencies
-        run: sudo apt-get -y install lcov
+        run: sudo apt-get -y install lcov gcov
 
       - name: TestCoverageData
         working-directory: ${{github.workspace}}/build/
-        run: geninfo --no-external "./PTN_Engine" -b "../" -o coverage.info
+        run: geninfo "./PTN_Engine" -b "../" -o coverage.info
 
       - name: TestCoverageReport
         working-directory: ${{github.workspace}}/build/
