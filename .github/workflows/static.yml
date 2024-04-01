@@ -65,7 +65,7 @@ jobs:
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: InstallCoverageReportDependencies
-        run: sudo apt-get -y install lcov gcov
+        run: sudo apt-get -y install lcov
 
       - name: TestCoverageData
         working-directory: ${{github.workspace}}/build/
