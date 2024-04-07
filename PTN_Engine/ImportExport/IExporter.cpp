@@ -41,11 +41,6 @@ void IFileExporter::_export(const PTN_Engine &ptnEngine)
 	{
 		exportTransition(transitionProperties);
 	}
-
-	for (const auto &arcProperties : ptnEngine.getArcsProperties())
-	{
-		exportArc(arcProperties);
-	}
 }
 
 } // namespace ptne

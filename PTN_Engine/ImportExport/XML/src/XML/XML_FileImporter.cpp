@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
+#include "XML/XML_FileImporter.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
-#include "XML/XML_FileImporter.h"
+#include <algorithm>
 #include <charconv>
 #include <iterator>
-#include <algorithm>
 
 using namespace pugi;
 using namespace std;
@@ -38,12 +38,13 @@ vector<string> collectTransitionAttributes(const xml_node &transition, const str
 {
 	vector<string> activationConditions;
 	const auto &childAttributes = transition.child(attribute.c_str());
-	ranges::transform(begin(childAttributes), end(childAttributes), back_inserter(activationConditions),
-			  [](const auto &activationCondition) { return activationCondition.attribute("name").value(); });
+	ranges::transform(childAttributes, back_inserter(activationConditions), [](const auto &activationCondition)
+					  { return activationCondition.attribute("name").value(); });
 	return activationConditions;
 }
 
-vector<ArcProperties> collectArcAttributes(const xml_node &transition, const string &attribute, const ArcProperties::Type type)
+vector<ArcProperties>
+collectArcAttributes(const xml_node &transition, const string &attribute, const ArcProperties::Type type)
 {
 	vector<ArcProperties> arcsProperties;
 	for (xml_node activationCondition : transition.child(attribute.c_str()))
@@ -56,10 +57,8 @@ vector<ArcProperties> collectArcAttributes(const xml_node &transition, const str
 			weight = static_cast<size_t>(atol(weightStr.c_str()));
 		}
 
-		arcsProperties.emplace_back(weight,
-			activationCondition.attribute("name").value(),
-			activationConditionName,
-			type);
+		arcsProperties.emplace_back(weight, activationCondition.attribute("name").value(), activationConditionName,
+									type);
 	}
 	return arcsProperties;
 }
@@ -134,7 +133,7 @@ vector<PlaceProperties> XML_FileImporter::importPlaces() const
 			isInput = isInputStr == "true" ? true : false;
 		}
 
-		size_t numberOfTokens = 0;		
+		size_t numberOfTokens = 0;
 		if (const string numberOfTokensStr = getAttributeValue(place, "tokens"); !numberOfTokensStr.empty())
 		{
 			numberOfTokens = static_cast<size_t>(atol(numberOfTokensStr.c_str()));
@@ -165,7 +164,8 @@ vector<TransitionProperties> XML_FileImporter::importTransitions() const
 		transitionProperties.destinationArcs = collectArcAttributes(transition, "DestinationPlaces", DESTINATION);
 		transitionProperties.inhibitorArcs = collectArcAttributes(transition, "InhibitorPlaces", INHIBITOR);
 		transitionProperties.additionalConditionsNames = activationConditions;
-		transitionProperties.requireNoActionsInExecution = getNodeValue<bool>("RequireNoActionsInExecution", transition);
+		transitionProperties.requireNoActionsInExecution =
+		getNodeValue<bool>("RequireNoActionsInExecution", transition);
 		transitionInfoCollection.emplace_back(transitionProperties);
 	}
 	return transitionInfoCollection;

@@ -301,12 +301,6 @@ public:
 	 */
 	std::vector<TransitionProperties> getTransitionsProperties() const;
 
-	/*!
-	 * \brief getArcsProperties
-	 * \return
-	 */
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
-
 private:
 	class PTN_EngineImpProxy;
 

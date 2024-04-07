@@ -33,8 +33,8 @@ namespace ptne
 class JobQueue
 {
 public:
-	~JobQueue() = default;
-	JobQueue() = default;
+	~JobQueue();
+	JobQueue();
 	JobQueue(const JobQueue &) = delete;
 	JobQueue(JobQueue &&) = delete;
 	JobQueue &operator=(const JobQueue &) = delete;
@@ -58,16 +58,17 @@ public:
 	//!
 	bool isActive() const;
 
-	//!
-	//! \brief Run the job queue. Should be executed in its own thread.
-	//!
-	void run(std::stop_token stopToken);
 
 private:
 	//!
 	//! \brief Launch the job queue.
 	//!
 	void launch();
+
+	//!
+	//! \brief Run the job queue. Should be executed in its own thread.
+	//!
+	void run(std::stop_token stopToken);
 
 	//! Whether the job queue is active or not.
 	std::atomic<bool> m_isJobQueueActive = true;

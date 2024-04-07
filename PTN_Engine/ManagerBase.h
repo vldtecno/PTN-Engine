@@ -51,8 +51,16 @@ protected:
 
 	void insert(const std::shared_ptr<T> &item)
 	{
+		if (item == nullptr)
+		{
+			throw PTN_Exception("Tried to insert nullptr item");
+		}
 		const auto &itemName = item->getName();
-		if (m_items.contains(itemName))
+		if (itemName.empty())
+		{
+			throw PTN_Exception("Empty item names are not supported.");
+		}
+		else if (m_items.contains(itemName))
 		{
 			throw RepeatedPlaceException(itemName);
 		}

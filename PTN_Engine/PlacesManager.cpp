@@ -26,6 +26,9 @@ namespace ptne
 {
 using namespace std;
 
+PlacesManager::~PlacesManager() = default;
+PlacesManager::PlacesManager() = default;
+
 bool PlacesManager::contains(const string &itemName) const
 {
 	shared_lock itemsGuard(m_itemsMutex);

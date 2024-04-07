@@ -51,8 +51,6 @@ private:
 
 	void exportTransition(const TransitionProperties &transitionProperties) override;
 
-	void exportArc(const std::vector<ArcProperties> &arcPropereties) override;
-
 	void saveFile() const;
 
 	pugi::xml_node m_arcsNode;

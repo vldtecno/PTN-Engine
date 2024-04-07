@@ -77,12 +77,6 @@ vector<TransitionProperties> PTN_Engine::PTN_EngineImpProxy::getTransitionsPrope
 	return m_ptnEngineImp.getTransitionsProperties();
 }
 
-vector<vector<ArcProperties>> PTN_Engine::PTN_EngineImpProxy::getArcsProperties() const
-{
-	shared_lock guard(m_mutex);
-	return m_ptnEngineImp.getArcsProperties();
-}
-
 void PTN_Engine::PTN_EngineImpProxy::createTransition(const TransitionProperties &transitionProperties)
 {
 	unique_lock guard(m_mutex);

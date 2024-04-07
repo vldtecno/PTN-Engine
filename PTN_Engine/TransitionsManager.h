@@ -36,14 +36,12 @@ using WeakPtrTransition = std::weak_ptr<Transition>;
 class TransitionsManager : private ManagerBase<Transition>
 {
 public:
-	~TransitionsManager() = default;
-	TransitionsManager() = default;
+	~TransitionsManager();
+	TransitionsManager();
 	TransitionsManager(const TransitionsManager &) = delete;
 	TransitionsManager(TransitionsManager &&) = delete;
 	TransitionsManager &operator=(const TransitionsManager &) = delete;
 	TransitionsManager &operator=(TransitionsManager &&) = delete;
-
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
 
 	//!
 	//! \brief Remove all transitions from the container.
@@ -61,8 +59,6 @@ public:
 	SharedPtrTransition getTransition(const std::string &transitionName) const;
 
 	std::vector<TransitionProperties> getTransitionsProperties() const;
-
-	bool hasTransition(const std::string &name) const;
 
 	void insert(std::shared_ptr<Transition> transition);
 

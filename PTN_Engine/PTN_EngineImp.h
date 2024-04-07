@@ -95,8 +95,6 @@ public:
 	//!
 	void execute(const bool log = false, std::ostream &o = std::cout);
 
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
-
 	//!
 	//! \brief Gets the current sleep time set in the event loop.
 	//! \return The sleep time of the event loop.
@@ -154,14 +152,17 @@ public:
 	void setEventLoopSleepDuration(const PTN_Engine::EventLoopSleepDuration sleepDuration);
 
 	//!
-	//! \brief Flags or clears flag of new tokens in input places.
-	//! \param newInputReceived - The new value for the new input received flag.
+	//! \brief Stop the execution of the petri net.
 	//!
-	void setNewInputReceived(const bool newInputReceived);
-
 	void stop() noexcept;
 
 private:
+	//!
+	//! \brief Execute the Petri net.
+	//! \param log
+	//! \param o
+	//! \return
+	//!
 	bool executeInt(const bool log = false, std::ostream &o = std::cout) override;
 
 	//!
@@ -188,6 +189,12 @@ private:
 						  const std::vector<ArcProperties> &inhibitorArcs,
 						  const std::vector<std::pair<std::string, ConditionFunction>> &additionalConditions,
 						  const bool requireNoActionsInExecution);
+
+	//!
+	//! \brief Flags or clears flag of new tokens in input places.
+	//! \param newInputReceived - The new value for the new input received flag.
+	//!
+	void setNewInputReceived(const bool newInputReceived);
 
 	//! Container with all the actions available to this Petri net.
 	ManagedContainer<ActionFunction> m_actions;

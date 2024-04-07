@@ -29,7 +29,7 @@ void detectRepeated(std::vector<std::weak_ptr<T>> items)
 	auto equals = [](const std::weak_ptr<T> &t, const std::weak_ptr<T> &u)
 	{ return !t.owner_before(u) && !u.owner_before(t); };
 
-	std::ranges::sort(items.begin(), items.end(), std::owner_less<std::weak_ptr<T>>());
+	std::ranges::sort(items, std::owner_less<std::weak_ptr<T>>());
 
 	if (items.end() - std::unique(items.begin(), items.end(), equals) > 0)
 	{
@@ -40,7 +40,7 @@ void detectRepeated(std::vector<std::weak_ptr<T>> items)
 template <class T, class E>
 void detectRepeatedNames(std::vector<T> items)
 {
-	std::ranges::sort(items.begin(), items.end());
+	std::ranges::sort(items);
 	if (items.end() - std::unique(items.begin(), items.end()) > 0)
 	{
 		throw E();

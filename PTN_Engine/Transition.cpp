@@ -32,6 +32,8 @@ namespace ptne
 {
 using namespace std;
 
+Transition::~Transition() = default;
+
 Transition::Transition(const string &name,
                        const vector<Arc> &activationArcs,
                        const vector<Arc> &destinationArcs,
@@ -48,19 +50,17 @@ Transition::Transition(const string &name,
 	auto getPlacesFromArcs = [](const vector<Arc> &arcs)
 	{
 		vector<WeakPtrPlace> places;
-		ranges::transform(arcs.cbegin(), arcs.cend(), back_inserter(places), [](const auto &arc) {
-			return arc.place; });
+		ranges::transform(arcs, back_inserter(places), [](const auto &arc) { return arc.place; });
 		return places;
 	};
 
 	utility::detectRepeated<Place, ActivationPlaceRepetitionException>(getPlacesFromArcs(activationArcs));
 	utility::detectRepeated<Place, DestinationPlaceRepetitionException>(getPlacesFromArcs(destinationArcs));
+	utility::detectRepeated<Place, InhibitorPlaceRepetitionException>(getPlacesFromArcs(inhibitorArcs));
 
 	auto validateWeights = [](const vector<Arc> &arcs)
 	{
-		if (ranges::find_if(arcs.cbegin(), arcs.cend(), [](const auto &arc) {
-			return arc.weight == 0;
-		}) != arcs.cend())
+		if (ranges::find_if(arcs, [](const auto &arc) { return arc.weight == 0; }) != arcs.cend())
 		{
 			throw ZeroValueWeightException();
 		}
@@ -69,12 +69,6 @@ Transition::Transition(const string &name,
 	validateWeights(activationArcs);
 	validateWeights(destinationArcs);
 	validateWeights(inhibitorArcs);
-}
-
-Transition::Transition(Transition &&transition) noexcept
-{
-	unique_lock guard(m_mutex);
-	moveMembers(transition);
 }
 
 string Transition::getName() const
@@ -156,12 +150,6 @@ vector<Arc> Transition::getInhibitorArcs() const
 	return m_inhibitorArcs;
 }
 
-bool Transition::requireNoActionsInExecution() const
-{
-	shared_lock guard(m_mutex);
-	return m_requireNoActionsInExecution;
-}
-
 bool Transition::checkInhibitorPlaces() const
 {
 	auto numberOfTokensGreaterThan0 = [](const auto &inhibitorArc)
@@ -170,7 +158,7 @@ bool Transition::checkInhibitorPlaces() const
 		return spInhibitorArc->getNumberOfTokens() > 0;
 	};
 
-	if (ranges::find_if(m_inhibitorArcs.cbegin(), m_inhibitorArcs.cend(), numberOfTokensGreaterThan0) != m_inhibitorArcs.end())
+	if (ranges::find_if(m_inhibitorArcs, numberOfTokensGreaterThan0) != m_inhibitorArcs.end())
 	{
 		return false;
 	}
@@ -179,62 +167,67 @@ bool Transition::checkInhibitorPlaces() const
 
 TransitionProperties Transition::getTransitionProperties() const
 {
+	shared_lock guard(m_mutex);
+
 	TransitionProperties transitionProperties;
 
 	auto getAdditionalConditionsNames = [this]()
 	{
 		vector<string> additionalActivationConditionNames;
-		for (const auto &[additionalActivationConditionName,_] : m_additionalActivationConditions)
+		for (const auto &[additionalActivationConditionName, _] : m_additionalActivationConditions)
 		{
 			additionalActivationConditionNames.push_back(additionalActivationConditionName);
 		}
 		return additionalActivationConditionNames;
 	};
 
+	auto getAdditionalConditions = [this]()
+	{
+		vector<ConditionFunction> additionalActivationConditions;
+		for (const auto &[_, additionalActivationCondition] : m_additionalActivationConditions)
+		{
+			additionalActivationConditions.push_back(additionalActivationCondition);
+		}
+		return additionalActivationConditions;
+	};
+
 	transitionProperties.additionalConditionsNames = getAdditionalConditionsNames();
+
+	auto getProperties = [this](const vector<Arc> &arcs, ArcProperties::Type type)
+	{
+		vector<ArcProperties> arcsProperties;
+		for (const auto &arc : arcs)
+		{
+			auto spPlace = lockWeakPtr(arc.place);
+			arcsProperties.emplace_back(arc.weight, spPlace->getName(), getName(), type);
+		}
+		return arcsProperties;
+	};
+	transitionProperties.additionalConditions = getAdditionalConditions();
+
+	transitionProperties.activationArcs = getProperties(getActivationArcs(), ArcProperties::Type::ACTIVATION);
+	transitionProperties.destinationArcs = getProperties(getDestinationArcs(), ArcProperties::Type::DESTINATION);
+	transitionProperties.inhibitorArcs = getProperties(getInhibitorArcs(), ArcProperties::Type::INHIBITOR);
 	transitionProperties.name = getName();
 	transitionProperties.requireNoActionsInExecution = m_requireNoActionsInExecution;
 
 	return transitionProperties;
 }
 
-array<vector<ArcProperties>,3> Transition::getArcsProperties() const
-{
-	array<vector<ArcProperties>, 3> arcsProperties;
-	auto arcPropertiesFromArcs =
-	[this](const vector<Arc> &arcs, ArcProperties::Type type)
-	{
-		vector<ArcProperties> arcProperties;
-		for (const auto &arc : arcs)
-		{
-			auto spPlace = lockWeakPtr(arc.place);
-			arcProperties.emplace_back(arc.weight, spPlace->getName(), getName(), type);
-		}
-		return arcProperties;
-	};
-
-	using enum ArcProperties::Type;
-	arcsProperties[0] = arcPropertiesFromArcs(m_activationArcs, ACTIVATION);
-	arcsProperties[1] = arcPropertiesFromArcs(m_destinationArcs, DESTINATION);
-	arcsProperties[2] = arcPropertiesFromArcs(m_inhibitorArcs, INHIBITOR);
-
-	return arcsProperties;
-}
-
 void Transition::addArc(const shared_ptr<Place> &place, const ArcProperties::Type type, const size_t weight)
 {
 	unique_lock guard(m_mutex);
 
-	auto addArcTo = [&place, weight] (auto &placesContainer)
+	auto addArcTo = [&place, weight](auto &placesContainer)
 	{
-		auto sameNameAs = [&place] (const auto &arc) {
-			return lockWeakPtr(arc.place)->getName() == place->getName();
-		};
+		auto sameNameAs = [&place](const auto &arc)
+		{ return lockWeakPtr(arc.place)->getName() == place->getName(); };
 
-		if (ranges::find_if(placesContainer.cbegin(), placesContainer.cend(), sameNameAs) == placesContainer.cend())
+		if (ranges::find_if(placesContainer, sameNameAs) != placesContainer.cend())
 		{
-			placesContainer.push_back({ place, weight });
+			throw PTN_Exception("Arc already exists");
 		}
+		placesContainer.push_back({ place, weight });
 	};
 
 	using enum ArcProperties::Type;
@@ -277,10 +270,14 @@ void Transition::removeArc(const shared_ptr<Place> &place, const ArcProperties::
 		auto sameNameAs = [&place](const auto &arc)
 		{ return lockWeakPtr(arc.place)->getName() == place->getName(); };
 
-		auto it = ranges::find_if(placesContainer.cbegin(), placesContainer.cend(), sameNameAs);
+		auto it = ranges::find_if(placesContainer, sameNameAs);
 		if (it != placesContainer.cend())
 		{
 			placesContainer.erase(it);
+		}
+		else
+		{
+			throw PTN_Exception("Cannot remove palce " + place->getName());
 		}
 	};
 
@@ -334,7 +331,7 @@ bool Transition::checkActivationPlaces() const
 
 bool Transition::checkAdditionalConditions() const
 {
-	for (const auto&[name, activationCondition] : m_additionalActivationConditions)
+	for (const auto &[name, activationCondition] : m_additionalActivationConditions)
 	{
 		if (!activationCondition)
 		{
@@ -398,14 +395,6 @@ void Transition::enterDestinationPlaces() const
 			spPlace->enterPlace(destinationWeight);
 		}
 	}
-}
-
-void Transition::moveMembers(Transition &transition)
-{
-	m_activationArcs = std::move(transition.m_activationArcs);
-	m_destinationArcs = std::move(transition.m_destinationArcs);
-	m_inhibitorArcs = std::move(transition.m_inhibitorArcs);
-	m_additionalActivationConditions = std::move(transition.m_additionalActivationConditions);
 }
 
 void Transition::blockStartingOnEnterActions(const bool value) const

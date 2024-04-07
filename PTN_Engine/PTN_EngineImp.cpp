@@ -61,13 +61,11 @@ void PTN_EngineImp::clearNet()
 
 void PTN_EngineImp::createTransition(const TransitionProperties &transitionProperties)
 {
-	createTransition(transitionProperties.name,
-					 transitionProperties.activationArcs,
-					 transitionProperties.destinationArcs,
-					 transitionProperties.inhibitorArcs,
+	createTransition(transitionProperties.name, transitionProperties.activationArcs,
+					 transitionProperties.destinationArcs, transitionProperties.inhibitorArcs,
 					 !transitionProperties.additionalConditionsNames.empty() ?
-						 m_conditions.getItems(transitionProperties.additionalConditionsNames) :
-						 createAnonymousConditions(transitionProperties.additionalConditions),
+					 m_conditions.getItems(transitionProperties.additionalConditionsNames) :
+					 createAnonymousConditions(transitionProperties.additionalConditions),
 					 transitionProperties.requireNoActionsInExecution);
 }
 
@@ -215,13 +213,15 @@ void PTN_EngineImp::addArc(const ArcProperties &arcProperties) const
 
 	if (!m_places.contains(arcProperties.placeName))
 	{
-		throw PTN_Exception("The place" + arcProperties.placeName + " must already exist in order to link to an arc.");
+		throw PTN_Exception("The place " + arcProperties.placeName +
+							" must already exist in order to link to an arc.");
 	}
 	auto spPlace = m_places.getPlace(arcProperties.placeName);
 
 	if (!m_transitions.contains(arcProperties.transitionName))
 	{
-		throw PTN_Exception("The transition " + arcProperties.transitionName +" must already exist in order to link to an arc.");
+		throw PTN_Exception("The transition " + arcProperties.transitionName +
+							" must already exist in order to link to an arc.");
 	}
 
 	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
@@ -237,13 +237,15 @@ void PTN_EngineImp::removeArc(const ArcProperties &arcProperties) const
 
 	if (!m_places.contains(arcProperties.placeName))
 	{
-		throw PTN_Exception("The place" + arcProperties.placeName + " must already exist in order to unlink an arc.");
+		throw PTN_Exception("The place " + arcProperties.placeName +
+							" must already exist in order to unlink an arc.");
 	}
 	auto spPlace = m_places.getPlace(arcProperties.placeName);
 
-	if (m_transitions.contains(arcProperties.transitionName))
+	if (!m_transitions.contains(arcProperties.transitionName))
 	{
-		throw PTN_Exception("The transition " + arcProperties.transitionName +" must already exist in order to unlink an arc.");
+		throw PTN_Exception("The transition " + arcProperties.transitionName +
+							" must already exist in order to unlink an arc.");
 	}
 
 	auto spTransition = m_transitions.getTransition(arcProperties.transitionName);
@@ -260,11 +262,6 @@ vector<TransitionProperties> PTN_EngineImp::getTransitionsProperties() const
 	return m_transitions.getTransitionsProperties();
 }
 
-vector<vector<ArcProperties>> PTN_EngineImp::getArcsProperties() const
-{
-	return m_transitions.getArcsProperties();
-}
-
 // Private
 
 void PTN_EngineImp::createTransition(const string &name,
@@ -275,7 +272,7 @@ void PTN_EngineImp::createTransition(const string &name,
                                      const bool requireNoActionsInExecution)
 {
 	// if a transition with this name already exists in the net, throw an exception
-	if (m_transitions.hasTransition(name))
+	if (m_transitions.contains(name))
 	{
 		throw PTN_Exception("Cannot create transition that already exists. Name: " + name);
 	}
@@ -290,29 +287,24 @@ void PTN_EngineImp::createTransition(const string &name,
 		return arcs;
 	};
 
-	m_transitions.insert(
-	make_shared<Transition>(name,
-							getArcsFromArcsProperties(activationArcs),
-							getArcsFromArcsProperties(destinationArcs),
-							getArcsFromArcsProperties(inhibitorArcs),
-							additionalConditions,
-							requireNoActionsInExecution));
-
+	m_transitions.insert(make_shared<Transition>(name, getArcsFromArcsProperties(activationArcs),
+												 getArcsFromArcsProperties(destinationArcs),
+												 getArcsFromArcsProperties(inhibitorArcs), additionalConditions,
+												 requireNoActionsInExecution));
 }
 
 vector<pair<string, ConditionFunction>>
 PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &conditions) const
 {
 	vector<pair<string, ConditionFunction>> anonymousConditionsVector;
-	ranges::transform(conditions.cbegin(), conditions.cend(), back_inserter(anonymousConditionsVector),
-			  [](const auto &condition) { return pair<string, ConditionFunction>("", condition); });
+	ranges::transform(conditions, back_inserter(anonymousConditionsVector),
+					  [](const auto &condition) { return pair<string, ConditionFunction>("", condition); });
 	return anonymousConditionsVector;
 }
 
 void PTN_EngineImp::addJob(const ActionFunction &actionFunction)
 {
-	if (m_actionsThreadOption != JOB_QUEUE || m_jobQueue == nullptr ||
-		!m_jobQueue->isActive())
+	if (m_actionsThreadOption != JOB_QUEUE || m_jobQueue == nullptr || !m_jobQueue->isActive())
 	{
 		throw PTN_Exception("addJob incorrectly called");
 	}

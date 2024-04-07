@@ -17,7 +17,6 @@
  */
 
 #include "PTN_Engine/PTN_Engine.h"
-#include "PTN_Engine/PTN_Exception.h"
 #include "XML/XML_FileExporter.h"
 #include <pugixml.hpp>
 #include <vector>
@@ -72,46 +71,28 @@ void XML_FileExporter::exportTransition(const TransitionProperties &transitionPr
 
 	xml_node requireNoActionsInExecution = transitionNode.append_child("RequireNoActionsInExecution");
 	requireNoActionsInExecution.append_attribute("value").set_value(transitionProperties.requireNoActionsInExecution? "true" : "false");
-}
 
-void XML_FileExporter::exportArc(const vector<ArcProperties> &arcsPropereties)
-{
-	for (const auto &arcProperties : arcsPropereties)
+	auto exportArcs = [this](const vector<ArcProperties> arcsProperties, const string &typeStr)
 	{
-		xml_node arcNode = m_arcsNode.append_child("Arc");
-		xml_node place = arcNode.append_child("Place");
-		place.append_attribute("value").set_value(arcProperties.placeName.c_str());
-
-		xml_node transition = arcNode.append_child("Transition");
-		transition.append_attribute("value").set_value(arcProperties.transitionName.c_str());
-
-		xml_node weight = arcNode.append_child("Weight");
-		weight.append_attribute("value").set_value(to_string(arcProperties.weight).c_str());
-
-		xml_node type = arcNode.append_child("Type");
-
-		using enum ArcProperties::Type;
-		string typeStr;
-		switch (arcProperties.type)
+		for (const auto &arcProperties : arcsProperties)
 		{
-		default:
-			throw PTN_Exception("Unsupported enum");
-			break;
-		case ACTIVATION:
-			typeStr = "Activation";
-			break;
-		case BIDIRECTIONAL:
-			typeStr = "Bidirectional";
-			break;
-		case DESTINATION:
-			typeStr = "Destination";
-			break;
-		case INHIBITOR:
-			typeStr = "Inhibitor";
-			break;
+			xml_node arcNode = m_arcsNode.append_child("Arc");
+			xml_node place = arcNode.append_child("Place");
+			place.append_attribute("value").set_value(arcProperties.placeName.c_str());
+
+			xml_node transition = arcNode.append_child("Transition");
+			transition.append_attribute("value").set_value(arcProperties.transitionName.c_str());
+
+			xml_node weight = arcNode.append_child("Weight");
+			weight.append_attribute("value").set_value(to_string(arcProperties.weight).c_str());
+
+			xml_node type = arcNode.append_child("Type");
+			type.append_attribute("value").set_value(typeStr.c_str());
 		}
-		type.append_attribute("value").set_value(typeStr.c_str());
-	}
+	};
+	exportArcs(transitionProperties.activationArcs, "Activation");
+	exportArcs(transitionProperties.destinationArcs, "Destination");
+	exportArcs(transitionProperties.inhibitorArcs, "Inhibitor");
 }
 
 void XML_FileExporter::saveFile() const

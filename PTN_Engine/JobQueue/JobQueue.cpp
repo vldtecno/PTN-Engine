@@ -23,6 +23,9 @@ namespace ptne
 {
 using namespace std;
 
+JobQueue::~JobQueue() = default;
+JobQueue::JobQueue() = default;
+
 void JobQueue::activate()
 {
 	if (m_isJobQueueActive)

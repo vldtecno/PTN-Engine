@@ -19,13 +19,15 @@
 #include "PTN_Engine/Place.h"
 #include "PTN_Engine/IPTN_EnginePlace.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include <mutex>
 #include <string>
 #include <thread>
-#include <mutex>
 
 namespace ptne
 {
 using namespace std;
+
+Place::~Place() = default;
 
 Place::Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties)
 : m_ptnEngine(parent)
@@ -36,7 +38,16 @@ Place::Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties)
 , m_onExitAction(placeProperties.onExitAction)
 , m_numberOfTokens(placeProperties.initialNumberOfTokens)
 , m_isInputPlace(placeProperties.input)
-{	
+{
+	if (!m_onEnterActionName.empty() && m_onEnterAction == nullptr)
+	{
+		throw PTN_Exception("On enter action function must be specified.");
+	}
+
+	if (!m_onExitActionName.empty() && m_onExitAction == nullptr)
+	{
+		throw PTN_Exception("On exit action function must be specified.");
+	}
 }
 
 string Place::getName() const
@@ -54,7 +65,7 @@ void Place::enterPlace(const size_t tokens)
 	}
 	while (m_blockStartingOnEnterActions)
 	{
-		// TODO make this wait period configurable
+		// TO DO make this wait period configurable
 		// add a max wait time after which an exception
 		// is thrown.
 		this_thread::sleep_for(100ms);
@@ -80,7 +91,7 @@ void Place::increaseNumberOfTokens(const size_t tokens)
 		throw NullTokensException();
 	}
 
-	if (tokens > UINT_MAX - m_numberOfTokens)
+	if (tokens > ULLONG_MAX - m_numberOfTokens)
 	{
 		throw OverflowException(tokens);
 	}
@@ -193,6 +204,8 @@ PlaceProperties Place::placeProperties() const
 	placeProperties.onEnterActionFunctionName = m_onEnterActionName;
 	placeProperties.onExitActionFunctionName = m_onExitActionName;
 	placeProperties.initialNumberOfTokens = m_numberOfTokens;
+	placeProperties.onEnterAction = m_onEnterAction;
+	placeProperties.onExitAction = m_onExitAction;
 	placeProperties.input = m_isInputPlace;
 	return placeProperties;
 }

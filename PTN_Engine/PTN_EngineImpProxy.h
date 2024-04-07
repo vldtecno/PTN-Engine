@@ -53,8 +53,6 @@ public:
 
 	ACTIONS_THREAD_OPTION getActionsThreadOption() const;
 
-	std::vector<std::vector<ArcProperties>> getArcsProperties() const;
-
 	EventLoopSleepDuration getEventLoopSleepDuration() const;
 
 	size_t getNumberOfTokens(const std::string &place) const;

@@ -225,7 +225,7 @@ void ElevatorController::mergeMinGoingUp()
 	{
 		return;
 	}
-	const int minWaiting = *ranges::min_element(m_floorsWaitingToGoUp.begin(), m_floorsWaitingToGoUp.end());
+	const int minWaiting = *ranges::min_element(m_floorsWaitingToGoUp);
 	m_destinations.insert(minWaiting);
 	m_floorsWaitingToGoUp.erase(minWaiting);
 
@@ -240,7 +240,7 @@ void ElevatorController::mergeMaxGoingDown()
 	{
 		return;
 	}
-	const int maxWaiting = *ranges::max_element(m_floorsWaitingToGoDown.begin(), m_floorsWaitingToGoDown.end());
+	const int maxWaiting = *ranges::max_element(m_floorsWaitingToGoDown);
 	m_destinations.insert(maxWaiting);
 	m_floorsWaitingToGoDown.erase(maxWaiting);
 
@@ -270,9 +270,8 @@ void ElevatorController::mergeToDestinations(unordered_set<int> &toAdd, const bo
 	{
 		deleted = false;
 		auto floorIt =
-		ranges::find_if(toAdd.cbegin(), toAdd.cend(),
-					 [this, &lessThan](const int floor)
-					 { return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor); });
+		ranges::find_if(toAdd, [this, &lessThan](const int floor)
+						{ return (lessThan && floor < m_currentFloor) || (!lessThan && floor > m_currentFloor); });
 		if (floorIt != toAdd.cend())
 		{
 			auto &floor = *floorIt;
@@ -337,7 +336,7 @@ bool ElevatorController::isMinSmallerThanCurrent() const
 	{
 		return false;
 	}
-	int minFloor = *ranges::min_element(m_destinations.cbegin(), m_destinations.cend());
+	int minFloor = *ranges::min_element(m_destinations);
 	return minFloor < m_currentFloor;
 }
 
@@ -348,7 +347,7 @@ bool ElevatorController::isMinGreaterThanCurrent() const
 	{
 		return false;
 	}
-	int minFloor = *ranges::min_element(m_destinations.cbegin(), m_destinations.cend());
+	int minFloor = *ranges::min_element(m_destinations);
 	return minFloor > m_currentFloor;
 }
 
@@ -359,7 +358,7 @@ bool ElevatorController::isMaxSmallerThanCurrent() const
 	{
 		return false;
 	}
-	int maxFloor = *ranges::max_element(m_destinations.cbegin(), m_destinations.cend());
+	int maxFloor = *ranges::max_element(m_destinations);
 	return maxFloor < m_currentFloor;
 }
 
@@ -370,7 +369,7 @@ bool ElevatorController::isMaxGreaterThanCurrent() const
 	{
 		return false;
 	}
-	int maxFloor = *ranges::max_element(m_destinations.cbegin(), m_destinations.cend());
+	int maxFloor = *ranges::max_element(m_destinations);
 	return maxFloor > m_currentFloor;
 }
 

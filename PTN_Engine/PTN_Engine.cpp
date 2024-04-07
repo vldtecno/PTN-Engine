@@ -65,11 +65,6 @@ vector<TransitionProperties> PTN_Engine::getTransitionsProperties() const
 	return m_impProxy->getTransitionsProperties();
 }
 
-vector<vector<ArcProperties>> PTN_Engine::getArcsProperties() const
-{
-	return m_impProxy->getArcsProperties();
-}
-
 void PTN_Engine::createTransition(const TransitionProperties &transitionProperties)
 {
 	m_impProxy->createTransition(transitionProperties);

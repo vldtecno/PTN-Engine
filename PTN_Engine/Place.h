@@ -36,7 +36,7 @@ class Place final
 public:
 	using ActionFunction = std::function<void(void)>;
 
-	~Place() = default;
+	~Place();
 	Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties);
 	Place(const Place &) = delete;
 	Place(Place &&) = delete;

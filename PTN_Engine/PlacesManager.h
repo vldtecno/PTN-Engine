@@ -35,8 +35,8 @@ using WeakPtrPlace = std::weak_ptr<Place>;
 class PlacesManager : private ManagerBase<Place>
 {
 public:
-	~PlacesManager() = default;
-	PlacesManager() = default;
+	~PlacesManager();
+	PlacesManager();
 	PlacesManager(const PlacesManager &) = delete;
 	PlacesManager(PlacesManager &&) = delete;
 	PlacesManager &operator=(PlacesManager &) = delete;

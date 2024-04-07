@@ -16,11 +16,12 @@
  */
 #pragma once
 
-#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
 #include <algorithm>
 #include <mutex>
 #include <shared_mutex>
+#include <unordered_map>
+#include <vector>
 
 namespace ptne
 {
@@ -94,7 +95,7 @@ public:
 	{
 		std::shared_lock lock(m_mutex);
 		std::vector<std::pair<std::string, T>> items;
-		std::ranges::for_each(names.cbegin(), names.cend(),
+		std::ranges::for_each(names,
 							  [&](const std::string &name)
 							  {
 								  if (name.empty())
@@ -106,8 +107,7 @@ public:
 								  {
 									  throw InvalidFunctionNameException(name);
 								  }
-								  items.push_back(
-								  std::pair<std::string, ConditionFunction>(name, m_items.at(name)));
+								  items.emplace_back(name, m_items.at(name));
 							  });
 		return items;
 	}

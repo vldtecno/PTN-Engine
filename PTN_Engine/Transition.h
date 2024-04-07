@@ -45,7 +45,7 @@ struct Arc
 class Transition final
 {
 public:
-	~Transition() = default;
+	~Transition();
 
 	//!
 	//! \brief Transition constructor.
@@ -65,7 +65,7 @@ public:
 			   const bool requireNoActionsInExecution);
 
 	Transition(const Transition &) = delete;
-	Transition(Transition &&transition) noexcept;
+	Transition(Transition &&transition) = delete;
 	Transition &operator=(Transition &) = delete;
 	Transition &operator=(Transition &&) = delete;
 
@@ -78,12 +78,6 @@ public:
 	bool execute();
 
 	std::vector<Arc> getActivationArcs() const;
-
-	//!
-	//! \brief Gets all arc properties for each arc in the transition.
-	//! \return Array size 3 with vectors of arcs for Activation, Destination, Inhibitor
-	//!
-	std::array<std::vector<ArcProperties>, 3> getArcsProperties() const;
 
 	//!
 	//! Evaluates if the transition can attempt to be fired.
@@ -115,12 +109,6 @@ public:
 	//! \param type - the type of arc.
 	//!
 	void removeArc(const std::shared_ptr<Place> &place, const ArcProperties::Type type);
-
-	//!
-	//! \brief requireNoActionsInExecution
-	//! \return true if it is required that the activation places have no ongoing on enter actions.
-	//!
-	bool requireNoActionsInExecution() const;
 
 private:
 	//! Block/unblock activation places from starting any on enter actions.
@@ -161,9 +149,6 @@ private:
 	//! \return true if the transition can be fired, false if it cannot.
 	//!
 	bool isEnabledInternal() const;
-
-	//! Move members of the class into the transition passed as argument.
-	void moveMembers(Transition &transition);
 
 	//!
 	//! \brief If there are no actions being currently executed in the activation places.

@@ -20,7 +20,6 @@
 
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Utilities/Explicit.h"
-#include <vector>
 
 namespace ptne
 {
@@ -51,8 +50,6 @@ private:
 	virtual void exportPlace(const PlaceProperties &placeProperties) = 0;
 
 	virtual void exportTransition(const TransitionProperties &transitionPropereties) = 0;
-
-	virtual void exportArc(const std::vector<ArcProperties> &arcPropereties) = 0;
 };
 
 } // namespace ptne

@@ -179,4 +179,17 @@ public:
 	}
 };
 
+/*!
+ * Exception to be thrown when inhibitor places in the constructor are repeated.
+ */
+class DLL_PUBLIC InhibitorPlaceRepetitionException : public PTN_Exception
+{
+public:
+	InhibitorPlaceRepetitionException()
+	: PTN_Exception("Repetition of inhibitor places is not permitted.")
+	{
+	}
+};
+
+
 } // namespace ptne

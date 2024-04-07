@@ -21,13 +21,15 @@
 #include "PTN_Engine/TransitionsManager.h"
 #include "PTN_Engine/Transition.h"
 #include <algorithm>
-#include <array>
 #include <mutex>
 #include <random>
 
 namespace ptne
 {
 using namespace std;
+
+TransitionsManager::~TransitionsManager() = default;
+TransitionsManager::TransitionsManager() = default;
 
 bool TransitionsManager::contains(const string &itemName) const
 {
@@ -51,10 +53,6 @@ vector<weak_ptr<Transition>> TransitionsManager::collectEnabledTransitionsRandom
 {
 	shared_lock transitionsGuard(m_itemsMutex);
 
-	// vector<weak_ptr<Transition>> enabledTransitions;
-	// copy_if(m_transitions.cbegin(), m_transitions.cend(), back_inserter(enabledTransitions),
-	// 		[](const auto &item) { return item.second->isEnabled(); });
-
 	vector<weak_ptr<Transition>> enabledTransitions;
 	for (const auto &[_, transition] : m_items)
 	{
@@ -64,17 +62,11 @@ vector<weak_ptr<Transition>> TransitionsManager::collectEnabledTransitionsRandom
 		}
 	}
 
-	// TODO check performance
+	// TO DO check performance
 	random_device randomDevice;
 	mt19937_64 seed(randomDevice());
-	ranges::shuffle(enabledTransitions.begin(), enabledTransitions.end(), seed);
+	ranges::shuffle(enabledTransitions, seed);
 	return enabledTransitions;
-}
-
-bool TransitionsManager::hasTransition(const string &name) const
-{
-	shared_lock itemsGuard(m_itemsMutex);
-	return ManagerBase<Transition>::contains(name);
 }
 
 SharedPtrTransition TransitionsManager::getTransition(const string &transitionName) const
@@ -92,20 +84,6 @@ vector<TransitionProperties> TransitionsManager::getTransitionsProperties() cons
 		transitionsProperties.push_back(transition->getTransitionProperties());
 	}
 	return transitionsProperties;
-}
-
-vector<vector<ArcProperties>> TransitionsManager::getArcsProperties() const
-{
-	shared_lock itemsGuard(m_itemsMutex);
-	vector<vector<ArcProperties>> arcsProperties;
-	for (const auto &[_, transition] : m_items)
-	{
-		auto arcsPropertiesExport = transition->getArcsProperties();
-		arcsProperties.push_back(arcsPropertiesExport[0]);
-		arcsProperties.push_back(arcsPropertiesExport[1]);
-		arcsProperties.push_back(arcsPropertiesExport[2]);
-	}
-	return arcsProperties;
 }
 
 } // namespace ptne
