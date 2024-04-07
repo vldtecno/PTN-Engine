@@ -23,13 +23,13 @@
 using namespace ptne;
 using namespace std;
 
-class TransitionsManagerObj : public testing::Test
+class TransitionsManager_Obj : public testing::Test
 {
 public:
 	TransitionsManager transitionsManager = TransitionsManager{};
 };
 
-TEST_F(TransitionsManagerObj, clear)
+TEST_F(TransitionsManager_Obj, clear)
 {
 	ASSERT_NO_THROW(transitionsManager.clear());
 	ASSERT_TRUE(transitionsManager.getTransitionsProperties().empty());
@@ -43,7 +43,7 @@ TEST_F(TransitionsManagerObj, clear)
 	EXPECT_TRUE(transitionsManager.getTransitionsProperties().empty());
 }
 
-TEST_F(TransitionsManagerObj, collectEnabledTransitionsRandomly)
+TEST_F(TransitionsManager_Obj, collectEnabledTransitionsRandomly)
 {
 	// TO DO
 
@@ -64,7 +64,7 @@ TEST_F(TransitionsManagerObj, collectEnabledTransitionsRandomly)
 	EXPECT_FALSE(transitionsManager.collectEnabledTransitionsRandomly().empty());
 }
 
-TEST_F(TransitionsManagerObj, contains_returns_if_the_container_contains_an_element_with_the_name_in_the_argument)
+TEST_F(TransitionsManager_Obj, contains_returns_if_the_container_contains_an_element_with_the_name_in_the_argument)
 {
 	EXPECT_FALSE(transitionsManager.contains("T1"));
 	TransitionProperties transitionProperties;
@@ -74,17 +74,17 @@ TEST_F(TransitionsManagerObj, contains_returns_if_the_container_contains_an_elem
 	EXPECT_TRUE(transitionsManager.contains("T1"));
 }
 
-TEST_F(TransitionsManagerObj, getTransition_throws_if_the_transition_name_is_empty)
+TEST_F(TransitionsManager_Obj, getTransition_throws_if_the_transition_name_is_empty)
 {
 	ASSERT_THROW(transitionsManager.getTransition(""), PTN_Exception);
 }
 
-TEST_F(TransitionsManagerObj, getTransition_throws_if_the_transition_name_does_not_match_an_existing_transition)
+TEST_F(TransitionsManager_Obj, getTransition_throws_if_the_transition_name_does_not_match_an_existing_transition)
 {
 	ASSERT_THROW(transitionsManager.getTransition("A"), PTN_Exception);
 }
 
-TEST_F(TransitionsManagerObj, getTransition_returns_the_transition_by_name)
+TEST_F(TransitionsManager_Obj, getTransition_returns_the_transition_by_name)
 {
 	TransitionProperties transitionProperties;
 	auto t = make_shared<Transition>("T1", vector<Arc>{}, vector<Arc>{}, vector<Arc>{},
@@ -94,7 +94,7 @@ TEST_F(TransitionsManagerObj, getTransition_returns_the_transition_by_name)
 	EXPECT_EQ(t, exported_t);
 }
 
-TEST_F(TransitionsManagerObj, getTransitionsProperties_exports_all_properties_from_all_transitions)
+TEST_F(TransitionsManager_Obj, getTransitionsProperties_exports_all_properties_from_all_transitions)
 {
 	TransitionProperties transitionProperties;
 	auto t1 = make_shared<Transition>("T1", vector<Arc>{}, vector<Arc>{}, vector<Arc>{},
@@ -120,10 +120,10 @@ TEST_F(TransitionsManagerObj, getTransitionsProperties_exports_all_properties_fr
 		{
 			ASSERT_FALSE(true);
 		}
-	}	
+	}
 }
 
-TEST_F(TransitionsManagerObj, insert_nullptr_throws)
+TEST_F(TransitionsManager_Obj, insert_nullptr_throws)
 {
 	ASSERT_THROW(transitionsManager.insert(nullptr), PTN_Exception);
 }

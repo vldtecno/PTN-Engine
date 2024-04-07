@@ -42,38 +42,17 @@ target_link_libraries(WhiteBoxTest PUBLIC
 
 set(WhiteBoxTestsExecutable "WhiteBoxTest${CMAKE_EXECUTABLE_SUFFIX}")
 
-add_test(NAME InputPlace
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*InputPlace)
-add_test(NAME EnterPlaceDefault
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*EnterPlaceDefault)
-add_test(NAME EnterPlace
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*EnterPlace)
-add_test(NAME ExitPlace
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*ExitPlace)
-add_test(NAME Overflow
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*Overflow)
-add_test(NAME NullTokens
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*NullTokens)
-add_test(NAME NotEnoughTokens
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*NotEnoughTokens)
-add_test(NAME T1
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T1)
-add_test(NAME T2
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T2)
-add_test(NAME T3
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T3)
-add_test(NAME T_Weights
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_Weights)
-add_test(NAME T_ZeroValueWeightException
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_ZeroValueWeightException)
-add_test(NAME T_ActivationWeightDimensionException
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_ActivationWeightDimensionException)
-add_test(NAME T_DestinationWeightDimensionException
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_DestinationWeightDimensionException)
-add_test(NAME T_ActivationPlaceRepetitionException
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_ActivationPlaceRepetitionException)
-add_test(NAME T_DestinationPlaceRepetitionException
-		COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*T_DestinationPlaceRepetitionException)
+add_test(NAME WhiteBoxTests COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=*)
+
+#add_test(NAME EventLoop	COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=EventLoop_*)
+#add_test(NAME JobQueue COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=JobQueue_*)
+#add_test(NAME ManagedContainer COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=ManagedContainer_*)
+#add_test(NAME Place COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=Place_*)
+#add_test(NAME PlacesManager COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=PlacesManager_*)
+#add_test(NAME PTN_Engine COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=PTN_Engine_*)
+#add_test(NAME PTN_EngineImp COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=PTN_EngineImp_*)
+#add_test(NAME Transition COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=Transition_*)
+#add_test(NAME TransitionsManager COMMAND ${WhiteBoxTestsExecutable} --gtest_filter=TransitionsManager_*)
 
 set_target_properties(WhiteBoxTest PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 

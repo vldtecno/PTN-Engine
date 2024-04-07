@@ -39,13 +39,13 @@ public:
 	}
 };
 
-class PlacesManagerObj : public testing::Test
+class PlacesManager_Obj : public testing::Test
 {
 public:
 	PlacesManager placesManager = PlacesManager{};
 };
 
-TEST_F(PlacesManagerObj, clear_clears_all_places)
+TEST_F(PlacesManager_Obj, clear_clears_all_places)
 {
 	ASSERT_NO_THROW(placesManager.clear());
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
@@ -59,7 +59,7 @@ TEST_F(PlacesManagerObj, clear_clears_all_places)
 	EXPECT_TRUE(placesManager.getPlacesProperties().empty());
 }
 
-TEST_F(PlacesManagerObj, clearInputPlaces_removes_all_tokens_from_input_places)
+TEST_F(PlacesManager_Obj, clearInputPlaces_removes_all_tokens_from_input_places)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -113,7 +113,7 @@ TEST_F(PlacesManagerObj, clearInputPlaces_removes_all_tokens_from_input_places)
 	}
 }
 
-TEST_F(PlacesManagerObj, contains_returns_if_place_with_given_place_name_is_contained)
+TEST_F(PlacesManager_Obj, contains_returns_if_place_with_given_place_name_is_contained)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -133,7 +133,7 @@ TEST_F(PlacesManagerObj, contains_returns_if_place_with_given_place_name_is_cont
 	EXPECT_FALSE(placesManager.contains("P3"));
 }
 
-TEST_F(PlacesManagerObj, getNumberOfTokens_returns_the_number_of_tokens_in_place_with_place_name)
+TEST_F(PlacesManager_Obj, getNumberOfTokens_returns_the_number_of_tokens_in_place_with_place_name)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -153,7 +153,7 @@ TEST_F(PlacesManagerObj, getNumberOfTokens_returns_the_number_of_tokens_in_place
 	ASSERT_THROW(placesManager.getNumberOfTokens("P3"), InvalidNameException);
 }
 
-TEST_F(PlacesManagerObj, getPlace)
+TEST_F(PlacesManager_Obj, getPlace)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -171,7 +171,7 @@ TEST_F(PlacesManagerObj, getPlace)
 	EXPECT_EQ(p2, placesManager.getPlace("P2"));
 }
 
-TEST_F(PlacesManagerObj, getPlaces_returns_weak_pointers_to_places)
+TEST_F(PlacesManager_Obj, getPlaces_returns_weak_pointers_to_places)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -194,7 +194,7 @@ TEST_F(PlacesManagerObj, getPlaces_returns_weak_pointers_to_places)
 	EXPECT_EQ(p1, places.at(1).lock());
 }
 
-TEST_F(PlacesManagerObj, getPlaces_throws_if_the_place_names_are_invalid)
+TEST_F(PlacesManager_Obj, getPlaces_throws_if_the_place_names_are_invalid)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -212,7 +212,7 @@ TEST_F(PlacesManagerObj, getPlaces_throws_if_the_place_names_are_invalid)
 	ASSERT_THROW(placesManager.getPlaces({ "P1", "P1" }), RepeatedPlaceNamesException);
 }
 
-TEST_F(PlacesManagerObj, incrementInputPlace_increments_the_input_places_token_numbers)
+TEST_F(PlacesManager_Obj, incrementInputPlace_increments_the_input_places_token_numbers)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;
@@ -236,7 +236,7 @@ TEST_F(PlacesManagerObj, incrementInputPlace_increments_the_input_places_token_n
 	ASSERT_THROW(placesManager.incrementInputPlace("P3"), PTN_Exception);
 }
 
-TEST_F(PlacesManagerObj, insert_inserts_a_new_place_in_the_collection)
+TEST_F(PlacesManager_Obj, insert_inserts_a_new_place_in_the_collection)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 	FakePTN_EnginePlace fakePTN_EnginePlace;

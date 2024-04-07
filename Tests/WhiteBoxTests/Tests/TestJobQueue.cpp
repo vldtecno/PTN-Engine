@@ -22,13 +22,13 @@
 using namespace ptne;
 using namespace std;
 
-class JobQueueObj : public testing::Test
+class JobQueue_Obj : public testing::Test
 {
 public:
 	JobQueue jobQueue;
 };
 
-TEST_F(JobQueueObj, activate_activates_the_job_queue)
+TEST_F(JobQueue_Obj, activate_activates_the_job_queue)
 {
 	EXPECT_TRUE(jobQueue.isActive());
 	jobQueue.deactivate();
@@ -37,7 +37,7 @@ TEST_F(JobQueueObj, activate_activates_the_job_queue)
 	EXPECT_TRUE(jobQueue.isActive());
 }
 
-TEST_F(JobQueueObj, add_job_when_deactivated_runs_job_when_again_active)
+TEST_F(JobQueue_Obj, add_job_when_deactivated_runs_job_when_again_active)
 {
 	bool executed = false;
 	auto f = [&executed]() { executed = true; };
@@ -52,7 +52,7 @@ TEST_F(JobQueueObj, add_job_when_deactivated_runs_job_when_again_active)
 	EXPECT_TRUE(executed);
 }
 
-TEST_F(JobQueueObj, run_add_job_runs_job_immediately_if_active)
+TEST_F(JobQueue_Obj, run_add_job_runs_job_immediately_if_active)
 {
 	bool executed = false;
 	auto f = [&executed]() { executed = true; };

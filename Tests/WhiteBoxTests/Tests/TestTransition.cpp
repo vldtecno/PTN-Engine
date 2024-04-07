@@ -23,31 +23,31 @@
 using namespace std;
 using namespace ptne;
 
-class PTNEngineObject : public testing::Test
+class Transition_PTNEngineObject : public testing::Test
 {
 public:
 	PTN_EngineImp ptnEngine = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 };
 
-class PTNEngineAndPlace : public PTNEngineObject
+class Transition_PTNEngineAndPlace : public Transition_PTNEngineObject
 {
 public:
 	void SetUp() override
 	{
-		PTNEngineObject::SetUp();
+		Transition_PTNEngineObject::SetUp();
 		p1 = make_shared<Place>(ptnEngine, PlaceProperties{});
 	}
 	SharedPtrPlace p1 = nullptr;
 };
 
-TEST_F(PTNEngineAndPlace, constructor_with_invalid_pointer_to_place_throws)
+TEST_F(Transition_PTNEngineAndPlace, constructor_with_invalid_pointer_to_place_throws)
 {
 	WeakPtrPlace wP1(p1);
 	p1.reset();
 	ASSERT_THROW(Transition t("", {}, {}, { { wP1, 0 } }, {}, false), PTN_Exception);
 }
 
-TEST_F(PTNEngineAndPlace, constructor_with_repeated_input_arcs_throws)
+TEST_F(Transition_PTNEngineAndPlace, constructor_with_repeated_input_arcs_throws)
 {
 	WeakPtrPlace wP1(p1);
 	p1.reset();
@@ -55,7 +55,7 @@ TEST_F(PTNEngineAndPlace, constructor_with_repeated_input_arcs_throws)
 				 ActivationPlaceRepetitionException);
 }
 
-TEST_F(PTNEngineAndPlace, constructor_with_repeated_destination_arcs_throws)
+TEST_F(Transition_PTNEngineAndPlace, constructor_with_repeated_destination_arcs_throws)
 {
 	WeakPtrPlace wP1(p1);
 	p1.reset();
@@ -63,7 +63,7 @@ TEST_F(PTNEngineAndPlace, constructor_with_repeated_destination_arcs_throws)
 				 DestinationPlaceRepetitionException);
 }
 
-TEST_F(PTNEngineAndPlace, constructor_with_repeated_inhibitor_arcs_throws)
+TEST_F(Transition_PTNEngineAndPlace, constructor_with_repeated_inhibitor_arcs_throws)
 {
 	WeakPtrPlace wP1(p1);
 	p1.reset();
@@ -71,7 +71,7 @@ TEST_F(PTNEngineAndPlace, constructor_with_repeated_inhibitor_arcs_throws)
 				 InhibitorPlaceRepetitionException);
 }
 
-TEST(TestGetTransitionProperties, getTransitionProperties_empty_transition_properties_is_exported)
+TEST(Transition_, getTransitionProperties_empty_transition_properties_is_exported)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	auto transitionProperties = t.getTransitionProperties();
@@ -84,7 +84,7 @@ TEST(TestGetTransitionProperties, getTransitionProperties_empty_transition_prope
 	EXPECT_FALSE(transitionProperties.requireNoActionsInExecution);
 }
 
-TEST(TestGetTransitionProperties, getTransitionProperties_requiresNoActionsInExecution_property_is_exported)
+TEST(Transition_, getTransitionProperties_requiresNoActionsInExecution_property_is_exported)
 {
 	Transition t("", {}, {}, {}, {}, true);
 	auto transitionProperties = t.getTransitionProperties();
@@ -97,7 +97,7 @@ TEST(TestGetTransitionProperties, getTransitionProperties_requiresNoActionsInExe
 	EXPECT_TRUE(transitionProperties.requireNoActionsInExecution);
 }
 
-TEST(TestGetTransitionProperties, getTransitionProperties_name_property_is_exported)
+TEST(Transition_, getTransitionProperties_name_property_is_exported)
 {
 	Transition t("Abc asb", {}, {}, {}, {}, true);
 	auto transitionProperties = t.getTransitionProperties();
@@ -110,7 +110,7 @@ TEST(TestGetTransitionProperties, getTransitionProperties_name_property_is_expor
 	EXPECT_TRUE(transitionProperties.requireNoActionsInExecution);
 }
 
-TEST_F(PTNEngineAndPlace, getTransitionProperties_activations_arc_are_exported)
+TEST_F(Transition_PTNEngineAndPlace, getTransitionProperties_activations_arc_are_exported)
 {
 	WeakPtrPlace wP1(p1);
 
@@ -126,7 +126,7 @@ TEST_F(PTNEngineAndPlace, getTransitionProperties_activations_arc_are_exported)
 	EXPECT_TRUE(transitionProperties.requireNoActionsInExecution);
 }
 
-TEST_F(PTNEngineAndPlace, getTransitionProperties_all_arcs_are_exported)
+TEST_F(Transition_PTNEngineAndPlace, getTransitionProperties_all_arcs_are_exported)
 {
 	WeakPtrPlace wP1(p1);
 
@@ -145,35 +145,35 @@ TEST_F(PTNEngineAndPlace, getTransitionProperties_all_arcs_are_exported)
 	EXPECT_TRUE(transitionProperties.requireNoActionsInExecution);
 }
 
-TEST_F(PTNEngineAndPlace, addArc_add_activation_arc_to_empty_transition_does_not_throw)
+TEST_F(Transition_PTNEngineAndPlace, addArc_add_activation_arc_to_empty_transition_does_not_throw)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	EXPECT_NO_THROW(t.addArc(p1, ArcProperties::Type::ACTIVATION, 1));
 	EXPECT_EQ(1, t.getActivationArcs().size());
 }
 
-TEST_F(PTNEngineAndPlace, addArc_add_destination_arc_to_empty_transition_does_not_throw)
+TEST_F(Transition_PTNEngineAndPlace, addArc_add_destination_arc_to_empty_transition_does_not_throw)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	EXPECT_NO_THROW(t.addArc(p1, ArcProperties::Type::DESTINATION, 1));
 	EXPECT_EQ(1, t.getDestinationArcs().size());
 }
 
-TEST_F(PTNEngineAndPlace, addArc_add_inhibitor_arc_to_empty_transition_does_not_throw)
+TEST_F(Transition_PTNEngineAndPlace, addArc_add_inhibitor_arc_to_empty_transition_does_not_throw)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	EXPECT_NO_THROW(t.addArc(p1, ArcProperties::Type::INHIBITOR, 1));
 	EXPECT_EQ(1, t.getInhibitorArcs().size());
 }
 
-TEST_F(PTNEngineAndPlace, addArc_add_repeated_activation_arc_to_transition_does_not_duplicate_arcs)
+TEST_F(Transition_PTNEngineAndPlace, addArc_add_repeated_activation_arc_to_transition_does_not_duplicate_arcs)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	EXPECT_NO_THROW(t.addArc(p1, ArcProperties::Type::ACTIVATION, 1));
 	EXPECT_THROW(t.addArc(p1, ArcProperties::Type::ACTIVATION, 1), PTN_Exception);
 }
 
-TEST_F(PTNEngineAndPlace, addArc_add_bidirectional_arc_to_transition_adds_two_arcs)
+TEST_F(Transition_PTNEngineAndPlace, addArc_add_bidirectional_arc_to_transition_adds_two_arcs)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	EXPECT_NO_THROW(t.addArc(p1, ArcProperties::Type::BIDIRECTIONAL, 1));
@@ -182,7 +182,7 @@ TEST_F(PTNEngineAndPlace, addArc_add_bidirectional_arc_to_transition_adds_two_ar
 	EXPECT_EQ(1, t.getDestinationArcs().size());
 }
 
-TEST_F(PTNEngineAndPlace, execute_empty_transition_does_nothing)
+TEST_F(Transition_PTNEngineAndPlace, execute_empty_transition_does_nothing)
 {
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -191,7 +191,7 @@ TEST_F(PTNEngineAndPlace, execute_empty_transition_does_nothing)
 	EXPECT_EQ(0, p1->getNumberOfTokens());
 }
 
-TEST_F(PTNEngineAndPlace, execute_with_invalid_pointer_to_place_throws)
+TEST_F(Transition_PTNEngineAndPlace, execute_with_invalid_pointer_to_place_throws)
 {
 	WeakPtrPlace wP1(p1);
 	Transition t("", {}, {}, { { wP1, 1 } }, {}, false);
@@ -205,7 +205,7 @@ TEST_F(PTNEngineAndPlace, execute_with_invalid_pointer_to_place_throws)
  * |___|       /||
  *              ||
  */
-TEST_F(PTNEngineAndPlace, execute_simple_transit_no_destination)
+TEST_F(Transition_PTNEngineAndPlace, execute_simple_transit_no_destination)
 {
 	p1->setNumberOfTokens(1);
 
@@ -222,7 +222,7 @@ TEST_F(PTNEngineAndPlace, execute_simple_transit_no_destination)
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(PTNEngineObject, execute_simple_transit_one_destination_place)
+TEST_F(Transition_PTNEngineObject, execute_simple_transit_one_destination_place)
 {
 	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
 	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2" });
@@ -247,7 +247,7 @@ TEST_F(PTNEngineObject, execute_simple_transit_one_destination_place)
  * |___|       /||
  *              ||
  */
-TEST_F(PTNEngineObject, execute_two_activation_places_no_destination)
+TEST_F(Transition_PTNEngineObject, execute_two_activation_places_no_destination)
 {
 	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
 	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
@@ -272,7 +272,7 @@ TEST_F(PTNEngineObject, execute_two_activation_places_no_destination)
  * |___|       /||
  *              ||
  */
-TEST_F(PTNEngineObject, execute_two_activation_places_one_destination_place)
+TEST_F(Transition_PTNEngineObject, execute_two_activation_places_one_destination_place)
 {
 	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
 	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
@@ -301,7 +301,7 @@ TEST_F(PTNEngineObject, execute_two_activation_places_one_destination_place)
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(PTNEngineObject, execute_two_activation_places_two_destination_place)
+TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination_place)
 {
 	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
 	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
@@ -334,7 +334,7 @@ TEST_F(PTNEngineObject, execute_two_activation_places_two_destination_place)
  *              ||       /|___|
  *              ||
  */
-TEST_F(PTNEngineObject, execute_one_activation_places_two_destination_place)
+TEST_F(Transition_PTNEngineObject, execute_one_activation_places_two_destination_place)
 {
 	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
 	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
@@ -363,7 +363,7 @@ TEST_F(PTNEngineObject, execute_one_activation_places_two_destination_place)
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(PTNEngineObject, execute_two_activation_places_two_destination_place_arcs_with_custom_weights)
+TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination_place_arcs_with_custom_weights)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true });
@@ -403,7 +403,7 @@ TEST_F(PTNEngineObject, execute_two_activation_places_two_destination_place_arcs
  * |___|         ||
  *               ||
  */
-TEST_F(PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_destination_place)
+TEST_F(Transition_PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_destination_place)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true });
@@ -433,7 +433,8 @@ TEST_F(PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_desti
  * |___|         ||
  *               ||
  */
-TEST_F(PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_destination_place_with_custom_weights)
+TEST_F(Transition_PTNEngineObject,
+       execute_one_activation_place_one_inhibitor_arc_one_destination_place_with_custom_weights)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
@@ -477,7 +478,7 @@ TEST_F(PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_desti
  * condition __\||
  * function2   /||
  */
-TEST_F(PTNEngineObject, execute_only_fires_if_all_condition_functions_return_true)
+TEST_F(Transition_PTNEngineObject, execute_only_fires_if_all_condition_functions_return_true)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
@@ -525,7 +526,7 @@ TEST_F(PTNEngineObject, execute_only_fires_if_all_condition_functions_return_tru
  * |___|        /||o___2___|   |
  *               ||        |___|
  */
-TEST_F(PTNEngineObject, getActivationArcs_returns_activation_arcs)
+TEST_F(Transition_PTNEngineObject, getActivationArcs_returns_activation_arcs)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
@@ -550,7 +551,7 @@ TEST_F(PTNEngineObject, getActivationArcs_returns_activation_arcs)
 	EXPECT_EQ(2, activationArcs[1].weight);
 }
 
-TEST(Transition, get_additional_act_conditions_returns_additional_act_conditions)
+TEST(Transition_, get_additional_act_conditions_returns_additional_act_conditions)
 {
 	bool conditionFunction1ReturnVal = false;
 	ptne::ConditionFunction conditionFunction1 = [&conditionFunction1ReturnVal]()
@@ -576,7 +577,7 @@ TEST(Transition, get_additional_act_conditions_returns_additional_act_conditions
 	EXPECT_TRUE(additionalActivationConditions.at(1).second());
 }
 
-TEST_F(PTNEngineObject, getDestinationArcs_returns_destination_arcs)
+TEST_F(Transition_PTNEngineObject, getDestinationArcs_returns_destination_arcs)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
@@ -599,7 +600,7 @@ TEST_F(PTNEngineObject, getDestinationArcs_returns_destination_arcs)
 	EXPECT_EQ(p2, destinationArcs.at(1).place.lock());
 }
 
-TEST_F(PTNEngineObject, getInhibitorArcs_returns_inhibitor_arcs)
+TEST_F(Transition_PTNEngineObject, getInhibitorArcs_returns_inhibitor_arcs)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
@@ -622,7 +623,7 @@ TEST_F(PTNEngineObject, getInhibitorArcs_returns_inhibitor_arcs)
 	EXPECT_EQ(p2, inhibitorArcs.at(1).place.lock());
 }
 
-TEST(Transition, getName_returns_name)
+TEST(Transition_, getName_returns_name)
 {
 	Transition t1("", {}, {}, {}, {}, false);
 	EXPECT_EQ("", t1.getName());
@@ -631,7 +632,7 @@ TEST(Transition, getName_returns_name)
 	EXPECT_EQ("AB", t2.getName());
 }
 
-TEST_F(PTNEngineObject,
+TEST_F(Transition_PTNEngineObject,
        isEnabled_conditions_depending_on_input_tokens) // TO DO - split up in different tests
 {
 	SharedPtrPlace p1 =
@@ -681,7 +682,7 @@ TEST_F(PTNEngineObject,
  * function2   /||
  *              ||
  */
-TEST_F(PTNEngineObject, isEnabled_is_true_but_only_fires_when_all_conditions_are_true)
+TEST_F(Transition_PTNEngineObject, isEnabled_is_true_but_only_fires_when_all_conditions_are_true)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
@@ -728,7 +729,7 @@ TEST_F(PTNEngineObject, isEnabled_is_true_but_only_fires_when_all_conditions_are
 	EXPECT_EQ(1, p4->getNumberOfTokens());
 }
 
-TEST_F(PTNEngineObject, removeArc_removes_arc)
+TEST_F(Transition_PTNEngineObject, removeArc_removes_arc)
 {
 	SharedPtrPlace p1 =
 	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
@@ -766,7 +767,7 @@ TEST_F(PTNEngineObject, removeArc_removes_arc)
 	EXPECT_EQ(0, t2.getInhibitorArcs().size());
 }
 
-TEST(Transition, requireNoActionsInExecution_does_not_fire_if_onEnter_action_in_execution)
+TEST(Transition_, requireNoActionsInExecution_does_not_fire_if_onEnter_action_in_execution)
 {
 	atomic<bool> stop = true;
 	auto onEnterActionFunction = [&stop]()

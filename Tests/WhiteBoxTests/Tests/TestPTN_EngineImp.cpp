@@ -22,13 +22,13 @@
 using namespace std;
 using namespace ptne;
 
-class JobQueuePTNEngineImp : public testing::Test
+class PTN_EngineImp_JobQueue : public testing::Test
 {
 public:
 	PTN_EngineImp ptnEngineImp = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 };
 
-TEST(PTN_EngineImp, addJob_only_works_with_the_JOB_QUEUE_mode)
+TEST(PTN_EngineImp_, addJob_only_works_with_the_JOB_QUEUE_mode)
 {
 	PTN_EngineImp ptnEngineImpJobQueue(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 	ActionFunction actionFunction = []() {};
@@ -43,7 +43,7 @@ TEST(PTN_EngineImp, addJob_only_works_with_the_JOB_QUEUE_mode)
 	// TO DO test invoking while in execution
 }
 
-TEST(PTN_EngineImp, getNewInputReceived_incrementing_a_input_place_sets_the_new_inputReceived_flag)
+TEST(PTN_EngineImp_, getNewInputReceived_incrementing_a_input_place_sets_the_new_inputReceived_flag)
 {
 	PTN_EngineImp ptnEngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 	EXPECT_FALSE(ptnEngineImp.getNewInputReceived());
@@ -84,7 +84,7 @@ TEST(PTN_EngineImp, getNewInputReceived_incrementing_a_input_place_sets_the_new_
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngineImp, clearInputPlaces_resets_the_new_inputReceived_flag)
+TEST_F(PTN_EngineImp_JobQueue, clearInputPlaces_resets_the_new_inputReceived_flag)
 {
 	EXPECT_FALSE(ptnEngineImp.getNewInputReceived());
 	ptnEngineImp.createPlace(PlaceProperties{ .name = "P1", .input = true });
@@ -99,7 +99,7 @@ TEST_F(JobQueuePTNEngineImp, clearInputPlaces_resets_the_new_inputReceived_flag)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngineImp, enabledTransitions_returns_all_enabled_transitions)
+TEST_F(PTN_EngineImp_JobQueue, enabledTransitions_returns_all_enabled_transitions)
 {
 	TransitionProperties transitionProperties{
 		.name = "T1",
@@ -142,7 +142,7 @@ TEST_F(JobQueuePTNEngineImp, enabledTransitions_returns_all_enabled_transitions)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngineImp, enabledTransitions_returns_all_enabled_transitions_in_a_random_order)
+TEST_F(PTN_EngineImp_JobQueue, enabledTransitions_returns_all_enabled_transitions_in_a_random_order)
 {
 	TransitionProperties transitionProperties{
 		.name = "T1",

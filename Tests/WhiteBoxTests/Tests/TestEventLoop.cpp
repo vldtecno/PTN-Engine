@@ -23,26 +23,26 @@
 using namespace ptne;
 using namespace std;
 
-class PTNEnginImpObj : public testing::Test
+class EventLoop_PTNEnginImpObj : public testing::Test
 {
 public:
 	PTN_EngineImp ptnEngineImp = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 	EventLoop eventLoop = EventLoop(ptnEngineImp);
 };
 
-TEST_F(PTNEnginImpObj, isRunning_returns_if_event_loop_is_running)
+TEST_F(EventLoop_PTNEnginImpObj, isRunning_returns_if_event_loop_is_running)
 {
 	EXPECT_FALSE(eventLoop.isRunning());
 }
 
-TEST_F(PTNEnginImpObj, stop_stops_the_event_loop)
+TEST_F(EventLoop_PTNEnginImpObj, stop_stops_the_event_loop)
 {
 	EXPECT_FALSE(eventLoop.isRunning());
 	eventLoop.stop();
 	EXPECT_FALSE(eventLoop.isRunning());
 }
 
-TEST_F(PTNEnginImpObj, start_starts_the_event_loop)
+TEST_F(EventLoop_PTNEnginImpObj, start_starts_the_event_loop)
 {
 	EXPECT_FALSE(eventLoop.isRunning());
 	eventLoop.start(false, std::cout);
@@ -50,7 +50,7 @@ TEST_F(PTNEnginImpObj, start_starts_the_event_loop)
 	eventLoop.stop();
 }
 
-TEST(EventLoop, start_single_threaded_stops_immediately_after_start)
+TEST(EventLoop_, start_single_threaded_stops_immediately_after_start)
 {
 	PTN_EngineImp ptnEngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
 	EventLoop eventLoop(ptnEngineImp);
@@ -59,7 +59,7 @@ TEST(EventLoop, start_single_threaded_stops_immediately_after_start)
 	EXPECT_FALSE(eventLoop.isRunning());
 }
 
-TEST_F(PTNEnginImpObj, start_again_throws)
+TEST_F(EventLoop_PTNEnginImpObj, start_again_throws)
 {
 	EXPECT_FALSE(eventLoop.isRunning());
 	eventLoop.start(false, std::cout);
@@ -68,14 +68,14 @@ TEST_F(PTNEnginImpObj, start_again_throws)
 }
 
 // void notifyNewEvent();
-TEST_F(PTNEnginImpObj, notifyNewEvent)
+TEST_F(EventLoop_PTNEnginImpObj, notifyNewEvent)
 {
 	ASSERT_FALSE(eventLoop.isRunning());
 	// TO DO
 	// fake the ptn_engine
 }
 
-TEST_F(PTNEnginImpObj, setSleepDuration)
+TEST_F(EventLoop_PTNEnginImpObj, setSleepDuration)
 {
 	EXPECT_EQ(100ms, eventLoop.getSleepDuration());
 	eventLoop.setSleepDuration(10ms);

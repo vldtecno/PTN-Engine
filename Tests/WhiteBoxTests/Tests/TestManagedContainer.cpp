@@ -24,13 +24,13 @@ template class ptne::ManagedContainer<int>;
 using namespace std;
 using namespace ptne;
 
-class ManagedContainerInt : public testing::Test
+class ManagedContainer_Int : public testing::Test
 {
 public:
 	ManagedContainer<int> managedContainer;
 };
 
-TEST_F(ManagedContainerInt, addItem_adds_item)
+TEST_F(ManagedContainer_Int, addItem_adds_item)
 {
 	managedContainer.addItem("a", 1);
 	managedContainer.addItem("b", 2);
@@ -38,29 +38,29 @@ TEST_F(ManagedContainerInt, addItem_adds_item)
 	EXPECT_EQ(2, managedContainer.getItem("b"));
 }
 
-TEST_F(ManagedContainerInt, addItem_add_repeated_item_name_throws)
+TEST_F(ManagedContainer_Int, addItem_add_repeated_item_name_throws)
 {
 	managedContainer.addItem("a", 1);
 	EXPECT_EQ(1, managedContainer.getItem("a"));
 	ASSERT_THROW(managedContainer.addItem("a", 2), RepeatedFunctionException);
 }
 
-TEST_F(ManagedContainerInt, addItem_add_item_without_name_throws)
+TEST_F(ManagedContainer_Int, addItem_add_item_without_name_throws)
 {
 	ASSERT_THROW(managedContainer.addItem("", 1), InvalidFunctionNameException);
 }
 
-TEST_F(ManagedContainerInt, getItem_get_item_with_empty_name_throws)
+TEST_F(ManagedContainer_Int, getItem_get_item_with_empty_name_throws)
 {
 	ASSERT_THROW(managedContainer.getItem(""), InvalidFunctionNameException);
 }
 
-TEST_F(ManagedContainerInt, getItem_get_item_with_non_existing_name_throws)
+TEST_F(ManagedContainer_Int, getItem_get_item_with_non_existing_name_throws)
 {
 	ASSERT_THROW(managedContainer.getItem("a"), InvalidFunctionNameException);
 }
 
-TEST_F(ManagedContainerInt, getItems_returns_items_and_in_the_correct_order)
+TEST_F(ManagedContainer_Int, getItems_returns_items_and_in_the_correct_order)
 {
 	managedContainer.addItem("a", 1);
 	managedContainer.addItem("b", 2);
@@ -83,7 +83,7 @@ TEST_F(ManagedContainerInt, getItems_returns_items_and_in_the_correct_order)
 	}
 }
 
-TEST_F(ManagedContainerInt, getItems_with_invalid_name_throws)
+TEST_F(ManagedContainer_Int, getItems_with_invalid_name_throws)
 {
 	managedContainer.addItem("a", 1);
 	managedContainer.addItem("b", 2);
@@ -92,7 +92,7 @@ TEST_F(ManagedContainerInt, getItems_with_invalid_name_throws)
 	ASSERT_THROW(managedContainer.getItems(names), InvalidFunctionNameException);
 }
 
-TEST_F(ManagedContainerInt, getItems_with_empty_name_throws)
+TEST_F(ManagedContainer_Int, getItems_with_empty_name_throws)
 {
 	managedContainer.addItem("a", 1);
 	managedContainer.addItem("b", 2);

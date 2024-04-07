@@ -24,19 +24,19 @@
 using namespace std;
 using namespace ptne;
 
-class EventLoopPTNEngine : public testing::Test
+class PTN_Engine_EventLoop : public testing::Test
 {
 public:
 	PTN_Engine ptnEngine = PTN_Engine(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
 };
 
-class JobQueuePTNEngine : public testing::Test
+class PTN_Engine_JobQueue : public testing::Test
 {
 public:
 	PTN_Engine ptnEngine = PTN_Engine(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 };
 
-TEST(PTN_Engine, constructors_do_not_throw)
+TEST(PTN_Engine_, constructors_do_not_throw)
 {
 	ASSERT_NO_THROW(PTN_Engine{ PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED });
 	ASSERT_NO_THROW(PTN_Engine{ PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE });
@@ -44,7 +44,7 @@ TEST(PTN_Engine, constructors_do_not_throw)
 	ASSERT_NO_THROW(PTN_Engine{ PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP });
 }
 
-TEST(PTN_Engine, getActionsThreadOption_returns_the_actions_thread_option)
+TEST(PTN_Engine_, getActionsThreadOption_returns_the_actions_thread_option)
 {
 	PTN_Engine ptnEngineJobQueue(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 	EXPECT_EQ(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE, ptnEngineJobQueue.getActionsThreadOption());
@@ -58,7 +58,7 @@ TEST(PTN_Engine, getActionsThreadOption_returns_the_actions_thread_option)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, addArc_adds_an_arc_between_a_place_and_a_transition)
+TEST_F(PTN_Engine_JobQueue, addArc_adds_an_arc_between_a_place_and_a_transition)
 {
 	ptnEngine.createPlace(PlaceProperties{ .name = "P1", .input = true });
 
@@ -101,7 +101,7 @@ TEST_F(JobQueuePTNEngine, addArc_adds_an_arc_between_a_place_and_a_transition)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, clearNet_clears_the_petri_net_from_all_places_and_transitons)
+TEST_F(PTN_Engine_JobQueue, clearNet_clears_the_petri_net_from_all_places_and_transitons)
 {
 	EXPECT_TRUE(ptnEngine.getTransitionsProperties().empty());
 	EXPECT_TRUE(ptnEngine.getPlacesProperties().empty());
@@ -124,7 +124,7 @@ TEST_F(JobQueuePTNEngine, clearNet_clears_the_petri_net_from_all_places_and_tran
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, createPlace_creates_a_place_in_the_petri_net)
+TEST_F(PTN_Engine_JobQueue, createPlace_creates_a_place_in_the_petri_net)
 {
 	EXPECT_TRUE(ptnEngine.getPlacesProperties().empty());
 	PlaceProperties placeProperties{
@@ -154,7 +154,7 @@ TEST_F(JobQueuePTNEngine, createPlace_creates_a_place_in_the_petri_net)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, createTransition_creates_a_transition_in_the_petri_net)
+TEST_F(PTN_Engine_JobQueue, createTransition_creates_a_transition_in_the_petri_net)
 {
 	EXPECT_TRUE(ptnEngine.getTransitionsProperties().empty());
 	TransitionProperties transitionProperties{
@@ -184,7 +184,7 @@ TEST_F(JobQueuePTNEngine, createTransition_creates_a_transition_in_the_petri_net
 	// TO DO test invoking while in execution
 }
 
-TEST(PTN_Engine, execute_starts_the_execution_of_the_petri_net)
+TEST(PTN_Engine_, execute_starts_the_execution_of_the_petri_net)
 {
 	PTN_Engine ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
 	TransitionProperties transitionProperties{
@@ -228,7 +228,7 @@ TEST(PTN_Engine, execute_starts_the_execution_of_the_petri_net)
 }
 
 TEST_F(
-EventLoopPTNEngine,
+PTN_Engine_EventLoop,
 event_loop_sleep_time_duration_determines_the_time_the_event_loop_waits_until_it_checks_if_a_transition_can_be_fired)
 {
 	EXPECT_EQ(100ms, ptnEngine.getEventLoopSleepDuration());
@@ -300,19 +300,19 @@ event_loop_sleep_time_duration_determines_the_time_the_event_loop_waits_until_it
 	EXPECT_GT(duration_ms, 950.0);
 }
 
-TEST_F(JobQueuePTNEngine, getNumberOfTokens_throws_if_an_invalid_place_name_is_given)
+TEST_F(PTN_Engine_JobQueue, getNumberOfTokens_throws_if_an_invalid_place_name_is_given)
 {
 	ASSERT_THROW(ptnEngine.getNumberOfTokens(""), PTN_Exception);
 }
 
-TEST_F(JobQueuePTNEngine, incrementInputPlace_thows_if_an_invalid_place_name_is_given)
+TEST_F(PTN_Engine_JobQueue, incrementInputPlace_thows_if_an_invalid_place_name_is_given)
 {
 	ASSERT_THROW(ptnEngine.incrementInputPlace(""), PTN_Exception);
 
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, isEventLoopRunning_returns_if_the_event_loop_is_running_for_JOB_QUEUE_mode)
+TEST_F(PTN_Engine_JobQueue, isEventLoopRunning_returns_if_the_event_loop_is_running_for_JOB_QUEUE_mode)
 {
 	EXPECT_FALSE(ptnEngine.isEventLoopRunning());
 	ptnEngine.execute();
@@ -322,7 +322,7 @@ TEST_F(JobQueuePTNEngine, isEventLoopRunning_returns_if_the_event_loop_is_runnin
 	// TO DO test invoking while in execution
 }
 
-TEST_F(EventLoopPTNEngine, isEventLoopRunning_returns_if_the_event_loop_is_running_for_EVENT_LOOP_mode)
+TEST_F(PTN_Engine_EventLoop, isEventLoopRunning_returns_if_the_event_loop_is_running_for_EVENT_LOOP_mode)
 {
 	EXPECT_FALSE(ptnEngine.isEventLoopRunning());
 	ptnEngine.execute();
@@ -332,7 +332,7 @@ TEST_F(EventLoopPTNEngine, isEventLoopRunning_returns_if_the_event_loop_is_runni
 	// TO DO test invoking while in execution
 }
 
-TEST(PTN_Engine, isEventLoopRunning_returns_if_the_event_loop_is_running_for_DETACHED_mode)
+TEST(PTN_Engine_, isEventLoopRunning_returns_if_the_event_loop_is_running_for_DETACHED_mode)
 {
 	PTN_Engine ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED);
 	EXPECT_FALSE(ptnEngine.isEventLoopRunning());
@@ -343,7 +343,7 @@ TEST(PTN_Engine, isEventLoopRunning_returns_if_the_event_loop_is_running_for_DET
 	// TO DO test invoking while in execution
 }
 
-TEST(PTN_Engine, isEventLoopRunning_returns_false_for_SINGLE_THREAD_mode)
+TEST(PTN_Engine_, isEventLoopRunning_returns_false_for_SINGLE_THREAD_mode)
 {
 	PTN_Engine ptnEngine(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
 	EXPECT_FALSE(ptnEngine.isEventLoopRunning());
@@ -354,7 +354,7 @@ TEST(PTN_Engine, isEventLoopRunning_returns_false_for_SINGLE_THREAD_mode)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, registerAction_registers_an_action_in_the_petri_net)
+TEST_F(PTN_Engine_JobQueue, registerAction_registers_an_action_in_the_petri_net)
 {
 	ActionFunction actionFunction = []() {};
 	ASSERT_THROW(ptnEngine.registerAction("", actionFunction), InvalidFunctionNameException);
@@ -370,7 +370,7 @@ TEST_F(JobQueuePTNEngine, registerAction_registers_an_action_in_the_petri_net)
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, registerCondition_registers_a_condition_function_in_the_petri_net)
+TEST_F(PTN_Engine_JobQueue, registerCondition_registers_a_condition_function_in_the_petri_net)
 {
 	ConditionFunction conditionFunction = []() { return false; };
 	ASSERT_THROW(ptnEngine.registerCondition("", conditionFunction), InvalidFunctionNameException);
@@ -388,7 +388,7 @@ TEST_F(JobQueuePTNEngine, registerCondition_registers_a_condition_function_in_th
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, removeArc_removes_an_arc_between_a_place_and_a_transition)
+TEST_F(PTN_Engine_JobQueue, removeArc_removes_an_arc_between_a_place_and_a_transition)
 {
 	ArcProperties arcProperties;
 	ASSERT_THROW(ptnEngine.removeArc(arcProperties), PTN_Exception);
@@ -404,7 +404,7 @@ TEST_F(JobQueuePTNEngine, removeArc_removes_an_arc_between_a_place_and_a_transit
 	// TO DO test invoking while in execution
 }
 
-TEST_F(JobQueuePTNEngine, setActionsThreadOption_sets_the_runtime_mode_in_the_petri_net)
+TEST_F(PTN_Engine_JobQueue, setActionsThreadOption_sets_the_runtime_mode_in_the_petri_net)
 {
 	ASSERT_NO_THROW(ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD));
 	ASSERT_NO_THROW(ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED));
@@ -417,7 +417,7 @@ TEST_F(JobQueuePTNEngine, setActionsThreadOption_sets_the_runtime_mode_in_the_pe
 	ASSERT_THROW(ptnEngine.setActionsThreadOption(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE), PTN_Exception);
 }
 
-TEST_F(JobQueuePTNEngine, stops_the_petri_net_execution_and_never_throws)
+TEST_F(PTN_Engine_JobQueue, stops_the_petri_net_execution_and_never_throws)
 {
 	ASSERT_NO_THROW(ptnEngine.stop());
 	ASSERT_NO_THROW(ptnEngine.stop());
