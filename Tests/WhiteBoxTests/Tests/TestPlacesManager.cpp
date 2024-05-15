@@ -16,33 +16,19 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/IPTN_EnginePlace.h"
+#include "PTN_Engine/Executor/ActionsExecutorFactory.h"
 #include "PTN_Engine/PlacesManager.h"
 #include <gtest/gtest.h>
 
 using namespace ptne;
 using namespace std;
 
-class FakePTN_EnginePlace : public ptne::IPTN_EnginePlace
-{
-public:
-	~FakePTN_EnginePlace() override = default;
-
-	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const override
-	{
-		return PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP;
-	}
-
-	void addJob(const ActionFunction &) override
-	{
-		// dummy function
-	}
-};
-
 class PlacesManager_Obj : public testing::Test
 {
 public:
 	PlacesManager placesManager = PlacesManager{};
+	shared_ptr<IActionsExecutor> executor =
+	ActionsExecutorFactory::createExecutor(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 };
 
 TEST_F(PlacesManager_Obj, clear_clears_all_places)
@@ -51,8 +37,7 @@ TEST_F(PlacesManager_Obj, clear_clears_all_places)
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
 
 	PlaceProperties placeProperties{ .name = "P1" };
-	FakePTN_EnginePlace fakePTN_EnginePlace;
-	auto p = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p);
 	ASSERT_FALSE(placesManager.getPlacesProperties().empty());
 	ASSERT_NO_THROW(placesManager.clear());
@@ -62,16 +47,15 @@ TEST_F(PlacesManager_Obj, clear_clears_all_places)
 TEST_F(PlacesManager_Obj, clearInputPlaces_removes_all_tokens_from_input_places)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
 	placeProperties.input = true;
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	auto placesProperties = placesManager.getPlacesProperties();
@@ -116,16 +100,15 @@ TEST_F(PlacesManager_Obj, clearInputPlaces_removes_all_tokens_from_input_places)
 TEST_F(PlacesManager_Obj, contains_returns_if_place_with_given_place_name_is_contained)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
 	placeProperties.input = true;
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	EXPECT_TRUE(placesManager.contains("P1"));
@@ -136,16 +119,15 @@ TEST_F(PlacesManager_Obj, contains_returns_if_place_with_given_place_name_is_con
 TEST_F(PlacesManager_Obj, getNumberOfTokens_returns_the_number_of_tokens_in_place_with_place_name)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
 	placeProperties.initialNumberOfTokens = 8;
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	EXPECT_EQ(2, placesManager.getNumberOfTokens("P1"));
@@ -156,15 +138,14 @@ TEST_F(PlacesManager_Obj, getNumberOfTokens_returns_the_number_of_tokens_in_plac
 TEST_F(PlacesManager_Obj, getPlace)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	EXPECT_EQ(p1, placesManager.getPlace("P1"));
@@ -174,15 +155,14 @@ TEST_F(PlacesManager_Obj, getPlace)
 TEST_F(PlacesManager_Obj, getPlaces_returns_weak_pointers_to_places)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	auto places = placesManager.getPlaces({ "P1", "P2" });
@@ -197,15 +177,14 @@ TEST_F(PlacesManager_Obj, getPlaces_returns_weak_pointers_to_places)
 TEST_F(PlacesManager_Obj, getPlaces_throws_if_the_place_names_are_invalid)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	ASSERT_THROW(placesManager.getPlaces({ "P1", "P3" }), InvalidNameException);
@@ -215,16 +194,15 @@ TEST_F(PlacesManager_Obj, getPlaces_throws_if_the_place_names_are_invalid)
 TEST_F(PlacesManager_Obj, incrementInputPlace_increments_the_input_places_token_numbers)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	placeProperties.name = "P2";
 	placeProperties.input = true;
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p2);
 
 	EXPECT_EQ(2, placesManager.getNumberOfTokens("P1"));
@@ -239,15 +217,14 @@ TEST_F(PlacesManager_Obj, incrementInputPlace_increments_the_input_places_token_
 TEST_F(PlacesManager_Obj, insert_inserts_a_new_place_in_the_collection)
 {
 	ASSERT_TRUE(placesManager.getPlacesProperties().empty());
-	FakePTN_EnginePlace fakePTN_EnginePlace;
 
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 2 };
 	placeProperties.name = "P1";
-	auto p1 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p1 = make_shared<Place>(placeProperties, executor);
 	placesManager.insert(p1);
 
 	ASSERT_THROW(placesManager.insert(p1), PTN_Exception);
 
-	auto p2 = make_shared<Place>(fakePTN_EnginePlace, placeProperties);
+	auto p2 = make_shared<Place>(placeProperties, executor);
 	ASSERT_THROW(placesManager.insert(p2), PTN_Exception);
 }

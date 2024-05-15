@@ -17,11 +17,14 @@
  */
 
 #include "PTN_Engine/Place.h"
-#include "PTN_Engine/IPTN_EnginePlace.h"
+#include "PTN_Engine/Executor/IActionsExecutor.h"
+#include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/PTN_Exception.h"
+#include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <mutex>
 #include <string>
 #include <thread>
+
 
 namespace ptne
 {
@@ -29,15 +32,15 @@ using namespace std;
 
 Place::~Place() = default;
 
-Place::Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties)
-: m_ptnEngine(parent)
-, m_name(placeProperties.name)
+Place::Place(const PlaceProperties &placeProperties, const shared_ptr<IActionsExecutor> &executor)
+: m_name(placeProperties.name)
 , m_onEnterActionName(placeProperties.onEnterActionFunctionName)
 , m_onEnterAction(placeProperties.onEnterAction)
 , m_onExitActionName(placeProperties.onExitActionFunctionName)
 , m_onExitAction(placeProperties.onExitAction)
 , m_numberOfTokens(placeProperties.initialNumberOfTokens)
 , m_isInputPlace(placeProperties.input)
+, m_actionsExecutor(executor)
 {
 	if (!m_onEnterActionName.empty() && m_onEnterAction == nullptr)
 	{
@@ -70,7 +73,7 @@ void Place::enterPlace(const size_t tokens)
 		// is thrown.
 		this_thread::sleep_for(100ms);
 	}
-	executeAction(m_onEnterAction, m_onEnterActionsInExecution);
+	lockWeakPtr(m_actionsExecutor)->executeAction(m_onEnterAction, m_onEnterActionsInExecution);
 }
 
 void Place::exitPlace(const size_t tokens)
@@ -81,7 +84,7 @@ void Place::exitPlace(const size_t tokens)
 	{
 		return;
 	}
-	executeAction(m_onExitAction, m_onExitActionsInExecution);
+	lockWeakPtr(m_actionsExecutor)->executeAction(m_onExitAction, m_onExitActionsInExecution);
 }
 
 void Place::increaseNumberOfTokens(const size_t tokens)
@@ -145,48 +148,6 @@ string Place::getOnExitActionName() const
 	return m_onExitActionName;
 }
 
-void Place::executeAction(const ActionFunction &action, atomic<size_t> &actionsInExecution)
-{
-	switch (m_ptnEngine.getActionsThreadOption())
-	{
-	default:
-	{
-		throw PTN_Exception("Invalid configuration");
-	}
-	case PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD:
-	case PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP:
-	{
-		++actionsInExecution;
-		action();
-		--actionsInExecution;
-		break;
-	}
-	case PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE:
-	{
-		++actionsInExecution;
-		auto f = [&actionsInExecution, &action]()
-		{
-			action();
-			--actionsInExecution;
-		};
-		m_ptnEngine.addJob(f);
-		break;
-	}
-	case PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED:
-	{
-		++actionsInExecution;
-		auto job = [&actionsInExecution, &action]()
-		{
-			action();
-			--actionsInExecution;
-		};
-		auto t = thread(job);
-		t.detach();
-		break;
-	}
-	}
-}
-
 bool Place::isOnEnterActionInExecution() const
 {
 	return m_onEnterActionsInExecution > 0;
@@ -208,6 +169,12 @@ PlaceProperties Place::placeProperties() const
 	placeProperties.onExitAction = m_onExitAction;
 	placeProperties.input = m_isInputPlace;
 	return placeProperties;
+}
+
+void Place::setActionsExecutor(shared_ptr<IActionsExecutor> &actionsExecutor)
+{
+	unique_lock guard(m_mutex);
+	m_actionsExecutor = actionsExecutor;
 }
 
 } // namespace ptne

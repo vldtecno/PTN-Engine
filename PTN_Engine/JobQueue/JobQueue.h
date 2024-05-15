@@ -50,7 +50,7 @@ public:
 	void addJob(const ActionFunction &actionFunction);
 
 	//! Deactivate the job queue.
-	void deactivate();
+	void deactivate() noexcept;
 
 	//!
 	//! \brief Informs on whether the job queue is running or not.

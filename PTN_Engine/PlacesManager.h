@@ -81,6 +81,12 @@ public:
 	//!
 	void printState(std::ostream &o) const;
 
+	//!
+	//! \brief Set the action executor in each place.
+	//! \param actionsExecutor - the new actions executor to be used.
+	//!
+	void setActionsExecutor(std::shared_ptr<IActionsExecutor> &actionsExecutor);
+
 private:
 	//!
 	//! Shared mutex to synchronize the access to the items(readers-writer lock).

@@ -16,26 +16,28 @@
  * limitations under the License.
  */
 
+#include "PTN_Engine/Executor/ActionsExecutorFactory.h"
 #include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Place.h"
 #include <gtest/gtest.h>
 
+
 using namespace ptne;
 using namespace std;
 
-class Place_PTNEngineObject : public testing::Test
+class Place_ExecutorObj : public testing::Test
 {
 public:
-	PTN_EngineImp ptnEngine = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
+	shared_ptr<IActionsExecutor> executor = ActionsExecutorFactory::createExecutor();
 };
 
-TEST_F(Place_PTNEngineObject, create_place_with_default_PlaceProperties)
+TEST_F(Place_ExecutorObj, create_place_with_default_PlaceProperties)
 {
 	PlaceProperties placeProperties;
-	ASSERT_NO_THROW(Place place(ptnEngine, placeProperties));
+	ASSERT_NO_THROW(Place place(placeProperties, executor));
 }
 
-TEST_F(Place_PTNEngineObject, missing_on_enter_throws)
+TEST_F(Place_ExecutorObj, missing_on_enter_throws)
 {
 	auto onExit = []() {};
 	PlaceProperties placeProperties{
@@ -44,10 +46,10 @@ TEST_F(Place_PTNEngineObject, missing_on_enter_throws)
 		.onEnterAction = nullptr,
 		.onExitAction = onExit,
 	};
-	ASSERT_THROW(Place place(ptnEngine, placeProperties), PTN_Exception);
+	ASSERT_THROW(Place place(placeProperties, executor), PTN_Exception);
 }
 
-TEST_F(Place_PTNEngineObject, missing_on_exit_throws)
+TEST_F(Place_ExecutorObj, missing_on_exit_throws)
 {
 	auto onEnter = []() {};
 	PlaceProperties placeProperties{
@@ -56,10 +58,10 @@ TEST_F(Place_PTNEngineObject, missing_on_exit_throws)
 		.onEnterAction = onEnter,
 		.onExitAction = nullptr,
 	};
-	ASSERT_THROW(Place place(ptnEngine, placeProperties), PTN_Exception);
+	ASSERT_THROW(Place place(placeProperties, executor), PTN_Exception);
 }
 
-TEST_F(Place_PTNEngineObject, no_missing_functions_does_not_throw)
+TEST_F(Place_ExecutorObj, no_missing_functions_does_not_throw)
 {
 	auto onEnter = []() {};
 	auto onExit = onEnter;
@@ -70,10 +72,10 @@ TEST_F(Place_PTNEngineObject, no_missing_functions_does_not_throw)
 		.onEnterAction = onEnter,
 		.onExitAction = onExit,
 	};
-	ASSERT_NO_THROW(Place place(ptnEngine, placeProperties));
+	ASSERT_NO_THROW(Place place(placeProperties, executor));
 }
 
-TEST_F(Place_PTNEngineObject, unnamed_onEnter_onExit_functions_does_not_throw)
+TEST_F(Place_ExecutorObj, unnamed_onEnter_onExit_functions_does_not_throw)
 {
 	auto onEnter = []() {};
 	auto onExit = onEnter;
@@ -82,19 +84,19 @@ TEST_F(Place_PTNEngineObject, unnamed_onEnter_onExit_functions_does_not_throw)
 		.onEnterAction = onEnter,
 		.onExitAction = onExit,
 	};
-	ASSERT_NO_THROW(Place place(ptnEngine, placeProperties));
+	ASSERT_NO_THROW(Place place(placeProperties, executor));
 }
 
-TEST_F(Place_PTNEngineObject, unspecified_onEnter_onExit_functions_does_not_throw)
+TEST_F(Place_ExecutorObj, unspecified_onEnter_onExit_functions_does_not_throw)
 {
 	PlaceProperties placeProperties{
 		.onEnterAction = nullptr,
 		.onExitAction = nullptr,
 	};
-	ASSERT_NO_THROW(Place place(ptnEngine, placeProperties));
+	ASSERT_NO_THROW(Place place(placeProperties, executor));
 }
 
-TEST_F(Place_PTNEngineObject, blockStartingOnEnterActions_prevents_on_enter_action_from_starting)
+TEST_F(Place_ExecutorObj, blockStartingOnEnterActions_prevents_on_enter_action_from_starting)
 {
 	atomic<bool> stop = false;
 	auto onEnter = [&stop]()
@@ -104,9 +106,8 @@ TEST_F(Place_PTNEngineObject, blockStartingOnEnterActions_prevents_on_enter_acti
 			this_thread::sleep_for(20ms);
 		}
 	};
-	auto ptnEngine = make_unique<PTN_EngineImp>(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 	PlaceProperties placeProperties{ .onEnterAction = onEnter };
-	Place place(*ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	EXPECT_FALSE(place.isOnEnterActionInExecution());
 	place.blockStartingOnEnterActions(true);
 	jthread t([&place]() { place.enterPlace(1); });
@@ -119,10 +120,10 @@ TEST_F(Place_PTNEngineObject, blockStartingOnEnterActions_prevents_on_enter_acti
 	EXPECT_FALSE(place.isOnEnterActionInExecution());
 }
 
-TEST_F(Place_PTNEngineObject, enter_place_increases_number_of_tokens)
+TEST_F(Place_ExecutorObj, enter_place_increases_number_of_tokens)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	ASSERT_EQ(0, place.getNumberOfTokens());
 	place.enterPlace();
 	EXPECT_EQ(1, place.getNumberOfTokens());
@@ -130,19 +131,19 @@ TEST_F(Place_PTNEngineObject, enter_place_increases_number_of_tokens)
 	EXPECT_EQ(3, place.getNumberOfTokens());
 }
 
-TEST_F(Place_PTNEngineObject, enter_place_overflow_throws)
+TEST_F(Place_ExecutorObj, enter_place_overflow_throws)
 {
 	PlaceProperties placeProperties{ .initialNumberOfTokens = ULLONG_MAX };
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	ASSERT_EQ(ULLONG_MAX, place.getNumberOfTokens());
 	ASSERT_THROW(place.enterPlace(), OverflowException);
 	ASSERT_THROW(place.enterPlace(0), NullTokensException);
 }
 
-TEST_F(Place_PTNEngineObject, exit_place_decreases_number_of_tokens)
+TEST_F(Place_ExecutorObj, exit_place_decreases_number_of_tokens)
 {
 	PlaceProperties placeProperties{ .initialNumberOfTokens = 10 };
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	ASSERT_EQ(10, place.getNumberOfTokens());
 	place.exitPlace();
 	EXPECT_EQ(9, place.getNumberOfTokens());
@@ -150,38 +151,38 @@ TEST_F(Place_PTNEngineObject, exit_place_decreases_number_of_tokens)
 	EXPECT_EQ(7, place.getNumberOfTokens());
 }
 
-TEST_F(Place_PTNEngineObject, exit_place_underflow_throws)
+TEST_F(Place_ExecutorObj, exit_place_underflow_throws)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	ASSERT_EQ(0, place.getNumberOfTokens());
 	ASSERT_THROW(place.exitPlace(), NotEnoughTokensException);
 }
 
-TEST_F(Place_PTNEngineObject, get_name_returns_name)
+TEST_F(Place_ExecutorObj, get_name_returns_name)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	EXPECT_TRUE(place.getName().empty());
 	placeProperties.name = "P1 1";
-	Place place2(ptnEngine, placeProperties);
+	Place place2(placeProperties, executor);
 	EXPECT_EQ("P1 1", place2.getName());
 }
 
-TEST_F(Place_PTNEngineObject, get_number_of_tokens_returns_number_of_tokens)
+TEST_F(Place_ExecutorObj, get_number_of_tokens_returns_number_of_tokens)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	EXPECT_EQ(0, place.getNumberOfTokens());
 	placeProperties.initialNumberOfTokens = ULLONG_MAX;
-	Place place2(ptnEngine, placeProperties);
+	Place place2(placeProperties, executor);
 	EXPECT_EQ(ULLONG_MAX, place2.getNumberOfTokens());
 	placeProperties.initialNumberOfTokens = -1;
-	Place place3(ptnEngine, placeProperties);
+	Place place3(placeProperties, executor);
 	EXPECT_EQ(ULLONG_MAX, place3.getNumberOfTokens());
 }
 
-TEST_F(Place_PTNEngineObject, get_action_name_returns_action_name)
+TEST_F(Place_ExecutorObj, get_action_name_returns_action_name)
 {
 	auto onEnter = []() {};
 	auto onExit = onEnter;
@@ -192,21 +193,21 @@ TEST_F(Place_PTNEngineObject, get_action_name_returns_action_name)
 		.onEnterAction = onEnter,
 		.onExitAction = onExit,
 	};
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	EXPECT_EQ("on_enter_function", place.getOnEnterActionName());
 	EXPECT_EQ("on_exit_function", place.getOnExitActionName());
 }
 
-TEST_F(Place_PTNEngineObject, isInputPlace_returns_if_place_is_input_place)
+TEST_F(Place_ExecutorObj, isInputPlace_returns_if_place_is_input_place)
 {
 	auto onEnter = []() {};
 	auto onExit = onEnter;
 
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	EXPECT_FALSE(place.isInputPlace());
 	placeProperties.input = true;
-	Place inputPlace(ptnEngine, placeProperties);
+	Place inputPlace(placeProperties, executor);
 	EXPECT_TRUE(inputPlace.isInputPlace());
 }
 
@@ -221,8 +222,9 @@ TEST(Place_, isOnEnterActionInExecutione_returns_if_on_enter_action_is_in_execut
 		}
 	};
 	PlaceProperties placeProperties{ .onEnterAction = onEnter };
-	PTN_EngineImp ptnEngine = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
-	Place place(ptnEngine, placeProperties);
+	shared_ptr<IActionsExecutor> executor =
+	ActionsExecutorFactory::createExecutor(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
+	Place place(placeProperties, executor);
 	EXPECT_FALSE(place.isOnEnterActionInExecution());
 	place.enterPlace(1);
 	EXPECT_TRUE(place.isOnEnterActionInExecution());
@@ -231,10 +233,10 @@ TEST(Place_, isOnEnterActionInExecutione_returns_if_on_enter_action_is_in_execut
 	EXPECT_FALSE(place.isOnEnterActionInExecution());
 }
 
-TEST_F(Place_PTNEngineObject, placeProperties_returns_place_properties)
+TEST_F(Place_ExecutorObj, placeProperties_returns_place_properties)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	place.setNumberOfTokens(10);
 	EXPECT_EQ(10, place.placeProperties().initialNumberOfTokens);
 	EXPECT_EQ(false, place.placeProperties().input);
@@ -254,7 +256,7 @@ TEST_F(Place_PTNEngineObject, placeProperties_returns_place_properties)
 	placeProperties.onEnterAction = f;
 	placeProperties.onExitAction = f;
 
-	Place place2(ptnEngine, placeProperties);
+	Place place2(placeProperties, executor);
 	EXPECT_EQ(2, place2.placeProperties().initialNumberOfTokens);
 	EXPECT_EQ(true, place2.placeProperties().input);
 	EXPECT_EQ("P0", place2.placeProperties().name);
@@ -266,10 +268,10 @@ TEST_F(Place_PTNEngineObject, placeProperties_returns_place_properties)
 	EXPECT_EQ("abc11", str);
 }
 
-TEST_F(Place_PTNEngineObject, setNumberOfTokens_returns_number_of_tokens)
+TEST_F(Place_ExecutorObj, setNumberOfTokens_returns_number_of_tokens)
 {
 	PlaceProperties placeProperties;
-	Place place(ptnEngine, placeProperties);
+	Place place(placeProperties, executor);
 	ASSERT_EQ(0, place.getNumberOfTokens());
 	place.setNumberOfTokens(1);
 	EXPECT_EQ(1, place.getNumberOfTokens());

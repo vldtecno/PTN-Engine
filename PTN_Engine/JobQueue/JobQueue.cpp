@@ -23,8 +23,10 @@ namespace ptne
 {
 using namespace std;
 
-JobQueue::~JobQueue() = default;
 JobQueue::JobQueue() = default;
+
+//! The thread destructor will request to stop and then join, by default.
+JobQueue::~JobQueue() = default;
 
 void JobQueue::activate()
 {
@@ -36,7 +38,7 @@ void JobQueue::activate()
 	launch();
 }
 
-void JobQueue::deactivate()
+void JobQueue::deactivate() noexcept
 {
 	if (!m_isJobQueueActive)
 	{
@@ -45,6 +47,7 @@ void JobQueue::deactivate()
 	if (m_workerThread.get_stop_token().stop_possible())
 	{
 		m_workerThread.request_stop();
+		m_workerThread.join();
 	}
 	m_isJobQueueActive = false;
 }
@@ -60,7 +63,14 @@ void JobQueue::launch()
 	if (!m_isJobQueueRunning && !m_jobQueue.empty() && m_isJobQueueActive)
 	{
 		m_isJobQueueRunning = true;
-		m_workerThread = jthread(bind_front(&JobQueue::run, this));
+		try
+		{
+			m_workerThread = jthread(bind_front(&JobQueue::run, this));
+		}
+		catch (const std::system_error &)
+		{
+			m_isJobQueueRunning = false;
+		}
 	}
 }
 

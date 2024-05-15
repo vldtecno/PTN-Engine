@@ -33,7 +33,9 @@ file (GLOB_RECURSE
 file (GLOB_RECURSE
 	PTN_Engine_SRC_4
 	"JobQueue/*.h"
-	"JobQueue/*.cpp")
+	"JobQueue/*.cpp"
+	"Executor/*.h"
+	"Executor/*.cpp")
 
 file (GLOB_RECURSE
 	PTN_Engine_SRC_5

@@ -19,6 +19,7 @@
  */
 
 #include "PTN_Engine/PTN_EngineImp.h"
+#include "PTN_Engine/Executor/ActionsExecutorFactory.h"
 #include "PTN_Engine/JobQueue/JobQueue.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
@@ -31,11 +32,8 @@ using enum PTN_Engine::ACTIONS_THREAD_OPTION;
 PTN_EngineImp::PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 : m_actionsThreadOption(actionsThreadOption)
 , m_eventLoop(*this)
+, m_actionsExecutor(ActionsExecutorFactory::createExecutor(actionsThreadOption))
 {
-	if (m_actionsThreadOption == JOB_QUEUE)
-	{
-		m_jobQueue = make_unique<JobQueue>();
-	}
 }
 
 PTN_EngineImp::~PTN_EngineImp()
@@ -83,7 +81,7 @@ void PTN_EngineImp::createPlace(PlaceProperties placeProperties)
 		placeProperties.onExitAction = m_actions.getItem(placeProperties.onExitActionFunctionName);
 	}
 
-	auto place = make_shared<Place>(*this, placeProperties);
+	auto place = make_shared<Place>(placeProperties, m_actionsExecutor);
 	m_places.insert(place);
 }
 
@@ -132,15 +130,11 @@ void PTN_EngineImp::setActionsThreadOption(const PTN_Engine::ACTIONS_THREAD_OPTI
 	{
 		return;
 	}
-	if (actionsThreadOption == JOB_QUEUE && m_jobQueue == nullptr)
-	{
-		m_jobQueue = make_unique<JobQueue>();
-	}
-	else if (actionsThreadOption != JOB_QUEUE && m_jobQueue != nullptr)
-	{
-		m_jobQueue.reset();
-	}
+
+	m_actionsExecutor = ActionsExecutorFactory::createExecutor(actionsThreadOption);
 	m_actionsThreadOption = actionsThreadOption;
+
+	m_places.setActionsExecutor(m_actionsExecutor);
 }
 
 PTN_Engine::ACTIONS_THREAD_OPTION PTN_EngineImp::getActionsThreadOption() const
@@ -300,16 +294,6 @@ PTN_EngineImp::createAnonymousConditions(const vector<ConditionFunction> &condit
 	ranges::transform(conditions, back_inserter(anonymousConditionsVector),
 					  [](const auto &condition) { return pair<string, ConditionFunction>("", condition); });
 	return anonymousConditionsVector;
-}
-
-void PTN_EngineImp::addJob(const ActionFunction &actionFunction)
-{
-	if (m_actionsThreadOption != JOB_QUEUE || m_jobQueue == nullptr || !m_jobQueue->isActive())
-	{
-		throw PTN_Exception("addJob incorrectly called");
-	}
-
-	m_jobQueue->addJob(actionFunction);
 }
 
 } // namespace ptne

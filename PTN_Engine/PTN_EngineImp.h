@@ -22,7 +22,6 @@
 
 #include "PTN_Engine/EventLoop.h"
 #include "PTN_Engine/IPTN_EngineEL.h"
-#include "PTN_Engine/IPTN_EnginePlace.h"
 #include "PTN_Engine/ManagedContainer.h"
 #include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Place.h"
@@ -34,8 +33,9 @@
 namespace ptne
 {
 
-class IConditionFunctor;
 class IActionFunctor;
+class IConditionFunctor;
+class IActionsExecutor;
 class JobQueue;
 class Place;
 class Transition;
@@ -45,7 +45,7 @@ using WeakPtrPlace = std::weak_ptr<Place>;
 
 
 //! Implements the Petri net logic.
-class PTN_EngineImp final : public IPTN_EngineEL, public IPTN_EnginePlace
+class PTN_EngineImp final : public IPTN_EngineEL
 {
 public:
 	~PTN_EngineImp() override;
@@ -54,12 +54,6 @@ public:
 	PTN_EngineImp(PTN_EngineImp &&) = delete;
 	PTN_EngineImp &operator=(const PTN_EngineImp &) = delete;
 	PTN_EngineImp &operator=(PTN_EngineImp &&) = delete;
-
-	//!
-	//! \brief Add job to job queue.
-	//! \param Function to be executed in the job queue.
-	//!
-	void addJob(const ActionFunction &actionFunction) override;
 
 	PTN_Engine::ACTIONS_THREAD_OPTION getActionsThreadOption() const override;
 
@@ -198,6 +192,9 @@ private:
 
 	//! Container with all the actions available to this Petri net.
 	ManagedContainer<ActionFunction> m_actions;
+
+	//! Executes the actions associated to each place, when tokens enter or exit them.z
+	std::shared_ptr<IActionsExecutor> m_actionsExecutor;
 
 	//! Determines how the actions will be executed.
 	PTN_Engine::ACTIONS_THREAD_OPTION m_actionsThreadOption;

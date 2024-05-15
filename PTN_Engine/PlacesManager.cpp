@@ -79,6 +79,15 @@ void PlacesManager::printState(ostream &o) const
 	o << endl << endl;
 }
 
+void PlacesManager::setActionsExecutor(shared_ptr<IActionsExecutor> &actionsExecutor)
+{
+	unique_lock placesGuard(m_itemsMutex);
+	for (auto &place : m_items)
+	{
+		place.second->setActionsExecutor(actionsExecutor);
+	}
+}
+
 size_t PlacesManager::getNumberOfTokens(const string &place) const
 {
 	shared_lock placesGuard(m_itemsMutex);

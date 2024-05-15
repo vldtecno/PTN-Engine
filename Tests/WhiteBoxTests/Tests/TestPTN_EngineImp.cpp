@@ -25,23 +25,8 @@ using namespace ptne;
 class PTN_EngineImp_JobQueue : public testing::Test
 {
 public:
-	PTN_EngineImp ptnEngineImp = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
+    PTN_EngineImp ptnEngineImp = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 };
-
-TEST(PTN_EngineImp_, addJob_only_works_with_the_JOB_QUEUE_mode)
-{
-	PTN_EngineImp ptnEngineImpJobQueue(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
-	ActionFunction actionFunction = []() {};
-	ASSERT_NO_THROW(ptnEngineImpJobQueue.addJob(actionFunction));
-	PTN_EngineImp ptnEngineImpDetached(PTN_Engine::ACTIONS_THREAD_OPTION::DETACHED);
-	ASSERT_THROW(ptnEngineImpDetached.addJob(actionFunction), PTN_Exception);
-	PTN_EngineImp ptnEngineImpSingleThread(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
-	ASSERT_THROW(ptnEngineImpSingleThread.addJob(actionFunction), PTN_Exception);
-	PTN_EngineImp ptnEngineImpEventLoop(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
-	ASSERT_THROW(ptnEngineImpEventLoop.addJob(actionFunction), PTN_Exception);
-
-	// TO DO test invoking while in execution
-}
 
 TEST(PTN_EngineImp_, getNewInputReceived_incrementing_a_input_place_sets_the_new_inputReceived_flag)
 {

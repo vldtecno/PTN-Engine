@@ -16,26 +16,29 @@
  * limitations under the License.
  */
 
+#include "PTN_Engine/Executor/ActionsExecutorFactory.h"
 #include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <gtest/gtest.h>
 
+
 using namespace std;
 using namespace ptne;
 
-class Transition_PTNEngineObject : public testing::Test
+class Transition_ExecutorObj : public testing::Test
 {
 public:
-	PTN_EngineImp ptnEngine = PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION::EVENT_LOOP);
+	shared_ptr<IActionsExecutor> executor =
+	ActionsExecutorFactory::createExecutor(PTN_Engine::ACTIONS_THREAD_OPTION::JOB_QUEUE);
 };
 
-class Transition_PTNEngineAndPlace : public Transition_PTNEngineObject
+class Transition_PTNEngineAndPlace : public Transition_ExecutorObj
 {
 public:
 	void SetUp() override
 	{
-		Transition_PTNEngineObject::SetUp();
-		p1 = make_shared<Place>(ptnEngine, PlaceProperties{});
+		Transition_ExecutorObj::SetUp();
+		p1 = make_shared<Place>(PlaceProperties{}, executor);
 	}
 	SharedPtrPlace p1 = nullptr;
 };
@@ -222,10 +225,10 @@ TEST_F(Transition_PTNEngineAndPlace, execute_simple_transit_no_destination)
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_simple_transit_one_destination_place)
+TEST_F(Transition_ExecutorObj, execute_simple_transit_one_destination_place)
 {
-	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2" });
+	SharedPtrPlace p1 = make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -247,10 +250,10 @@ TEST_F(Transition_PTNEngineObject, execute_simple_transit_one_destination_place)
  * |___|       /||
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_two_activation_places_no_destination)
+TEST_F(Transition_ExecutorObj, execute_two_activation_places_no_destination)
 {
-	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
+	SharedPtrPlace p1 = make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -272,11 +275,11 @@ TEST_F(Transition_PTNEngineObject, execute_two_activation_places_no_destination)
  * |___|       /||
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_two_activation_places_one_destination_place)
+TEST_F(Transition_ExecutorObj, execute_two_activation_places_one_destination_place)
 {
-	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
+	SharedPtrPlace p1 = make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -301,12 +304,12 @@ TEST_F(Transition_PTNEngineObject, execute_two_activation_places_one_destination
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination_place)
+TEST_F(Transition_ExecutorObj, execute_two_activation_places_two_destination_place)
 {
-	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
-	SharedPtrPlace p4 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P4" });
+	SharedPtrPlace p1 = make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
+	SharedPtrPlace p4 = make_shared<Place>(PlaceProperties{ .name = "P4" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -334,11 +337,11 @@ TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination
  *              ||       /|___|
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_one_activation_places_two_destination_place)
+TEST_F(Transition_ExecutorObj, execute_one_activation_places_two_destination_place)
 {
-	SharedPtrPlace p1 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P4" });
+	SharedPtrPlace p1 = make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P4" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -363,13 +366,13 @@ TEST_F(Transition_PTNEngineObject, execute_one_activation_places_two_destination
  * |___|       /||       /|___|
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination_place_arcs_with_custom_weights)
+TEST_F(Transition_ExecutorObj, execute_two_activation_places_two_destination_place_arcs_with_custom_weights)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
-	SharedPtrPlace p4 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P4" });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
+	SharedPtrPlace p4 = make_shared<Place>(PlaceProperties{ .name = "P4" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 2);
@@ -403,12 +406,12 @@ TEST_F(Transition_PTNEngineObject, execute_two_activation_places_two_destination
  * |___|         ||
  *               ||
  */
-TEST_F(Transition_PTNEngineObject, execute_one_activation_place_one_inhibitor_arc_one_destination_place)
+TEST_F(Transition_ExecutorObj, execute_one_activation_place_one_inhibitor_arc_one_destination_place)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true });
-	SharedPtrPlace p2 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 1, .input = true }, executor);
+	SharedPtrPlace p2 = make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1 }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 1);
@@ -433,14 +436,14 @@ TEST_F(Transition_PTNEngineObject, execute_one_activation_place_one_inhibitor_ar
  * |___|         ||
  *               ||
  */
-TEST_F(Transition_PTNEngineObject,
+TEST_F(Transition_ExecutorObj,
        execute_one_activation_place_one_inhibitor_arc_one_destination_place_with_custom_weights)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true }, executor);
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 5);
@@ -478,13 +481,13 @@ TEST_F(Transition_PTNEngineObject,
  * condition __\||
  * function2   /||
  */
-TEST_F(Transition_PTNEngineObject, execute_only_fires_if_all_condition_functions_return_true)
+TEST_F(Transition_ExecutorObj, execute_only_fires_if_all_condition_functions_return_true)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true }, executor);
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 3, .input = true });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 3, .input = true }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
 
 	bool conditionFunction1ReturnVal = false;
 	ptne::ConditionFunction conditionFunction1 = [&conditionFunction1ReturnVal]()
@@ -526,13 +529,13 @@ TEST_F(Transition_PTNEngineObject, execute_only_fires_if_all_condition_functions
  * |___|        /||o___2___|   |
  *               ||        |___|
  */
-TEST_F(Transition_PTNEngineObject, getActivationArcs_returns_activation_arcs)
+TEST_F(Transition_ExecutorObj, getActivationArcs_returns_activation_arcs)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true }, executor);
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true });
-	SharedPtrPlace p3 = make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3" });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true }, executor);
+	SharedPtrPlace p3 = make_shared<Place>(PlaceProperties{ .name = "P3" }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 5);
@@ -577,13 +580,13 @@ TEST(Transition_, get_additional_act_conditions_returns_additional_act_condition
 	EXPECT_TRUE(additionalActivationConditions.at(1).second());
 }
 
-TEST_F(Transition_PTNEngineObject, getDestinationArcs_returns_destination_arcs)
+TEST_F(Transition_ExecutorObj, getDestinationArcs_returns_destination_arcs)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	Transition t1("", {}, {}, {}, {}, false);
 	auto destinationArcs = t1.getDestinationArcs();
@@ -600,13 +603,13 @@ TEST_F(Transition_PTNEngineObject, getDestinationArcs_returns_destination_arcs)
 	EXPECT_EQ(p2, destinationArcs.at(1).place.lock());
 }
 
-TEST_F(Transition_PTNEngineObject, getInhibitorArcs_returns_inhibitor_arcs)
+TEST_F(Transition_ExecutorObj, getInhibitorArcs_returns_inhibitor_arcs)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	Transition t1("", {}, {}, {}, {}, false);
 	auto inhibitorArcs = t1.getInhibitorArcs();
@@ -632,15 +635,15 @@ TEST(Transition_, getName_returns_name)
 	EXPECT_EQ("AB", t2.getName());
 }
 
-TEST_F(Transition_PTNEngineObject,
-       isEnabled_conditions_depending_on_input_tokens) // TO DO - split up in different tests
+TEST_F(Transition_ExecutorObj,
+	   isEnabled_conditions_depending_on_input_tokens) // TO DO - split up in different tests
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 0, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 0, .input = true }, executor);
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 1, .input = true }, executor);
 	SharedPtrPlace p3 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3", .initialNumberOfTokens = 1, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P3", .initialNumberOfTokens = 1, .input = true }, executor);
 
 	Transition t("", {}, {}, {}, {}, false);
 	t.addArc(p1, ArcProperties::Type::ACTIVATION, 5);
@@ -682,16 +685,16 @@ TEST_F(Transition_PTNEngineObject,
  * function2   /||
  *              ||
  */
-TEST_F(Transition_PTNEngineObject, isEnabled_is_true_but_only_fires_when_all_conditions_are_true)
+TEST_F(Transition_ExecutorObj, isEnabled_is_true_but_only_fires_when_all_conditions_are_true)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P1", .initialNumberOfTokens = 5, .input = true }, executor);
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 3, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 3, .input = true }, executor);
 	SharedPtrPlace p3 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P3", .initialNumberOfTokens = 0, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P3", .initialNumberOfTokens = 0, .input = true }, executor);
 	SharedPtrPlace p4 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P4", .initialNumberOfTokens = 0, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P4", .initialNumberOfTokens = 0, .input = true }, executor);
 
 
 	bool conditionFunction1ReturnVal = false;
@@ -729,13 +732,13 @@ TEST_F(Transition_PTNEngineObject, isEnabled_is_true_but_only_fires_when_all_con
 	EXPECT_EQ(1, p4->getNumberOfTokens());
 }
 
-TEST_F(Transition_PTNEngineObject, removeArc_removes_arc)
+TEST_F(Transition_ExecutorObj, removeArc_removes_arc)
 {
 	SharedPtrPlace p1 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	SharedPtrPlace p2 =
-	make_shared<Place>(ptnEngine, PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true });
+	make_shared<Place>(PlaceProperties{ .name = "P2", .initialNumberOfTokens = 5, .input = true }, executor);
 
 	Transition t1("", {}, {}, {}, {}, false);
 	auto activationArcs = t1.getActivationArcs();

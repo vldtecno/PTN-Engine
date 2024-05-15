@@ -27,6 +27,8 @@ namespace ptne
 {
 
 class IPTN_EnginePlace;
+class IActionsExecutor;
+
 
 //!
 //! \brief Implements a place of a Petri net.
@@ -37,7 +39,7 @@ public:
 	using ActionFunction = std::function<void(void)>;
 
 	~Place();
-	Place(IPTN_EnginePlace &parent, const PlaceProperties &placeProperties);
+	Place(const PlaceProperties &placeProperties, const std::shared_ptr<IActionsExecutor> &);
 	Place(const Place &) = delete;
 	Place(Place &&) = delete;
 	Place &operator=(Place &) = delete;
@@ -104,6 +106,13 @@ public:
 	PlaceProperties placeProperties() const;
 
 	//!
+	//! \brief Set the action executor in each place.
+	//! \param actionsExecutor - the new actions executor to be used.
+	//!
+	void setActionsExecutor(std::shared_ptr<IActionsExecutor> &actionsExecutor);
+
+
+	//!
 	//! Set the number of tokens in the place.
 	//! \param tokens Number of tokens to be set.
 	//!
@@ -117,19 +126,10 @@ private:
 	void decreaseNumberOfTokens(const size_t tokens = 1);
 
 	//!
-	//! \brief Execute the action according to the configuration.
-	//! \param action to be executed
-	//!
-	void executeAction(const ActionFunction &action, std::atomic<size_t> &);
-
-	//!
 	//! Increase number of tokens in the place.
 	//! \param tokens Number of tokens to be added. Must be at least 1.
 	//!
 	void increaseNumberOfTokens(const size_t tokens = 1);
-
-	//! Reference to the PTN Engine instance, to which the place belongs.
-	IPTN_EnginePlace &m_ptnEngine;
 
 	//! Flag to block triggering on enter actions.
 	std::atomic<bool> m_blockStartingOnEnterActions = false;
@@ -163,6 +163,9 @@ private:
 
 	//! Counter of on exit functions being executed.
 	std::atomic<size_t> m_onExitActionsInExecution = 0;
+
+	//! Actions executor.
+	std::weak_ptr<IActionsExecutor> m_actionsExecutor;
 };
 
 } // namespace ptne
