@@ -17,6 +17,8 @@
  */
 
 #include "PTN_Engine/ImportExport/IFileImporter.h"
+#include "PTN_Engine/ImportExport/ActionsThreadOptionConversions.h"
+#include "PTN_Engine/PTN_Engine.h"
 
 namespace ptne
 {
@@ -30,7 +32,8 @@ void IFileImporter::_import(PTN_Engine &ptnEngine) const
 	}
 
 	string actionsThreadOptionStr = importActionsThreadOption();
-	ptnEngine.setActionsThreadOption(std::move(PTN_Engine::toACTIONS_THREAD_OPTION(actionsThreadOptionStr)));
+	ptnEngine.setActionsThreadOption(
+	std::move(ActionsThreadOptionConversions::toACTIONS_THREAD_OPTION(actionsThreadOptionStr)));
 
 	for (const auto &placeProperties : importPlaces())
 	{

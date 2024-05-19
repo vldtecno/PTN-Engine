@@ -36,12 +36,13 @@ using ActionFunction = std::function<void(void)>;
  */
 struct DLL_PUBLIC ArcProperties final
 {
-	enum class Type {
+	enum class Type
+	{
 		ACTIVATION,
 		DESTINATION,
 		BIDIRECTIONAL,
 		INHIBITOR,
-		//RESET,
+		// RESET,
 	};
 
 	/*!
@@ -164,20 +165,6 @@ public:
 		JOB_QUEUE
 	};
 
-	/*!
-	 * \brief toACTIONS_THREAD_OPTION
-	 * \param actionsThreadOptionStr
-	 * \return
-	 */
-	static ACTIONS_THREAD_OPTION toACTIONS_THREAD_OPTION(const std::string &actionsThreadOptionStr);
-
-	/*!
-	 * \brief toString
-	 * \param actionsThreadOption
-	 * \return
-	 */
-	static std::string toString(ACTIONS_THREAD_OPTION actionsThreadOption);
-
 	using EventLoopSleepDuration = std::chrono::duration<long, std::ratio<1, 1000>>;
 
 	virtual ~PTN_Engine();
@@ -276,13 +263,13 @@ public:
 	 * \brief addArc
 	 * \param arcProperties
 	 */
-	void addArc(const ArcProperties& arcProperties);
+	void addArc(const ArcProperties &arcProperties);
 
 	/*!
 	 * \brief addArc
 	 * \param arcProperties
 	 */
-	void removeArc(const ArcProperties& arcProperties);
+	void removeArc(const ArcProperties &arcProperties);
 
 	/*!
 	 * \brief clearNet

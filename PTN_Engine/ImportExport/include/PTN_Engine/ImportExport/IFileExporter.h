@@ -18,13 +18,15 @@
 
 #pragma once
 
-#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Utilities/Explicit.h"
+#include <string>
 
 namespace ptne
 {
 
 class PTN_Engine;
+class PlaceProperties;
+class TransitionProperties;
 
 //!
 //! \brief The IFileExporter class is an interface for all PTN_Engine file exporters.

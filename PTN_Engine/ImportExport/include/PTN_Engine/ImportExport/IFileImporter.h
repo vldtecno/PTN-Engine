@@ -18,14 +18,17 @@
 
 #pragma once
 
-#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/Utilities/Explicit.h"
+#include <string>
 #include <vector>
 
 namespace ptne
 {
 
+class ArcProperties;
 class PTN_Engine;
+class PlaceProperties;
+class TransitionProperties;
 
 //!
 //! \brief The IFileImporter class is an interface class for all PTN_Engine file importers.

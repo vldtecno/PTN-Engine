@@ -16,31 +16,21 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/ImportExport/IFileExporter.h"
-#include "PTN_Engine/PTN_Exception.h"
-
+#include "PTN_Engine/PTN_Engine.h"
 namespace ptne
 {
-using namespace std;
 
-void IFileExporter::_export(const PTN_Engine &ptnEngine)
+class ActionsThreadOptionConversions
 {
-	if (ptnEngine.isEventLoopRunning())
-	{
-		throw PTN_Exception("Cannot change actions thread option while the event loop is running.");
-	}
+public:
+	static PTN_Engine::ACTIONS_THREAD_OPTION toACTIONS_THREAD_OPTION(const std::string &actionsThreadOptionStr);
+	static std::string toString(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption);
 
-	exportActionsThreadOption(PTN_Engine::toString(ptnEngine.getActionsThreadOption()));
-
-	for (const auto &placeProperties : ptnEngine.getPlacesProperties())
-	{
-		exportPlace(placeProperties);
-	}
-
-	for (const auto &transitionProperties : ptnEngine.getTransitionsProperties())
-	{
-		exportTransition(transitionProperties);
-	}
-}
+private:
+	static const std::string ACTIONS_THREAD_OPTION_SINGLE_THREAD;
+	static const std::string ACTIONS_THREAD_OPTION_EVENT_LOOP;
+	static const std::string ACTIONS_THREAD_OPTION_DETACHED;
+	static const std::string ACTIONS_THREAD_OPTION_JOB_QUEUE;
+};
 
 } // namespace ptne
