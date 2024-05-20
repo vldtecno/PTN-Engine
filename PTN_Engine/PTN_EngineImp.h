@@ -208,9 +208,6 @@ private:
 	//! Loop that processes events and executes the Petri net.
 	EventLoop m_eventLoop;
 
-	//! Job queue to dispatch actions.
-	std::unique_ptr<JobQueue> m_jobQueue;
-
 	//! Flag reporting a new input event.
 	std::atomic<bool> m_newInputReceived = false;
 

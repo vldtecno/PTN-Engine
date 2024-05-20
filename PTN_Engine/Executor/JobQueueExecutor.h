@@ -31,7 +31,7 @@ public:
 
 private:
 	//! Job queue to dispatch actions.
-	std::unique_ptr<JobQueue> m_jobQueue = std::make_unique<JobQueue>();
+	JobQueue m_jobQueue;
 };
 
 } // namespace ptne

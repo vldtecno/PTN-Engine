@@ -32,7 +32,7 @@ void JobQueueExecutor::executeAction(const ActionFunction &action, atomic<size_t
 		action();
 		--actionsInExecution;
 	};
-	m_jobQueue->addJob(f);
+	m_jobQueue.addJob(f);
 }
 
 } // namespace ptne

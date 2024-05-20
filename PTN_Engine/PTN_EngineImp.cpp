@@ -20,7 +20,6 @@
 
 #include "PTN_Engine/PTN_EngineImp.h"
 #include "PTN_Engine/Executor/ActionsExecutorFactory.h"
-#include "PTN_Engine/JobQueue/JobQueue.h"
 #include "PTN_Engine/Utilities/LockWeakPtr.h"
 #include <algorithm>
 
@@ -31,8 +30,8 @@ using enum PTN_Engine::ACTIONS_THREAD_OPTION;
 
 PTN_EngineImp::PTN_EngineImp(PTN_Engine::ACTIONS_THREAD_OPTION actionsThreadOption)
 : m_actionsThreadOption(actionsThreadOption)
-, m_eventLoop(*this)
 , m_actionsExecutor(ActionsExecutorFactory::createExecutor(actionsThreadOption))
+, m_eventLoop(*this)
 {
 }
 
