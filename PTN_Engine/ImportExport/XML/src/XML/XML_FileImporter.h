@@ -33,7 +33,7 @@ class PTN_Engine;
 class XML_FileImporter : public IFileImporter //, public IFileImporter
 {
 public:
-	~XML_FileImporter() override = default;
+	~XML_FileImporter() override;
 	XML_FileImporter() = default;
 	XML_FileImporter(const XML_FileImporter &) = delete;
 	XML_FileImporter(XML_FileImporter &&) = delete;

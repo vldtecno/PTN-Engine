@@ -24,9 +24,10 @@
 namespace ptne
 {
 
+struct ArcProperties;
 class PTN_Engine;
-class PlaceProperties;
-class TransitionProperties;
+struct PlaceProperties;
+struct TransitionProperties;
 
 //!
 //! \brief The IFileExporter class is an interface for all PTN_Engine file exporters.
@@ -34,7 +35,7 @@ class TransitionProperties;
 class DLL_PUBLIC IFileExporter
 {
 public:
-	virtual ~IFileExporter() = default;
+	virtual ~IFileExporter();
 
 	//!
 	//! \brief Export a PTN_Engine object to a file.
@@ -44,7 +45,7 @@ public:
 	virtual void _export(const PTN_Engine &ptnEngine, const std::string &filePath) = 0;
 
 protected:
-	void _export(const PTN_Engine &ptnEngine);
+	void _exportInt(const PTN_Engine &ptnEngine);
 
 private:
 	virtual void exportActionsThreadOption(const std::string &actionsThreadOption) = 0;

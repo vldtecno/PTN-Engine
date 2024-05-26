@@ -107,13 +107,15 @@ size_t getNodeValue(const string &nodeName, const xml_node &xmlNode)
 
 namespace ptne
 {
+XML_FileImporter::~XML_FileImporter() = default;
+
 void XML_FileImporter::_import(const string &filePath, PTN_Engine &ptnEngine)
 {
 	if (const auto &result = m_document.load_file(filePath.c_str()); !result)
 	{
 		throw PTN_Exception(result.description());
 	}
-	IFileImporter::_import(ptnEngine);
+	IFileImporter::_importInt(ptnEngine);
 }
 
 string XML_FileImporter::importActionsThreadOption() const

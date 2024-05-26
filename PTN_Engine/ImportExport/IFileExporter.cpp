@@ -18,14 +18,15 @@
 
 #include "PTN_Engine/ImportExport/IFileExporter.h"
 #include "PTN_Engine/ImportExport/ActionsThreadOptionConversions.h"
-#include "PTN_Engine/PTN_Engine.h"
 #include "PTN_Engine/PTN_Exception.h"
 
 namespace ptne
 {
 using namespace std;
 
-void IFileExporter::_export(const PTN_Engine &ptnEngine)
+IFileExporter::~IFileExporter() = default;
+
+void IFileExporter::_exportInt(const PTN_Engine &ptnEngine)
 {
 	if (ptnEngine.isEventLoopRunning())
 	{

@@ -30,7 +30,7 @@ namespace ptne
 class XML_FileExporter : public IFileExporter
 {
 public:
-	~XML_FileExporter() override = default;
+	~XML_FileExporter() override;
 	XML_FileExporter() = default;
 	XML_FileExporter(const XML_FileExporter &) = delete;
 	XML_FileExporter(XML_FileExporter &&) = delete;

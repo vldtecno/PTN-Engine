@@ -24,7 +24,9 @@ namespace ptne
 {
 using namespace std;
 
-void IFileImporter::_import(PTN_Engine &ptnEngine) const
+IFileImporter::~IFileImporter() = default;
+
+void IFileImporter::_importInt(PTN_Engine &ptnEngine) const
 {
 	if (ptnEngine.isEventLoopRunning())
 	{

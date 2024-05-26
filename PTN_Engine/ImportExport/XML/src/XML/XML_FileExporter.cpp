@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "PTN_Engine/PTN_Engine.h"
 #include "XML/XML_FileExporter.h"
+#include "PTN_Engine/PTN_Engine.h"
 #include <pugixml.hpp>
 #include <vector>
 
@@ -26,7 +26,9 @@ namespace ptne
 using namespace pugi;
 using namespace std;
 
-void XML_FileExporter::_export(const PTN_Engine &ptnEngine, const string& filePath)
+XML_FileExporter::~XML_FileExporter() = default;
+
+void XML_FileExporter::_export(const PTN_Engine &ptnEngine, const string &filePath)
 {
 	m_filePath = filePath;
 	m_rootNode = m_document.append_child("PTN-Engine");
@@ -36,7 +38,7 @@ void XML_FileExporter::_export(const PTN_Engine &ptnEngine, const string& filePa
 	m_placesNode = m_rootNode.append_child("Places");
 	m_transitionsNode = m_rootNode.append_child("Transitions");
 	m_arcsNode = m_rootNode.append_child("Arcs");
-	IFileExporter::_export(ptnEngine);
+	IFileExporter::_exportInt(ptnEngine);
 	saveFile();
 }
 
@@ -70,9 +72,10 @@ void XML_FileExporter::exportTransition(const TransitionProperties &transitionPr
 	}
 
 	xml_node requireNoActionsInExecution = transitionNode.append_child("RequireNoActionsInExecution");
-	requireNoActionsInExecution.append_attribute("value").set_value(transitionProperties.requireNoActionsInExecution? "true" : "false");
+	requireNoActionsInExecution.append_attribute("value").set_value(
+	transitionProperties.requireNoActionsInExecution ? "true" : "false");
 
-	auto exportArcs = [this](const vector<ArcProperties> arcsProperties, const string &typeStr)
+	auto exportArcs = [this](const vector<ArcProperties> &arcsProperties, const string &typeStr)
 	{
 		for (const auto &arcProperties : arcsProperties)
 		{

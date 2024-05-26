@@ -25,10 +25,10 @@
 namespace ptne
 {
 
-class ArcProperties;
+struct ArcProperties;
 class PTN_Engine;
-class PlaceProperties;
-class TransitionProperties;
+struct PlaceProperties;
+struct TransitionProperties;
 
 //!
 //! \brief The IFileImporter class is an interface class for all PTN_Engine file importers.
@@ -36,7 +36,7 @@ class TransitionProperties;
 class DLL_PUBLIC IFileImporter
 {
 public:
-	virtual ~IFileImporter() = default;
+	virtual ~IFileImporter();
 
 	//!
 	//! \brief Import a PTN_Engine object from a file.
@@ -46,7 +46,7 @@ public:
 	virtual void _import(const std::string &filePath, PTN_Engine &ptnEngine) = 0;
 
 protected:
-	void _import(PTN_Engine &ptnEngine) const;
+	void _importInt(PTN_Engine &ptnEngine) const;
 
 private:
 	virtual std::string importActionsThreadOption() const = 0;
