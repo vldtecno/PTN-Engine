@@ -19,9 +19,7 @@ In your own project configure your build to link against these libraries and inc
 
 **Note**: You should use the same compiler and compiler settings for the *PTN Engine* and for your application to guarantee binary compatibility.
 
-### Step by step guide
-
-#### 2 - Create your own PTN Engine instance.
+### 2 - Create your own PTN Engine instance.
 
 Create a PTN_Engine and select on of the ACTIONS_THREAD_OPTION options available.
 Example:
@@ -33,7 +31,7 @@ PTN_Engine pn(PTN_Engine::ACTIONS_THREAD_OPTION::SINGLE_THREAD);
 ```
 At this point pn object is basically empty and has no Petri net defined. Specifying the Petri net is done in the following steps.
 
-#### 3 - Create the action functions 
+### 3 - Create the action functions 
 
 These are the functions you want to invoke when a token enters or exits a given place.
 Example:
@@ -49,7 +47,7 @@ ActionFunction compute = [&x, &result](){
 
 These can be any kind of functions as long as they return void, take no arguments and are accessible to the PTN_Engine object.
 
-#### 4 - Create the condition functions (optional)
+### 4 - Create the condition functions (optional)
 
 This is optional. If you want to add some additional conditions to the transition's activation, now is the moment to do it.
 Example:
@@ -60,7 +58,7 @@ ConditionFunction notFinished = [&finished]() { return !finished(); };
 ```
 These can be any kind of functions as long as they return bool, take no arguments and are accessible to the PTN_Engine object.
 
-#### 5 - Create the Petri net's places
+### 5 - Create the Petri net's places
 
 Create *all* places in the Petri net.
 Example:
@@ -72,7 +70,7 @@ pn.createPlace({ .name="Compute",
 pn.createPlace({ .name="Finished"} );
 ```
 
-#### 7 - Create the Petri net's transitions
+### 6 - Create the Petri net's transitions
 
 The last step is to create *all* transitions in the net.
 Example:
@@ -88,7 +86,7 @@ pn.createTransition({ .name = "T2",
                       .additionalConditions = { finished } });
 ```
 
-#### 8 - Run the Petri net
+### 7 - Run the Petri net
 
 This last step finally runs the Petri net specified in the previous steps.
 Example:
